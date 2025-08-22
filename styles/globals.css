@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+/* runtime vars used by tokens */
+:root {
+  --foreground: #000000;
+  --background: #ffffff;
+
+  /* fallbacks for your font tokens */
+  --font-geist-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  --font-geist-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  /* default scrollbar theme (override per-element if you want) */
+  --scrollbar-track: #f5f4f4; /* light-400 */
+  --scrollbar-thumb: #000000; /* dark-300 */
+  --scrollbar-thumb-hover: #000000; /* dark-400 */
+}
+
+/* Neutralize autofill background & text */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #111 !important; /* your text color */
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important; /* your bg color */
+  box-shadow: 0 0 0px 1000px #fff inset !important;
+  transition: background-color 9999s ease-in-out 0s; /* prevents brief flash */
+  caret-color: #111; /* caret matches text */
+}
+
+/* Firefox */
+input:-moz-autofill,
+textarea:-moz-autofill,
+select:-moz-autofill {
+  box-shadow: 0 0 0px 1000px #fff inset !important; /* your bg color */
+  -moz-text-fill-color: #111 !important; /* your text color */
+  caret-color: #111;
+}
+
+/* Tailwind v4 tokens */
+@theme inline {
+  /* light shades */
+  --color-light-main: var(--foreground);
+  --color-light-400: #f5f4f4;
+  --color-light-200: #fafafa;
+  --color-light-100: #e3e5e5;
+  --color-light-0: #cdcfd0;
+
+  /* dark shades */
+  --color-dark: var(--background);
+  --color-dark-00: #090a0a;
+  --color-dark-600: #0a0d14;
+  --color-dark-500: #72777a;
+  --color-dark-400: #757575;
+  --color-dark-300: #666666;
+  --color-dark-200: #6c757d;
+
+  /* green shades */
+  --color-green-main: #28a745;
+  --color-green-500: #008000;
+  --color-green-300: #1a4331;
+  --color-green-200: #dffae5;
+  --color-green-100: #e2efe7;
+
+  /* red shades */
+  --color-red-main: #ef4a4a;
+  --color-red-600: #dc3545;
+  --color-red-500: #d90000;
+  --color-red-300: #f56630;
+
+  /* purple shades */
+  --color-purple-main: #430999;
+  --color-purple-600: #5e5ef4;
+  --color-purple-200: #d4dbe3;
+  --color-purple-blue-100: #e2e4e9;
+
+  /* yellow shades */
+  --color-yellow-main: #ffc107;
+  --color-yellow-400: #ab8205;
+  --color-yellow-100: #fdecb6;
+
+  /* fonts */
+  --font-jost: "Jost";
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* ✅ Smooth scrolling globally */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 🎨 Cross-browser custom scrollbars (global defaults) */
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+/* WebKit (Chrome, Edge, Safari desktop) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid var(--scrollbar-track);
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+/* Dark mode defaults */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: #ffffff;
+    --background: #000000;
+
+    /* tweak scrollbar theme for dark */
+    --scrollbar-track: #0a0d14; /* dark-600 */
+    --scrollbar-thumb: #72777a; /* dark-500 */
+    --scrollbar-thumb-hover: #757575; /* dark-400 */
+  }
+}
+
+/* Your utilities (fixed: added missing dots) */
+@layer utilities {
+  .bold-text {
+    @apply font-black;
+  }
+
+  .flex-row-center {
+    @apply flex flex-row items-center justify-center;
+  }
+
+  .flex-row-between {
+    @apply flex flex-row items-center justify-between;
+  }
+
+  .flex-rows {
+    @apply flex items-center;
+  }
+  .flex-row-start {
+    @apply flex flex-row items-start;
+  }
+
+  .flex-cols {
+    @apply flex flex-col;
+  }
+
+  .flex-col-center {
+    @apply flex flex-col items-center justify-center;
+  }
+
+  .flex-col-between {
+    @apply flex flex-col items-center justify-between;
+  }
+
+  .grid-2 {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-4;
+  }
+  .grid-3 {
+    @apply grid md:grid-cols-2 lg:grid-cols-3 gap-4;
+  }
+
+  .lay-bg {
+    @apply w-full max-w-[1536px] mx-auto px-2 md:px-4;
+  }
+
+  .input-container {
+    @apply w-full h-12 px-4  border border-[#e3e5e5] rounded-lg;
+  }
+
+  .select-container {
+    @apply w-full min-h-[91px] bg-[#F8F8F8] px-4  border border-[#e2e4e9] rounded-lg flex items-center justify-between;
+  }
+
+  .text-input {
+    @apply w-full h-full text-[#72777A] rounded-lg text-base ring-0 border-0 focus:outline-none;
+  }
+
+  .trigger {
+    @apply inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm border border-white/15 text-white bg-black hover:bg-black/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60;
+  }
+
+  /* Optional helpers to theme scrollbars per element using your tokens */
+  .scrollbar-green {
+    --scrollbar-thumb: var(--color-green-main);
+  }
+  .scrollbar-yellow {
+    --scrollbar-thumb: var(--color-yellow-main);
+  }
+  .scrollbar-red {
+    --scrollbar-thumb: var(--color-red-main);
+  }
+  .scrollbar-track-light {
+    --scrollbar-track: var(--color-light-200);
+  }
+  .scrollbar-track-dark {
+    --scrollbar-track: var(--color-dark-600);
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scroll-mt-nav {
+    scroll-margin-top: 5rem;
+  }
+}
+
+/* Your own CSS */
+body {
+  color: var(--background);
+  background: var(--foreground);
+  font-family: var(--font-jost), var(--font-sans);
+}
+
+.bg-orange-yellow-gradient {
+  background: linear-gradient(312.09deg, #ff6f47 -1.05%, #ffcd0f 101.06%);
+}
