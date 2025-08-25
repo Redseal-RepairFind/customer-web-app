@@ -17,8 +17,8 @@ export default function Error({
   return (
     <div className="flex flex-col py-12 px-4 items-center justify-center min-h-[600px] gap-5">
       <span className="flex items-center gap-3">
-        <h1 className="text-gray-600 text-3xl font-bold">Error</h1>-
-        <h2>An Error Occured</h2>
+        <h1 className="text-dark-300 text-3xl font-bold">Error</h1>-
+        <h2 className="text-dark-500">An Error Occured</h2>
       </span>
       <p>{error.message}</p>
       <p>

@@ -28,9 +28,9 @@ const Footer = () => {
 
   return (
     <footer className="lay-bg bg-dark md:px-20 md:pt-14">
-      <div className="min-h-[326px] py-8 flex flex-col gap-8 md:flex-row md:justify-between md:items-start">
+      <div className="min-h-[226px] py-8 flex flex-col gap-8 md:flex-row md:justify-between md:items-start">
         {/* Left side: Logo + link sections */}
-        <div className="flex flex-col-center gap-8 md:flex-row md:gap-12">
+        <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:gap-12">
           {/* Logo */}
           <div className="">
             <RepairfindLogo />

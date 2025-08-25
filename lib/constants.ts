@@ -2,6 +2,8 @@ import worker from "@/public/image/worker.jpg";
 import icon from "@/public/image/icon.png";
 import landing from "@/public/image/landing.png";
 import tools from "@/public/image/tools.jpg";
+import home from "@/public/image/home.png";
+
 import linkedin from "@/public/icons/linkedin.png";
 import facebook from "@/public/icons/facebook.png";
 import instagram from "@/public/icons/instagram.png";
@@ -18,6 +20,7 @@ import eyeIcon from "@/public/icons/openeyeIcon.png";
 import smsIcon from "@/public/icons/sms.png";
 import downIcon from "@/public/icons/downIcon.png";
 import infoIcon from "@/public/icons/info.png";
+import hamburger from "@/public/icons/hamburger.png";
 
 export const accountType = [
   {
@@ -41,6 +44,7 @@ export const images = {
   icon,
   landing,
   tools,
+  home,
 };
 
 export const icons = {
@@ -55,6 +59,7 @@ export const icons = {
   smsIcon,
   downIcon,
   infoIcon,
+  hamburger,
 };
 
 export const socialIcons = {
@@ -160,6 +165,21 @@ export const countries = [
     dial_code: "+34",
     lang: "Spanish",
   },
+];
+
+export const validations = [
+  {
+    name: "Must be at least 8 characters",
+    id: "length",
+  },
+  {
+    name: "Must contain one special character",
+    id: "specialChar",
+  },
+  // {
+  //   name: "Passwords must match",
+  //   id: "match",
+  // },
 ];
 
 export const equipmentAge = [
@@ -363,7 +383,7 @@ export const businessAcctType = [
     title: "Age of Equipment",
     type: "drop_down",
     placeHolder: "Select age",
-    id: "",
+    id: "eqAge",
     icon: icons.downIcon,
     notice: "notice text",
     inputType: "",
@@ -388,5 +408,146 @@ export const businessAcctType = [
     notice: "",
     inputType: "password",
     list: [],
+  },
+];
+
+export const plans = [
+  {
+    name: "Starter Plan",
+    billingCycle: {
+      monthly: {
+        price: 179.99,
+        cycle: "monthly",
+      },
+      yearly: {
+        price: 1979.89,
+        slashed: 2159.88,
+        cycle: "yearly",
+      },
+    },
+    target: "For aged 0-4 years, included maintenance",
+    features: [
+      "Exhaust hood & fan check (Quarterly) - Clean hood to remove grease. Inspect the exhaust fan and motor to ensure they function properly. Replace or clean ventilation filters.",
+      "Plumbing System (Quarterly). - Grease trap visual inspection and alert",
+      "Plumbing - Repair leaks under sinks and dishwashers, clear and maintain drains. (Subscriber must request service)",
+      "Heating/cooling (Bi-Annual). - Inspect gas lines and burners for leaks. Clean compressor and condenser coils. Change air filters and clean ducts. Inspect refrigeration door gaskets",
+      "Safety & Compliance-(Annually) - Electrical panel inspection exit/emergency compliance check.",
+      "Dishwasher check & descaling (Quarterly)",
+      "30-Day Waiting Period",
+      "Maintenance Records Dashboard. - All service visits logged digitally, helps with inspections, insurance, and maintenance reports",
+      "Troubleshooting (1 call/year). - Electrical, Plumbing, and Heating & Cooling",
+      "Free estimates for expansion/remodel projects.",
+      "Certified Pros (Electrical, Plumbing, Heating/Cooling only )",
+      "Service repair credit $3000 * - (All labour services are valued at $200/hr and applied towards the Service Repair Credit.)",
+    ],
+    benefits: [
+      "Fast Response, Reliable Service",
+      "Predictable Monthly Cost",
+      "Peace of Mind 365 Days A Year",
+      "Local Contractors, Licensed and Vetted",
+      "Avoid Emergency Downtime and Lost Revenue",
+      "Protect your plumbing, electrical, heat/cooling, and peace of mind with just one plan.",
+    ],
+  },
+  {
+    name: "Premium Plan",
+    billingCycle: {
+      monthly: {
+        price: 299.99,
+        cycle: "monthly",
+      },
+      yearly: {
+        price: 3299.89,
+        slashed: 3599.88,
+        cycle: "yearly",
+      },
+    },
+    target: "For equipment aged 5-8 years. Includes 1 rooftop HVAC unit.",
+    features: [
+      "Includes Starter plan",
+      "Rooftop HVAC unit maintenance (Two) (Annual)",
+      "Grease trap clean-out (Annual, if required)",
+      "Fire Suppression Support (Annually) - Inspect the fire suppression system and arrange testing as required",
+      "Electrical Load Balance & Circuit Check",
+      "Appliance installation (2) Labour only",
+      "30-Day Waiting Period",
+      "Maintenance Records Dashboard. - All service visits logged digitally, helps with inspections, insurance, and maintenance reports",
+      "Troubleshooting (1 call/year)- Electrical, Plumbing, and Heating & Cooling",
+      "Free estimates for expansion/remodel projects",
+      "Certified Pros (Electrical, Plumbing, Heating/Cooling only)",
+      "Service repair credit $4,100 * - (All labour services are valued at $200/hr and applied towards the Service Repair Credit.)",
+    ],
+    benefits: [
+      "Fast Response, Reliable Service",
+      "Predictable Monthly Cost",
+      "Peace of Mind 365 Days A Year",
+      "Local Contractors, Licensed and Vetted",
+      "Avoid Emergency Downtime and Lost Revenue",
+      "Protect your plumbing, electrical, heat/cooling, and peace of mind with just one plan.",
+    ],
+  },
+  {
+    name: "Legacy Plan",
+    billingCycle: {
+      monthly: {
+        price: 399.99,
+        cycle: "monthly",
+      },
+      yearly: {
+        price: 4399.89,
+        slashed: 4799.88,
+        cycle: "yearly",
+      },
+    },
+    target: "For restaurants aged 9+ years. Includes 2 rooftop HVAC units.",
+    features: [
+      "Includes Premium plan",
+      "Rooftop HVAC unit full service(Two) (Annual)",
+      "Grease trap clean-out (Bi-Annual if required)",
+      "Electrical & lighting system check (Annual)",
+      "Fire Suppression Support (Annually) - Inspect the fire suppression system and arrange testing as required",
+      "Appliance installation (2) Labour only",
+      "30-Day Waiting Period",
+      "Maintenance Records Dashboard. - All service visits logged digitally, helps with inspections, insurance, and maintenance reports",
+      "Troubleshooting (1 call/year)- Electrical, Plumbing, and Heating & Cooling",
+      "Free estimates for expansion/remodel projects",
+      "Certified Pros (Electrical, Plumbing, Heating/Cooling only)",
+      "Service repair credit $5,500 * - (All labour services are valued at $200/hr and applied towards the Service Repair Credit.)",
+    ],
+    benefits: [
+      "Fast Response, Reliable Service",
+      "Predictable Monthly Cost",
+      "Peace of Mind 365 Days A Year",
+      "Local Contractors, Licensed and Vetted",
+      "Avoid Emergency Downtime and Lost Revenue",
+      "Protect your plumbing, electrical, heat/cooling, and peace of mind with just one plan.",
+    ],
+  },
+];
+
+export const nav = [
+  {
+    name: "Why RepairFind",
+    route: "/why-me",
+  },
+  {
+    name: "How it works",
+    route: "/how-it-works",
+  },
+  {
+    name: "Contractors",
+    route: "/contractors",
+  },
+  {
+    name: "Explore Services",
+    route: "/services",
+  },
+  {
+    name: "Blogs",
+    route: "/blogs",
+  },
+  {
+    name: "Contact us",
+    route: "/contact-us",
   },
 ];

@@ -12,6 +12,7 @@ const SignupPage = () => {
   const initPlan = accountType[0];
   const [selectedPlan, setselectedPlan] = useState(initPlan);
   const router = useRouter();
+
   return (
     <div className="flex-col md:px-5 gap-10 w-full">
       <div className="mb-12 flex-cols">
@@ -19,7 +20,7 @@ const SignupPage = () => {
           Create a RepairFinder account
         </Text.Heading>
         <Text.SmallText className="text-dark-400 text-[13px]">
-          Choose appropriate account to create your account
+          Choose appropriate account type to create your account
         </Text.SmallText>
       </div>
 

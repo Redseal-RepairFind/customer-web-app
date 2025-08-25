@@ -16,19 +16,33 @@ import { useState } from "react";
 import Button from "../ui/custom-btn";
 import AuthQuestion from "./question";
 import PlacesAutocomplete from "../ui/places-autocomplete";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import HoverTooltip from "../ui/tool-tip";
 
 const UserInformation = () => {
   const params = useSearchParams();
   const field = params.get("type");
   const [dropdown, setDropdown] = useState<any>();
+  const [showPassword, setShowPassword] = useState({
+    pass: false,
+    confirm: false,
+  });
   const initPlan = accountType?.find((acct) => acct.id === field);
   const [selectedPlan, setselectedPlan] = useState(initPlan);
   const [selectedPredictions, setSelectedPredictions] = useState<any>("");
   const fieldsInput = field?.toUpperCase()?.includes("RESIDENTIAL")
     ? residentialAcctType
     : businessAcctType;
+
+  const handleTogglePwd = (id: "pass" | "confirm") => {
+    setShowPassword((pass) => ({
+      ...pass,
+      [id]: !pass[id],
+    }));
+  };
+
   return (
-    <form className="flex-col md:px-5 gap-10 w-full">
+    <div className="flex-col md:px-5 gap-10 w-full">
       <Text.Heading className="mb-5">
         Create a RepairFinder account
       </Text.Heading>
@@ -40,24 +54,59 @@ const UserInformation = () => {
               <Text.Paragraph className="font-semibold mr-2">
                 {inps.title}
               </Text.Paragraph>
-
               {inps.notice ? (
-                <button className="h-4 w-4 relative">
-                  <Image src={icons.infoIcon} alt="Info icon" fill />
-                </button>
+                <HoverTooltip content="Providing false information about your equipment’s age will void your RepairFind subscription.">
+                  <button type="button" className="h-4 w-4 relative">
+                    <Image src={icons.infoIcon} alt="Info icon" fill />
+                  </button>
+                </HoverTooltip>
               ) : null}
             </div>
 
             <InputContainer>
               <input
-                type={inps.inputType}
+                type={
+                  inps.id === "password"
+                    ? showPassword.pass
+                      ? "text"
+                      : "password"
+                    : inps.id === "confirmPassword"
+                    ? showPassword.confirm
+                      ? "text"
+                      : "password"
+                    : inps.inputType
+                }
                 className="text-input"
                 placeholder={inps.placeHolder}
               />
 
               {inps.icon ? (
-                <button className="h-5 w-5 relative">
-                  <Image src={inps.icon} fill alt="Icons" />
+                <button
+                  className="h-5 w-5 relative cursor-pointer"
+                  onClick={() =>
+                    inps.id.toLowerCase().includes("password")
+                      ? handleTogglePwd(
+                          inps.id === "password" ? "pass" : "confirm"
+                        )
+                      : () => {}
+                  }
+                  type="button"
+                >
+                  {inps.id === "password" ? (
+                    showPassword.pass ? (
+                      <FaEye />
+                    ) : (
+                      <FaEyeSlash />
+                    )
+                  ) : inps.id === "confirmPassword" ? (
+                    showPassword.confirm ? (
+                      <FaEye />
+                    ) : (
+                      <FaEyeSlash />
+                    )
+                  ) : (
+                    <Image src={inps.icon} fill alt="Icons" />
+                  )}
                 </button>
               ) : null}
             </InputContainer>
@@ -70,9 +119,20 @@ const UserInformation = () => {
               </Text.Paragraph>
 
               {inps.notice ? (
-                <button className="h-4 w-4 relative">
-                  <Image src={icons.infoIcon} alt="Info icon" fill />
-                </button>
+                <HoverTooltip
+                  content={
+                    inps.id === "homeAddress"
+                      ? "This is the address that will be linked to your subscription"
+                      : "Providing false information about your equipment’s age will void your RepairFind subscription."
+                  }
+                >
+                  <button
+                    type="button"
+                    className="h-4 w-4 relative cursor-pointer"
+                  >
+                    <Image src={icons.infoIcon} alt="Info icon" fill />
+                  </button>
+                </HoverTooltip>
               ) : null}
             </div>
             {inps.id === "homeAddress" ? (
@@ -87,7 +147,7 @@ const UserInformation = () => {
                   <Text.Paragraph className="text-dark-500">
                     {inps.id === "acctType"
                       ? selectedPlan?.name
-                      : dropdown?.name}
+                      : dropdown?.name || "Select Equipment Age"}
                   </Text.Paragraph>
                 </Dropdown.Trigger>
                 <Dropdown.Content className="w-full bg-white">
@@ -130,7 +190,7 @@ const UserInformation = () => {
       <div className="">
         <AuthQuestion link="/login" linkTxt="Log in" text="Have an account?" />
       </div>
-    </form>
+    </div>
   );
 };
 

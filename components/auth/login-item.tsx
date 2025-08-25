@@ -9,17 +9,31 @@ import Dropdown from "../ui/dropdown";
 import { countries } from "@/lib/constants";
 import Image from "next/image";
 import { useState } from "react";
+import { FaEye } from "react-icons/fa6";
+import { FaEyeSlash } from "react-icons/fa6";
 
 const LoginPage = () => {
-  const initCnt = countries[0];
-  const [language, setLanguage] = useState({
-    flag: initCnt.flag,
-    lang: initCnt.lang,
+  // const initCnt = countries[0];
+  // const [language, setLanguage] = useState({
+  //   flag: initCnt.flag,
+  //   lang: initCnt.lang,
+  // });
+
+  const [showPassword, setShowPassword] = useState({
+    pass: false,
+    confirm: false,
   });
+
+  const handleTogglePwd = (id: "pass" | "confirm") => {
+    setShowPassword((pass) => ({
+      ...pass,
+      [id]: !pass[id],
+    }));
+  };
 
   return (
     <div className="flex-col md:px-5 gap-10 w-full">
-      <div className="absolute top-0 right-0 w-[221px]">
+      {/* <div className="absolute top-0 right-0 w-[221px]">
         <Dropdown className="w-full">
           <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
             <span className="flex-rows">
@@ -63,7 +77,7 @@ const LoginPage = () => {
             ))}
           </Dropdown.Content>
         </Dropdown>
-      </div>
+      </div> */}
       <Text.Heading className="mb-12">Welcome Back!</Text.Heading>
 
       <div className="flex-col gap-12  ">
@@ -85,17 +99,23 @@ const LoginPage = () => {
 
           <InputContainer>
             <input
-              type="password"
+              type={showPassword.pass ? "text" : "password"}
               className="text-input"
               placeholder="Password"
             />
 
-            <button></button>
+            <button
+              type="button"
+              className="cursor-pointer"
+              onClick={() => handleTogglePwd("pass")}
+            >
+              {showPassword.pass ? <FaEye /> : <FaEyeSlash />}
+            </button>
           </InputContainer>
         </div>
 
         <div className="flex-rows justify-end mb-4">
-          <Link href={"/"}>
+          <Link href={"/forgotPassword"}>
             <Text.Paragraph className="text-dark-500">
               Forgot Password
             </Text.Paragraph>

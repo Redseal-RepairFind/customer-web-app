@@ -46,6 +46,7 @@ select:-moz-autofill {
   --color-light-400: #f5f4f4;
   --color-light-200: #fafafa;
   --color-light-100: #e3e5e5;
+  --color-light-50: #e8edf2;
   --color-light-0: #cdcfd0;
 
   /* dark shades */
@@ -56,6 +57,7 @@ select:-moz-autofill {
   --color-dark-400: #757575;
   --color-dark-300: #666666;
   --color-dark-200: #6c757d;
+  --color-dark-100: #667185;
 
   /* green shades */
   --color-green-main: #28a745;
@@ -129,6 +131,13 @@ html {
 }
 
 /* Your utilities (fixed: added missing dots) */
+
+@utility text-gradient {
+  background: linear-gradient(to bottom, #ffffff, #72777a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 @layer utilities {
   .bold-text {
     @apply font-black;
@@ -169,7 +178,7 @@ html {
   }
 
   .lay-bg {
-    @apply w-full max-w-[1536px] mx-auto px-2 md:px-4;
+    @apply w-full max-w-[1536px] mx-auto;
   }
 
   .input-container {
