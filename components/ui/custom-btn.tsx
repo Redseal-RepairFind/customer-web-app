@@ -3,7 +3,7 @@ import * as React from "react";
 type BaseProps<E extends HTMLElement = HTMLElement> =
   React.HTMLAttributes<E> & { className?: string };
 
-type Variant = "primary" | "secondary";
+type Variant = "primary" | "secondary" | "tertiary";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant;
@@ -29,7 +29,7 @@ function ButtonBase({
   ...rest
 }: ButtonProps) {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center gap-2 rounded-md px-2 sm:px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed";
 
   const variants: Record<Variant, string> = {
     primary: `bg-black text-white border border-transparent hover:bg-black/90 hover:text-dark-500 transition-all duration-300 cursor-pointer ${
@@ -37,6 +37,9 @@ function ButtonBase({
     }`,
     secondary:
       "bg-white text-black border border-black hover:bg-black/5 hover:text-white transition-all duration-300 cursor-pointer",
+
+    tertiary:
+      "bg-white text-black  hover:bg-black hover:text-white transition-all duration-300 cursor-pointer",
   };
 
   return (
@@ -59,7 +62,7 @@ function ButtonIcon({ className, ...props }: BaseProps<HTMLSpanElement>) {
 ButtonIcon.displayName = "Button.Icon";
 
 function ButtonText({ className, ...props }: BaseProps<HTMLSpanElement>) {
-  return <span className={cx("truncate", className)} {...props} />;
+  return <p className={cx("truncate", className)} {...props} />;
 }
 ButtonText.displayName = "Button.Text";
 

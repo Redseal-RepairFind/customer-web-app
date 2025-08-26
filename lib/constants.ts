@@ -15,12 +15,41 @@ import china from "@/public/icons/china.png";
 import france from "@/public/icons/france.png";
 import greenPeople from "@/public/icons/greenPeople.png";
 import whitePeople from "@/public/icons/whitePeople.png";
+import tool1 from "@/public/image/tool-1.jpg";
+import tool2 from "@/public/image/tool-2.jpg";
+import tool3 from "@/public/image/tool-3.jpg";
 
 import eyeIcon from "@/public/icons/openeyeIcon.png";
 import smsIcon from "@/public/icons/sms.png";
 import downIcon from "@/public/icons/downIcon.png";
 import infoIcon from "@/public/icons/info.png";
 import hamburger from "@/public/icons/hamburger.png";
+
+import dollarIcon from "@/public/icons/dollar-02.png";
+import calendarIcon from "@/public/icons/calendar-2.png";
+import checkIcon from "@/public/icons/tick-circle.png";
+import starIcon from "@/public/icons/star-half.png";
+import illustrationIcon from "@/public/icons/Illustration.png";
+
+import chatIcon from "@/public/icons/chat.png";
+import chatIconActive from "@/public/icons/chat-active.png";
+
+import requestIcon from "@/public/icons/request.png";
+import requestIconActive from "@/public/icons/request-active.png";
+
+import referIcon from "@/public/icons/refer.png";
+import referIconActive from "@/public/icons/refer-active.png";
+
+import dashboardIcon from "@/public/icons/dashboard.png";
+import dashboardIconActive from "@/public/icons/dashboard-active.png";
+
+import accountIcon from "@/public/icons/account.png";
+import accountIconActive from "@/public/icons/account-active.png";
+
+import maintenanceIcon from "@/public/icons/maintenance.png";
+import maintenanceIconActive from "@/public/icons/maintenance-active.png";
+
+import logoutIcon from "@/public/icons/logout.png";
 
 export const accountType = [
   {
@@ -45,6 +74,9 @@ export const images = {
   landing,
   tools,
   home,
+  tool1,
+  tool2,
+  tool3,
 };
 
 export const icons = {
@@ -60,6 +92,24 @@ export const icons = {
   downIcon,
   infoIcon,
   hamburger,
+  chatIcon,
+  chatIconActive,
+  requestIcon,
+  requestIconActive,
+  referIcon,
+  referIconActive,
+  dashboardIcon,
+  dashboardIconActive,
+  accountIcon,
+  accountIconActive,
+  maintenanceIcon,
+  maintenanceIconActive,
+  logoutIcon,
+  dollarIcon,
+  calendarIcon,
+  checkIcon,
+  starIcon,
+  illustrationIcon,
 };
 
 export const socialIcons = {

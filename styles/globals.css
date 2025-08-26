@@ -39,14 +39,25 @@ select:-moz-autofill {
   caret-color: #111;
 }
 
+/* Hide scrollbar but keep scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 /* Tailwind v4 tokens */
 @theme inline {
   /* light shades */
   --color-light-main: var(--foreground);
   --color-light-400: #f5f4f4;
   --color-light-200: #fafafa;
+  --color-light-300: #f0f2f5;
   --color-light-100: #e3e5e5;
   --color-light-50: #e8edf2;
+  --color-light-10: #e2e4e9;
   --color-light-0: #cdcfd0;
 
   /* dark shades */
@@ -58,6 +69,7 @@ select:-moz-autofill {
   --color-dark-300: #666666;
   --color-dark-200: #6c757d;
   --color-dark-100: #667185;
+  --color-dark-50: #727070;
 
   /* green shades */
   --color-green-main: #28a745;

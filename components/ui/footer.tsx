@@ -3,6 +3,7 @@ import Image from "next/image";
 import RepairfindLogo from "./logo";
 import Text from "./text";
 import { footerItems } from "@/lib/constants";
+import { usePageNavigator } from "@/hook/navigator";
 
 /**
  * Optional (but recommended) typing if you control `footerItems`
@@ -22,12 +23,26 @@ const Footer = () => {
     heading: string;
     items: { title: string; link: string }[];
   }[] = [
-    { heading: "About us", items: footerItems.aboutUs },
-    { heading: "Business", items: footerItems.business },
+    { heading: "", items: footerItems.aboutUs },
+    { heading: "", items: footerItems.business },
   ];
 
+  const { curPathname } = usePageNavigator();
+
+  const isHome = curPathname === "/";
+
+  const isAuth =
+    curPathname === "/login" ||
+    curPathname === "/otp" ||
+    curPathname === "/signup" ||
+    curPathname === "/forgotPassword";
+
   return (
-    <footer className="lay-bg bg-dark md:px-20 md:pt-14">
+    <footer
+      className={` bg-dark md:px-20 md:pt-14 ${
+        isHome || isAuth ? "lay-bg" : ""
+      }`}
+    >
       <div className="min-h-[226px] py-8 flex flex-col gap-8 md:flex-row md:justify-between md:items-start">
         {/* Left side: Logo + link sections */}
         <div className="flex flex-col items-center gap-8 md:flex-row md:items-start md:gap-12">

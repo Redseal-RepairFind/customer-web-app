@@ -181,8 +181,11 @@ const Navigation = ({ onMenuOpen }: { onMenuOpen: () => void }) => {
           <Button.Text>Sign in</Button.Text>
         </Button>
         <Button className="border border-light-main" variant="secondary">
-          <Button.Text className="hover:text-white">
-            Become a contractor
+          <Button.Text
+            className="hover:text-white"
+            onClick={() => navigator.navigate("/signup", "push")}
+          >
+            Become a premium customer
           </Button.Text>
         </Button>
       </div>

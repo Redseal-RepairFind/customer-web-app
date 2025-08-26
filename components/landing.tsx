@@ -11,12 +11,13 @@ import { SplitText } from "gsap/all";
 import RepairfindLogo from "./ui/logo";
 import { CgClose } from "react-icons/cg";
 import { useEffect, useRef, useState } from "react";
+import { usePageNavigator } from "@/hook/navigator";
 
 gsap.registerPlugin(useGSAP, SplitText);
 
 const Home = () => {
   const [navOpen, setNavOpen] = useState(false);
-
+  const { navigator } = usePageNavigator();
   useGSAP(() => {
     const subtitleSplit = new SplitText(".subtitle", { type: "chars,words" });
     const titleSplit = new SplitText(".title", { type: "lines" });
@@ -82,8 +83,9 @@ const Home = () => {
             <Button
               className="border border-light-main cta-btn"
               variant="secondary"
+              onClick={() => navigator.navigate("/signup", "push")}
             >
-              <Button.Text>Become a contractor</Button.Text>
+              <Button.Text>Become a premium customer</Button.Text>
             </Button>
           </div>
 
@@ -115,11 +117,10 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
   const linkRefs = useRef<HTMLButtonElement[]>([]);
   const ctaRefs = useRef<HTMLDivElement[]>([]);
   const closeRef = useRef<HTMLButtonElement | null>(null);
-
   // keep arrays stable
   linkRefs.current = [];
   ctaRefs.current = [];
-
+  const { navigator } = usePageNavigator();
   const addLinkRef = (el: HTMLButtonElement | null) => {
     if (el && !linkRefs.current.includes(el)) linkRefs.current.push(el);
   };
@@ -319,6 +320,7 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
                 <Button
                   className="border border-light-main"
                   variant="secondary"
+                  onClick={() => navigator.navigate("/signup", "push")}
                 >
                   <Button.Text className="hover:text-white">
                     Become a contractor

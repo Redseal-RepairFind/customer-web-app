@@ -33,7 +33,7 @@ function TextHeading({
 }: BaseProps<HTMLHeadingElement>) {
   return (
     <h1
-      className={`text-2xl md:text-3xl font-bold ${className || ""}`}
+      className={`text-2xl   md:text-3xl font-bold ${className || ""}`}
       {...props}
     >
       {children}
@@ -83,7 +83,7 @@ function TextSubParagraph(props: BaseProps<HTMLParagraphElement>) {
 TextSubParagraph.displayName = "Text.SubParagraph";
 
 function TextSmallText(props: BaseProps<HTMLSpanElement>) {
-  return <span className={`text-xs ${props.className || ""}`} {...props} />;
+  return <p className={`text-xs ${props.className || ""}`} {...props} />;
 }
 TextSmallText.displayName = "Text.SmallText";
 
