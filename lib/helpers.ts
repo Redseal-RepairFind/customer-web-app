@@ -1,3 +1,5 @@
+import Cookies from "js-cookie";
+
 export const confirmPasswordCharacters = (chars: string) => {
   const minLength = /^.{8,}$/;
   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>_\-\\[\]\/]/;
@@ -30,4 +32,37 @@ export function formatCurrency(
     style: "currency",
     currency,
   }).format(amount);
+}
+
+export const formatError = (error: any) => {
+  return error?.response?.data?.message;
+};
+
+export const setCookie = (name: string, item: any) => {
+  Cookies.set(name, item, {
+    expires: 7,
+    path: "/",
+    sameSite: "lax",
+    // secure: process.env.NODE_ENV === "production",
+  });
+};
+
+export const readCookie = (name: string) => {
+  const token = Cookies.get(name); // string | undefined
+
+  return token && JSON?.parse(token as string);
+};
+
+export const removeCookie = (name: string) => {
+  Cookies.remove(name, { path: "/" });
+};
+
+// utils/getUserTimezone.ts
+export function getUserTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch (error) {
+    console.error("Unable to detect timezone:", error);
+    return "UTC"; // fallback
+  }
 }

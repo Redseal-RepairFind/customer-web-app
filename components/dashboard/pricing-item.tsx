@@ -9,34 +9,32 @@ const PricingItem = ({
   isRecommended,
   item,
   cycle,
+  blurItems,
+  onSelectPlan,
 }: {
-  item: {
-    name: string;
-    billingCycle: {
-      monthly: {
-        price: number;
-        cycle: string;
-      };
-      yearly: {
-        price: number;
-        slashed: number;
-        cycle: string;
-      };
-    };
-    target: string;
-    features: string[];
-    benefits: string[];
-  };
+  item: any;
   isRecommended: boolean;
   cycle: "monthly" | "yearly";
+  blurItems: string[];
+  onSelectPlan: (item: any) => void;
 }) => {
+  // console.log(blurItems);
+  // return null;
   const [showall, setShowall] = useState(false);
-  const feats = showall ? item.features : item.features.slice(0, 5);
+  const feats = showall ? item?.features : item?.features.slice(0, 5) || [];
 
   return (
-    <div className="bg-light-200 p-6 w-full rounded-lg border border-purple-200">
+    <div
+      className={`bg-light-200 p-6 w-full rounded-lg border  ${
+        blurItems?.includes(item?._id)
+          ? "blur-xs pointer-events-none select-none border-dark-400"
+          : "border-purple-200"
+      }`}
+    >
       <div className="flex-row-between mb-2">
-        <Text.Paragraph className="font-bold">{item.name}</Text.Paragraph>
+        <Text.Paragraph className="font-bold">
+          {item?.name.split(" - ")[0]}
+        </Text.Paragraph>
         {isRecommended ? (
           <span className=" px-3 py-2 rounded-full text-base text-white bg-black">
             Recommended
@@ -45,13 +43,13 @@ const PricingItem = ({
       </div>
 
       <span className="flex-rows gap-2 mb-1">
-        {cycle === "yearly" ? (
+        {item?.billingFrequency === "ANNUALLY" ? (
           <Text.SubHeading className="text-red-500 font-semibold line-through">
-            {formatCurrency(item.billingCycle.yearly.slashed)}
+            {formatCurrency(item?.priceDetails?.discountedPrice || "")}
           </Text.SubHeading>
         ) : null}
         <Text.Heading className="font-black">
-          {formatCurrency(item.billingCycle[cycle as "monthly"].price)}
+          {formatCurrency(item?.priceDetails?.basePrice)}
         </Text.Heading>
 
         <Text.SubHeading>/{cycle}</Text.SubHeading>
@@ -61,32 +59,35 @@ const PricingItem = ({
         {item.target}
       </Text.Paragraph>
 
-      <button className="h-10 w-full flex-row-center rounded-lg bg-purple-blue-100 mb-5">
+      <button
+        className="h-10 w-full flex-row-center rounded-lg bg-purple-blue-100 mb-5 cursor-pointer hover:bg-black hover:text-white transition-all duration-300"
+        onClick={() => onSelectPlan(item)}
+      >
         <Text.Paragraph className="font-semibold">
-          Choose {item.name}
+          Choose {item?.name.split(" - ")[0]}
         </Text.Paragraph>
       </button>
 
-      {feats.map((feat, i) => {
-        const splitedText = feat.split(" - ");
+      {feats?.map((feat: any, i: number) => {
+        // const splitedText = feat?;
 
         return (
           <div className="flex gap-2 items-start mt-2" key={i}>
             <BiCheck />
 
             <Text.Paragraph className="text-dark-400 text-xl">
-              {splitedText[0]}
+              {feat.name}
               {"  "}
               <span className="text-sm font-light sm:ml-1">
-                {splitedText[1]}
+                {feat.description}
               </span>
             </Text.Paragraph>
           </div>
         );
       })}
-      {showall
+      {/* {showall
         ? item?.benefits.map((feat, i) => {
-            const splitedText = feat.split(" - ");
+            const splitedText = feat?.split(" - ");
             return (
               <div className="flex gap-2 items-start mt-2" key={i}>
                 <BiCheck />
@@ -101,7 +102,7 @@ const PricingItem = ({
               </div>
             );
           })
-        : null}
+        : null} */}
 
       <div
         className="flex-row-center w-full mt-10"

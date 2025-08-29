@@ -66,9 +66,8 @@ const Home = () => {
   return (
     <main className="lg:px-5 bg-black h-dvh relative px-4">
       <Navigation onMenuOpen={() => setNavOpen(true)} />
-
       <NavWindow open={navOpen} onClose={() => setNavOpen(false)} />
-      <section className="flex items-center justify-center h-full w-full">
+      <section className="flex items-center justify-center h-full w-full lg:px-8 xl:px-16 ">
         <div className="flex flex-col lg:flex-row lg:justify-between w-full">
           <div className="flex flex-col items-center lg:items-start gap-2">
             <Text.Heading className="lg:text-4xl text-white font-bold text-center lg:text-start title">

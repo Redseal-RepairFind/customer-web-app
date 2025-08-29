@@ -1,21 +1,78 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Text from "../ui/text";
 import ToggleBtn from "../ui/toggle-btn";
 import PlacesAutocomplete from "../ui/places-autocomplete";
 import Dropdown from "../ui/dropdown";
 import { equipmentAge, plans } from "@/lib/constants";
 import PricingItem from "./pricing-item";
+import { useUser } from "@/hook/useMe";
+import LoadingTemplate from "../ui/spinner";
+import { usePricing } from "@/hook/usePricing";
+import Modal from "../ui/customModal";
+import PaymentModal from "./home/payment-modal";
 
 const Pricingg = () => {
+  const { curUser, loadingCurUser } = useUser();
+
+  const user = curUser?.data;
+
+  const initAgeCat = equipmentAge.find(
+    (eq) => eq.id === user?.subscription?.equipmentAgeCategory
+  );
   const [toggle, setToggle] = useState(false);
-  const [selectedPredictions, setSelectedPredictions] = useState<any>("");
-  const [dropdown, setDropdown] = useState<any>();
+  const [selectedPredictions, setSelectedPredictions] = useState<any>({
+    prediction: user?.subscription?.coverageAddress,
+    modal: false,
+  });
+
+  const { loadingSubsPlans, monthlyPlans, yearlylyPlans } = usePricing();
+
+  const [dropdown, setDropdown] = useState<any>(initAgeCat);
+  const [paymentInfo, setPaymentInfo] = useState({
+    info: {},
+    open: false,
+  });
+
+  useEffect(() => {
+    if (user?.subscription) {
+      const initAgeCat = equipmentAge.find(
+        (eq) => eq.id === user.subscription.equipmentAgeCategory
+      );
+
+      setDropdown(initAgeCat || null);
+      setSelectedPredictions({
+        prediction: user.subscription.coverageAddress || "",
+        modal: false,
+      });
+    }
+  }, [user, equipmentAge]);
+  if (loadingCurUser || loadingSubsPlans) return <LoadingTemplate />;
+
+  // console.log(yearlylyPlans);
+
+  const plansToRender = toggle ? yearlylyPlans : monthlyPlans;
+
+  // console.log(plansToRender);
+
+  const handleCloseInfoModal = () => setPaymentInfo({ info: {}, open: false });
+  const handleOpenInfoModal = (item: any) =>
+    setPaymentInfo({ info: item, open: true });
 
   return (
-    <main className="w-full">
-      <div className="flex-col-center w-full mb-8">
+    <main className="w-full my-12 xl:px-16 lg:px-8">
+      <Modal isOpen={paymentInfo.open} onClose={handleCloseInfoModal}>
+        <PaymentModal
+          onClose={handleCloseInfoModal}
+          subPlan={paymentInfo?.info}
+          dropdown={dropdown}
+          selectedPredictions={selectedPredictions}
+          setDropdown={setDropdown}
+          setSelectedPredictions={setSelectedPredictions}
+        />
+      </Modal>
+      <div className="flex-col-center w-full mb-8 ">
         <Text.Heading className="text-xl lg:text-3xl text-center">
           RepairFind Subscription Plans
         </Text.Heading>
@@ -51,19 +108,19 @@ const Pricingg = () => {
 
           <Text.SmallText className="text-dark-100 text-xs"></Text.SmallText>
         </div>
-
-        <PlacesAutocomplete
-          selectedPredictions={selectedPredictions}
-          setSelectedPredictions={setSelectedPredictions}
-          // modal
-        />
+        {paymentInfo?.open ? null : (
+          <PlacesAutocomplete
+            selectedPredictions={selectedPredictions}
+            setSelectedPredictions={setSelectedPredictions}
+            // modal
+          />
+        )}
       </div>
       <div className="flex-col gap-4 mb-4">
         <div className="flex-rows mb-2">
           <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
-            Age of Equipment{" "}
+            Age of Equipment
             <span className="font-light text-xs sm:ml-1">
-              {" "}
               (Providing false information about your equipment’s age will void
               your RepairFind subscription)
             </span>
@@ -78,7 +135,7 @@ const Pricingg = () => {
           <Dropdown.Content className="w-full bg-white">
             <Dropdown.Label>
               <Text.Paragraph className="text-dark-500">
-                {dropdown?.name || "Select Equipment Age"}
+                {"Select Equipment Age"}
               </Text.Paragraph>
             </Dropdown.Label>
 
@@ -102,14 +159,37 @@ const Pricingg = () => {
       </div>
 
       <div className="grid-3 w-full">
-        {plans.map((pla, i) => (
-          <PricingItem
-            isRecommended={i === 0}
-            item={pla as any}
-            key={i}
-            cycle={toggle ? "monthly" : "yearly"}
-          />
-        ))}
+        {plansToRender.map((pla: any, i: number) => {
+          let ids: string[] = [];
+          if (dropdown)
+            if (dropdown?.id === "5-8") {
+              ids = [plansToRender[0]?._id];
+            } else if (dropdown?.id === "9+") {
+              ids = [plansToRender[0]?._id, plansToRender[1]?._id];
+            } else if (dropdown?.id === "Unknown") {
+              ids = plansToRender.map((id: any) => id?._id);
+            } else {
+              ids = [];
+            }
+          return (
+            <PricingItem
+              isRecommended={
+                dropdown?.id && dropdown?.id === "1-4"
+                  ? i === 0
+                  : dropdown?.id === "5-8"
+                  ? i === 1
+                  : dropdown?.id === "9+"
+                  ? i === 2
+                  : false
+              }
+              item={pla as any}
+              key={i}
+              cycle={toggle ? "yearly" : "monthly"}
+              blurItems={ids}
+              onSelectPlan={handleOpenInfoModal}
+            />
+          );
+        })}
       </div>
     </main>
   );

@@ -1,94 +1,35 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import OtpInput from "./otp-input";
 import AuthQuestion from "./question";
 import Button from "../ui/custom-btn";
 import Text from "../ui/text";
-import { MdWarning } from "react-icons/md";
-import { BiInfoCircle } from "react-icons/bi";
-import { BsFillInfoCircleFill } from "react-icons/bs";
 
-const RESEND_SECONDS = 30;
+import { BsFillInfoCircleFill } from "react-icons/bs";
+import { useAuthentication } from "@/hook/useAuthentication";
+import LoadingTemplate from "../ui/spinner";
+
+const RESEND_SECONDS = 60;
 
 export default function VerifyOtpPage() {
-  const router = useRouter();
-  const search = useSearchParams();
-  const to = search.get("to") ?? ""; // email or phone (masked on UI)
-  const flow = search.get("flow") ?? "login"; // optional
-
-  const maskedTo = useMemo(() => {
-    if (!to) return "";
-    if (to.includes("@")) {
-      const [u, d] = to.split("@");
-      const mu =
-        u.length <= 2
-          ? u[0] + "*"
-          : u[0] + "*".repeat(Math.max(1, u.length - 2)) + u.at(-1);
-      return `${mu}@${d}`;
-    }
-    // rudimentary phone mask
-    return to.replace(/\d(?=\d{2})/g, "*");
-  }, [to]);
-
   const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [err, setErr] = useState<string | null>(null);
 
   const [cooldown, setCooldown] = useState(RESEND_SECONDS);
+
+  const {
+    resending,
+    verifying,
+    handleEmailVerification,
+    handleResendCode,
+    otpEror,
+  } = useAuthentication();
 
   useEffect(() => {
     // start cooldown
     const t = setInterval(() => setCooldown((s) => (s > 0 ? s - 1 : 0)), 1000);
     return () => clearInterval(t);
   }, []);
-
-  // Optionally trigger initial send
-  useEffect(() => {
-    // fire-and-forget; ignore errors here
-    fetch("/api/otp/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ to }),
-    }).catch(() => {});
-  }, [to]);
-
-  const verify = useCallback(async () => {
-    setLoading(true);
-    setErr(null);
-    try {
-      const res = await fetch("/api/otp/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ code: otp, to, flow }),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data?.message || "Invalid or expired code.");
-      }
-      // success — continue your flow
-      router.replace("/dashboard");
-    } catch (e: any) {
-      setErr(e.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [otp, router, to, flow]);
-
-  const resend = useCallback(async () => {
-    if (cooldown > 0) return;
-    setCooldown(RESEND_SECONDS);
-    setErr(null);
-    await fetch("/api/otp/send", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify({ to }),
-    }).catch(() => setErr("Failed to resend. Try again."));
-  }, [cooldown, to]);
 
   return (
     <main className="flex-col md:px-5 gap-10 w-full">
@@ -100,8 +41,8 @@ export default function VerifyOtpPage() {
 
       <div className="mt-6">
         <OtpInput
-          length={6}
-          isError={!!err}
+          length={4}
+          isError={!!otpEror}
           onChange={setOtp}
           // onComplete={(v) => {
           //   setOtp(v);
@@ -111,22 +52,14 @@ export default function VerifyOtpPage() {
         />
       </div>
 
-      {err && (
+      {otpEror && (
         <span className="flex-rows gap-2 my-4 ">
           <BsFillInfoCircleFill size={20} className="text-red-600 my-4 " />
           <Text.SmallText className=" text-sm text-red-600 ml-" role="alert">
-            {err}
+            {otpEror}
           </Text.SmallText>
         </span>
       )}
-
-      {/* <button
-        className="mt-6 w-full rounded-md bg-blue-600 px-4 py-3 text-white font-medium disabled:opacity-60"
-        onClick={verify}
-        disabled={loading || otp.length !== 6}
-      >
-        {loading ? "Verifying…" : "Verify"}
-      </button> */}
 
       <span className="flex-rows gap-2 my-4">
         <Text.SmallText className="text-dark-500 text-xs">
@@ -137,6 +70,10 @@ export default function VerifyOtpPage() {
             className="cursor-pointer"
             type="button"
             disabled={cooldown > 0}
+            onClick={() => {
+              setCooldown(RESEND_SECONDS);
+              handleResendCode();
+            }}
           >
             <Text.SmallText className="text-purple-main text-xs">
               {cooldown > 0 ? cooldown.toString() + "s" : "Resend"}
@@ -144,8 +81,16 @@ export default function VerifyOtpPage() {
           </button>
         }
       </span>
-      <Button className="cursor-pointer w-full mt-8 mb-4">
-        <Button.Text>Next</Button.Text>
+      <Button
+        className="cursor-pointer w-full mt-8 mb-4 min-h-12 relative"
+        disabled={verifying || resending}
+        onClick={() => handleEmailVerification(otp)}
+      >
+        {verifying ? (
+          <LoadingTemplate isMessage={false} variant="small" />
+        ) : (
+          <Button.Text>Next</Button.Text>
+        )}
       </Button>
       <div className="mt-6 text-sm text-gray-600">
         <AuthQuestion

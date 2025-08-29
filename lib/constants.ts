@@ -235,28 +235,28 @@ export const validations = [
 export const equipmentAge = [
   {
     name: "1 - 4 years",
-    id: "1to4",
+    id: "1-4",
     tag: "Tailored plans for businesses managing multiple properties and equipment.",
     variant: "green",
     icon: greenPeople,
   },
   {
     name: "5 - 8 years",
-    id: "5to8",
+    id: "5-8",
     tag: "Tailored plans for businesses managing multiple properties and equipment.",
     variant: "green",
     icon: greenPeople,
   },
   {
     name: "9+",
-    id: "9plus",
+    id: "9+",
     tag: "Tailored plans for businesses managing multiple properties and equipment.",
     variant: "green",
     icon: greenPeople,
   },
   {
     name: "I don't know",
-    id: "idontknow",
+    id: "Unknown",
 
     tag: "Tailored plans for businesses managing multiple properties and equipment.",
     variant: "green",
@@ -288,7 +288,7 @@ export const residentialAcctType = [
   {
     title: "Last Name",
     type: "input",
-    placeHolder: "enter first name",
+    placeHolder: "Enter Last name",
     id: "lastName",
     icon: "",
     notice: "",
@@ -391,7 +391,7 @@ export const businessAcctType = [
   {
     title: "Contact Person's Last Name",
     type: "input",
-    placeHolder: "enter first name",
+    placeHolder: "Enter last name",
     id: "lastName",
     icon: "",
     notice: "",

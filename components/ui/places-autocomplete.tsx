@@ -170,9 +170,10 @@ const PlacesAutocomplete = ({
           }))
         }
       >
-        <Text.Paragraph className="text-dark-500 font-normal ">
-          {selectedPredictions.prediction
-            ? selectedPredictions.prediction.description
+        <Text.Paragraph className="text-dark-500 font-normal text-start">
+          {selectedPredictions?.prediction
+            ? selectedPredictions?.prediction?.description ||
+              selectedPredictions?.prediction?.address
             : "Enter address"}
         </Text.Paragraph>
         <BiChevronRight size={24} />

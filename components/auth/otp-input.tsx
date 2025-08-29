@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default function OtpInput({
-  length = 6,
+  length = 4,
   disabled,
   isError,
   onChange,
@@ -108,7 +108,7 @@ export default function OtpInput({
           pattern="\d*"
           aria-label={`Digit ${i + 1}`}
           maxLength={1}
-          className={`h-12 w-10 text-center text-lg rounded-md border outline-none
+          className={`h-12 w-16 text-center text-lg rounded-md border outline-none
             ${
               isError
                 ? "border-red-500 focus:ring-2 focus:ring-red-400"

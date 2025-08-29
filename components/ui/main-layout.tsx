@@ -2,6 +2,7 @@
 
 import { usePageNavigator } from "@/hook/navigator";
 import Footer from "./footer";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export default function MainLayout({
   children,
@@ -11,30 +12,36 @@ export default function MainLayout({
   const { curPathname } = usePageNavigator();
 
   const isHome = curPathname === "/";
+  const queryClient = new QueryClient();
 
   const isAuth =
     curPathname === "/login" ||
     curPathname === "/otp" ||
     curPathname === "/signup" ||
-    curPathname === "/forgotPassword";
+    curPathname === "/signup/info" ||
+    curPathname === "/forgotPassword" ||
+    curPathname === "/pricing" ||
+    curPathname === "/resetPassword";
   return (
-    <div
-      className={`flex min-h-dvh flex-col border ${isHome ? "bg-black" : ""}`}
-    >
-      <main>
-        <div
-          className={` ${isHome || !isAuth ? "" : "px-2 md:px-4"} ${
-            isHome || isAuth ? "lay-bg" : ""
-          }`}
-        >
-          {children}
-        </div>
-      </main>
+    <QueryClientProvider client={queryClient}>
+      <div
+        className={`flex min-h-dvh flex-col border ${isHome ? "bg-black" : ""}`}
+      >
+        <main>
+          <div
+            className={` ${isHome || !isAuth ? "" : "px-2 md:px-4"} ${
+              isHome || isAuth ? "lay-bg" : ""
+            }`}
+          >
+            {children}
+          </div>
+        </main>
 
-      {/* wrapper gives the auto top margin that sticks it to the bottom when short */}
-      <div className="mt-auto">
-        <Footer />
+        {/* wrapper gives  the auto top margin that sticks it to the bottom when short */}
+        <div className="mt-auto">
+          <Footer />
+        </div>
       </div>
-    </div>
+    </QueryClientProvider>
   );
 }

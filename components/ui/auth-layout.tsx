@@ -17,18 +17,19 @@ const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
     flag: initCnt.flag,
     lang: initCnt.lang,
   });
-  console.log(curPathname);
+  // console.log(curPathname);
 
-  const derivedHeight = Number(height) - 326;
+  // const derivedHeight = Number(height) - 326;
+
   return (
     <div
-      className="grid-2 pt-8 h-full relative mb-12"
+      className="grid lg:grid-cols-2 pt-8 items-center min-h-[900px] relative mb-12"
       style={{
-        minHeight: height ? `${derivedHeight}px` : "968px",
+        minHeight: height ? `968px` : "968px",
       }}
     >
-      <div className="h-full hidden lg:flex">
-        <div className="relative max-h-[968px] w-full  ">
+      <div className="h-full hidden lg:flex lg:items-center">
+        <div className="relative h-[968px] w-full  ">
           <Image src={images.landing} fill alt="Page" />
         </div>
       </div>
@@ -87,7 +88,7 @@ const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
 
         <div
           className={`w-full ${
-            curPathname === "/signup/info" ? "mt-[120px] lg:mt-0" : ""
+            curPathname === "/signup/info" ? "mt-24 lg:mt-0" : ""
           }`}
         >
           {children}

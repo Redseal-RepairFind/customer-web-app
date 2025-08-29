@@ -135,7 +135,7 @@ const Navigation = ({ onMenuOpen }: { onMenuOpen: () => void }) => {
   return (
     <nav
       ref={navRef}
-      className="flex lay-bg items-center justify-between top-0 right-0 left-0 h-20 py-2 nav fixed z-[40] px-2"
+      className="flex lay-bg items-center justify-between top-0 right-0 left-0 h-20 py-2 nav fixed z-[40] lg:px-8 xl:px-16"
       style={{
         willChange: "transform, backdrop-filter, background-color, height",
       }}

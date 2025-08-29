@@ -9,10 +9,11 @@ import { usePageNavigator } from "@/hook/navigator";
 import { icons, images } from "@/lib/constants";
 import Button from "../ui/custom-btn";
 import Badge from "../ui/badge";
+import { useAuthentication } from "@/hook/useAuthentication";
 
 const DashNav = () => {
   const { curPathname } = usePageNavigator();
-
+  const { handleLogout } = useAuthentication();
   return (
     <aside className="hidden lg:block border-r bg-black p-4 overflow-y-hidden relative z-[100]">
       <div className="fixed top-0 h-dvh overflow-y-auto no-scrollbar">
@@ -68,34 +69,72 @@ const DashNav = () => {
               <Text.SmallText className="text-light-main text-xs uppercase">
                 Others
               </Text.SmallText>
-              {otherNav.map((dash) => (
-                <Link
-                  className={`${
-                    curPathname === dash.route ? "bg-white" : "bg-transparent"
-                  } flex-rows py-2 px-3 rounded-lg gap-2 hover:bg-dark-600  transition-all duration-300`}
-                  key={dash.route}
-                  href={dash.route}
-                >
-                  <span className="h-5 w-5 relative">
-                    <Image
-                      src={
-                        curPathname === dash.route ? dash.activeIcon : dash.icon
-                      }
-                      fill
-                      alt="Icons"
-                    />
-                  </span>
-                  <Text.SmallText
+              {otherNav.map((dash) => {
+                if (dash.isLogout)
+                  return (
+                    <button
+                      className={`${
+                        curPathname === dash.route
+                          ? "bg-white"
+                          : "bg-transparent"
+                      } flex-rows py-2 px-3 rounded-lg gap-2 hover:bg-dark-600  transition-all duration-300`}
+                      onClick={dash.isLogout ? () => handleLogout() : () => {}}
+                      key={dash.route}
+                    >
+                      <span className="h-5 w-5 relative">
+                        <Image
+                          src={
+                            curPathname === dash.route
+                              ? dash.activeIcon
+                              : dash.icon
+                          }
+                          fill
+                          alt="Icons"
+                        />
+                      </span>
+                      <Text.SmallText
+                        className={`${
+                          curPathname === dash.route
+                            ? "text-dark-main"
+                            : "text-light-main"
+                        } text-sm`}
+                      >
+                        {dash.name}
+                      </Text.SmallText>
+                    </button>
+                  );
+                return (
+                  <Link
                     className={`${
-                      curPathname === dash.route
-                        ? "text-dark-main"
-                        : "text-light-main"
-                    } text-sm`}
+                      curPathname === dash.route ? "bg-white" : "bg-transparent"
+                    } flex-rows py-2 px-3 rounded-lg gap-2 hover:bg-dark-600  transition-all duration-300`}
+                    key={dash.route}
+                    href={dash?.isLogout ? "" : dash.route}
+                    onClick={dash.isLogout ? () => handleLogout() : () => {}}
                   >
-                    {dash.name}
-                  </Text.SmallText>
-                </Link>
-              ))}
+                    <span className="h-5 w-5 relative">
+                      <Image
+                        src={
+                          curPathname === dash.route
+                            ? dash.activeIcon
+                            : dash.icon
+                        }
+                        fill
+                        alt="Icons"
+                      />
+                    </span>
+                    <Text.SmallText
+                      className={`${
+                        curPathname === dash.route
+                          ? "text-dark-main"
+                          : "text-light-main"
+                      } text-sm`}
+                    >
+                      {dash.name}
+                    </Text.SmallText>
+                  </Link>
+                );
+              })}
 
               <div className="w-50 min-h-32 rounded-lg bg-light-main relative p-4 flex-col gap-4">
                 <div className="absolute h-12 left-0 right-0 top-[-14] flex justify-center">

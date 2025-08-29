@@ -16,7 +16,7 @@ export default function Modal({
   onClose,
   children,
   title,
-  maxWidth = "max-w-lg",
+  maxWidth = "max-w-2xl",
 }: ModalProps) {
   // Prevent background scroll
   useEffect(() => {
@@ -53,7 +53,7 @@ export default function Modal({
             onClick={onClose}
           >
             <div
-              className={`relative w-full ${maxWidth} rounded-2xl bg-white shadow-lg p-6`}
+              className={`relative w-full ${maxWidth}  rounded-lg bg-white shadow-lg p-6`}
               onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
             >
               {/* Close button */}
