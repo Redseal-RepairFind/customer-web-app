@@ -3,7 +3,7 @@ import { icons, images } from "./constants";
 export const dashboardNav = [
   {
     name: "Dashboard",
-    route: "/home",
+    route: "/dashboard",
     icon: icons.dashboardIcon,
     activeIcon: icons.dashboardIconActive,
   },

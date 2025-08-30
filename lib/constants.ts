@@ -2,8 +2,8 @@ import worker from "@/public/image/worker.jpg";
 import icon from "@/public/image/icon.png";
 import landing from "@/public/image/landing.png";
 import tools from "@/public/image/tools.jpg";
-import home from "@/public/image/home.png";
-
+import home1 from "@/public/image/home.png";
+import home from "@/public/image/pricing-home.png";
 import linkedin from "@/public/icons/linkedin.png";
 import facebook from "@/public/icons/facebook.png";
 import instagram from "@/public/icons/instagram.png";
@@ -18,6 +18,7 @@ import whitePeople from "@/public/icons/whitePeople.png";
 import tool1 from "@/public/image/tool-1.jpg";
 import tool2 from "@/public/image/tool-2.jpg";
 import tool3 from "@/public/image/tool-3.jpg";
+import subpic from "@/public/image/subpic.png";
 
 import eyeIcon from "@/public/icons/openeyeIcon.png";
 import smsIcon from "@/public/icons/sms.png";
@@ -74,9 +75,11 @@ export const images = {
   landing,
   tools,
   home,
+  home1,
   tool1,
   tool2,
   tool3,
+  subpic,
 };
 
 export const icons = {

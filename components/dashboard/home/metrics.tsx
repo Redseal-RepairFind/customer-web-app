@@ -4,8 +4,29 @@ import { dummyMetrics } from "@/lib/dasboard-constatns";
 import Box from "./box";
 import Image from "next/image";
 import Text from "@/components/ui/text";
+import { formatCurrency } from "@/lib/helpers";
 
-const Metrics = () => {
+const Metrics = ({
+  stats,
+}: {
+  stats: {
+    jobsCompleted: number;
+    jobsCanceled: number;
+    jobsPending: number;
+    jobsTotal: number;
+    reviewSummary: { name: string; averageRating: number }[];
+    amountInHolding: string;
+    amountRefunded: string;
+    creditBalance: string;
+    planType: string;
+  };
+}) => {
+  const allRatings = stats.reviewSummary
+    .map((rt) => rt.averageRating)
+    .reduce((cnt, rv) => cnt + rv, 0);
+
+  const avgRating = allRatings / stats.reviewSummary?.length;
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 lg:gap-2 xl:gap-4  ">
       {dummyMetrics.map((mtrc, i) => (
@@ -33,7 +54,13 @@ const Metrics = () => {
             </Text.SmallText>
 
             <Text.SmallHeading className="text-sm xl:text-base font-semibold">
-              {mtrc.metric}
+              {mtrc.name === "Customer Ratings"
+                ? avgRating || 0
+                : mtrc.name === "Completed Jobs"
+                ? stats.jobsCompleted
+                : mtrc.name === "Available Credits"
+                ? formatCurrency(Number(stats.creditBalance || 0))
+                : mtrc.metric}
             </Text.SmallHeading>
           </div>
         </Box>

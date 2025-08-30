@@ -14,6 +14,7 @@ import { useAuthentication } from "@/hook/useAuthentication";
 const DashNav = () => {
   const { curPathname } = usePageNavigator();
   const { handleLogout } = useAuthentication();
+
   return (
     <aside className="hidden lg:block border-r bg-black p-4 overflow-y-hidden relative z-[100]">
       <div className="fixed top-0 h-dvh overflow-y-auto no-scrollbar">

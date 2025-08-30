@@ -7,17 +7,19 @@ import Text from "./ui/text";
 import { images, nav } from "@/lib/constants";
 import Button from "./ui/custom-btn";
 import { useGSAP } from "@gsap/react";
-import { SplitText } from "gsap/all";
+import { SplitText, ScrollTrigger } from "gsap/all"; // ✨ added ScrollTrigger
 import RepairfindLogo from "./ui/logo";
 import { CgClose } from "react-icons/cg";
 import { useEffect, useRef, useState } from "react";
 import { usePageNavigator } from "@/hook/navigator";
 
-gsap.registerPlugin(useGSAP, SplitText);
+gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger); // ✨ register
 
 const Home = () => {
   const [navOpen, setNavOpen] = useState(false);
   const { navigator } = usePageNavigator();
+
+  // Intro hero animations
   useGSAP(() => {
     const subtitleSplit = new SplitText(".subtitle", { type: "chars,words" });
     const titleSplit = new SplitText(".title", { type: "lines" });
@@ -40,7 +42,6 @@ const Home = () => {
         },
         "-=0.3"
       )
-      // image drops in from above and bounces a bit
       .from(
         ".hero-image",
         {
@@ -51,7 +52,6 @@ const Home = () => {
         },
         "-=0.2"
       )
-      // button fades in (and slides up slightly)
       .from(
         ".cta-btn",
         {
@@ -61,42 +61,130 @@ const Home = () => {
         },
         "-=0.1"
       );
-  }, []); // auto-collects & reverts
+  }, []);
+
+  // ✨ Second section fade-in on scroll (per element, no early hide)
+  useGSAP(() => {
+    gsap.utils.toArray<HTMLElement>(".section-two .reveal").forEach((el) => {
+      gsap.from(el, {
+        y: 24,
+        autoAlpha: 0,
+        duration: 0.6,
+        ease: "power3.out",
+        immediateRender: false, // <-- don't hide until the trigger starts
+        scrollTrigger: {
+          trigger: el, // each element reveals as it enters
+          start: "top 85%",
+          once: true,
+        },
+      });
+    });
+
+    // ensure proper positions once images/layout settle
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  }, []);
 
   return (
-    <main className="lg:px-5 bg-black h-dvh relative px-4">
+    <main className=" relative ">
       <Navigation onMenuOpen={() => setNavOpen(true)} />
-      <NavWindow open={navOpen} onClose={() => setNavOpen(false)} />
-      <section className="flex items-center justify-center h-full w-full lg:px-8 xl:px-16 ">
-        <div className="flex flex-col lg:flex-row lg:justify-between w-full">
-          <div className="flex flex-col items-center lg:items-start gap-2">
-            <Text.Heading className="lg:text-4xl text-white font-bold text-center lg:text-start title">
-              Connect with a Trusted Contractor{" "}
-              <br className="hidden lg:block" /> in Vancouver - At Your Service!
+      <NavWindow open={navOpen} onClose={() => setNavOpen(false)} nav={nav} />
+
+      <section className="bg-black lg:px-5 px-4 pt-24">
+        <div className="flex items-center justify-center   w-full  h-dvh">
+          <div className="flex flex-col items-center  lg:justify-between w-full lg:px-8 xl:px-16">
+            <div className="flex flex-col items-center justify-center gap-2">
+              <Text.Heading className="lg:text-4xl text-white font-bold text-center title">
+                One Subscription, Unlimited Peace of{" "}
+                <br className="hidden lg:block" />
+                Mind for Your Home.
+              </Text.Heading>
+
+              <Text.Paragraph className="text-xl text-white my-5 text-center  subtitle">
+                Match with skilled professionals and book services today.
+              </Text.Paragraph>
+
+              <Button
+                className="border border-light-main cta-btn"
+                variant="secondary"
+                onClick={() => navigator.navigate("/signup", "push")}
+              >
+                <Button.Text>Subscribe Now</Button.Text>
+              </Button>
+            </div>
+
+            <div className="flex flex-col items-center justify-center lg:items-start lg:justify-start">
+              <div className="w-[300px] md:w-[450px] xl:w-[600px] lg:h-[450px] h-96 relative hero-image">
+                <Image
+                  src={images.home}
+                  fill
+                  alt="Landing image"
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ✨ tag the whole section & reveal children */}
+      <section className="section-two bg-light-main min-h-screen lg:px-8 xl:px-24 mb-12 py-5 px-4">
+        <div className="flex flex-col md:flex-row gap-5 md:items-center  md:justify-between ">
+          <div className="max-w-[400px] xl:max-w-[610px] flex-cols gap-2">
+            <Text.Heading className="reveal">
+              Home Repairs, Simplified with Subscription
             </Text.Heading>
-
-            <Text.Paragraph className="text-xl text-white my-5 text-center lg:text-start subtitle">
-              Match with skilled professionals and book services today.
+            <Text.Paragraph className="reveal">
+              Skip the stress of finding contractors every time something
+              breaks. With a Repairfind subscription, you get guaranteed access
+              to trusted professionals, faster response times, and predictable
+              costs — all in one plan. Keep your home running smoothly while we
+              take care of the details.
             </Text.Paragraph>
-
-            <Button
-              className="border border-light-main cta-btn"
-              variant="secondary"
-              onClick={() => navigator.navigate("/signup", "push")}
-            >
-              <Button.Text>Become a premium customer</Button.Text>
-            </Button>
+            <div className="reveal">
+              <Button onClick={() => navigator.navigate("/login", "replace")}>
+                <Button.Text>Subscribe now</Button.Text>
+              </Button>
+            </div>
           </div>
 
-          <div className="flex flex-col items-center justify-center lg:items-start lg:justify-start">
-            <div className="w-[400px] md:w-[500px] lg:w-[600px] lg:h-[450px] h-96 relative hero-image">
-              <Image
-                src={images.home}
-                fill
-                alt="Landing image"
-                className="object-contain"
-                priority
-              />
+          <div className="w-[300px]  xl:w-[600px] lg:h-[450px] h-96 relative hero-image ">
+            <Image
+              src={images.subpic}
+              fill
+              alt="Landing image"
+              className="object-contain"
+              // priority
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col-reverse md:flex-row gap-5 md:items-center  md:justify-between ">
+          <div className="w-[300px]  xl:w-[600px] lg:h-[450px] h-96 relative hero-image ">
+            <Image
+              src={images.subpic}
+              fill
+              alt="Landing image"
+              className="object-contain"
+              // priority
+            />
+          </div>
+
+          <div className="max-w-[400px] xl:max-w-[610px] flex-cols gap-2">
+            <Text.Heading className="reveal">
+              One Subscription, Total Home Care{" "}
+            </Text.Heading>
+            <Text.Paragraph className="reveal">
+              Subheading: From AC maintenance to plumbing emergencies,
+              Repairfind gives you peace of mind with unlimited repair requests
+              through your plan. No hidden fees, no guessing games — just
+              reliable service whenever you need it. Designed for busy
+              homeowners who value convenience, safety, and trust.
+            </Text.Paragraph>
+            <div className="reveal">
+              <Button onClick={() => navigator.navigate("/login", "replace")}>
+                <Button.Text>Subscribe now</Button.Text>
+              </Button>
             </div>
           </div>
         </div>
@@ -107,9 +195,9 @@ const Home = () => {
 
 export default Home;
 
-type NavWindowProps = { open: boolean; onClose: () => void };
+type NavWindowProps = { open: boolean; onClose: () => void; nav: any };
 
-const NavWindow = ({ open, onClose }: NavWindowProps) => {
+export const NavWindow = ({ open, onClose, nav }: NavWindowProps) => {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const scrimRef = useRef<HTMLButtonElement | null>(null);
@@ -172,29 +260,24 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         tlRef.current = gsap
           .timeline({ paused: true, defaults: { ease: "expo.out" } })
-          // make it renderable
           .set(rootRef.current, { display: "block" })
-          // scrim fade
           .fromTo(
             scrimRef.current,
             { opacity: 0 },
             { opacity: 1, duration: 0.35, ease: "power2.out" }
           )
-          // panel drop + subtle skew/rotate then settle
           .fromTo(
             panelRef.current,
             { y: -80, opacity: 0, rotate: -2, skewY: 3 },
             { y: 0, opacity: 1, rotate: 0, skewY: 0, duration: 0.7 },
             "<-0.1"
           )
-          // fun clip reveal on the inner card
           .fromTo(
             panelRef.current,
             { clipPath: "inset(0 0 100% 0 round 16px)" },
             { clipPath: "inset(0 0 0% 0 round 16px)", duration: 0.6 },
             "<"
           )
-          // links: alternating x slide + fade with small overshoot
           .from(
             linkRefs.current,
             {
@@ -206,7 +289,6 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
             },
             "-=0.2"
           )
-          // CTAs: scale pop
           .from(
             ctaRefs.current,
             {
@@ -218,7 +300,6 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
             },
             "-=0.2"
           )
-          // close icon spin
           .fromTo(
             closeRef.current,
             { rotate: -90, opacity: 0 },
@@ -239,19 +320,24 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
     const tl = tlRef.current;
     if (!tl) return;
 
+    // ✨ lock scroll when open
     if (open) {
+      document.documentElement.style.overflow = "hidden";
       tl.play(0);
-      // focus first link for accessibility
       setTimeout(() => {
         linkRefs.current[0]?.focus();
       }, 10);
     } else {
-      // reverse and hide after
+      document.documentElement.style.overflow = "";
       tl.reverse();
       tl.eventCallback("onReverseComplete", () => {
         gsap.set(rootRef.current, { display: "none" });
       });
     }
+
+    return () => {
+      document.documentElement.style.overflow = "";
+    };
   }, [open]);
 
   // close on ESC
@@ -267,9 +353,11 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
     <div
       ref={rootRef}
       className="fixed inset-0 z-[60] hidden"
-      aria-hidden={!open}
+      role="dialog" // ✨ a11y
+      aria-modal="true" // ✨ a11y
+      aria-hidden={open ? "false" : "true"}
     >
-      {/* BLURRED SCRIM (kept) */}
+      {/* BLURRED SCRIM */}
       <button
         ref={scrimRef}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
@@ -277,14 +365,19 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
         onClick={onClose}
       />
 
-      {/* YOUR PANEL UI — unchanged markup/classes, only refs + onClose hook */}
+      {/* PANEL */}
       <div
         ref={panelRef}
-        className="absolute left-0 right-0 top-0 h-[80%] bg-white z-5 p-5 "
+        className="absolute left-0 right-0 top-0 h-[80%] bg-white z-5 p-5 rounded-b-2xl shadow-xl"
       >
         <div className="flex-row-between mb-8">
           <RepairfindLogo nav />
-          <button className=" cursor-pointer" onClick={onClose} ref={closeRef}>
+          <button
+            className=" cursor-pointer"
+            aria-label="Close"
+            onClick={onClose}
+            ref={closeRef}
+          >
             <CgClose size={28} />
           </button>
         </div>
@@ -297,7 +390,11 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
                   <button
                     ref={addLinkRef}
                     className="cursor-pointer w-full"
-                    onClick={onClose}
+                    onClick={() => {
+                      // ✨ navigate if href exists, still closes
+                      // if (nv.href) navigator.navigate(nv.href, "push");
+                      onClose();
+                    }}
                   >
                     {nv.name}
                   </button>
@@ -312,17 +409,26 @@ const NavWindow = ({ open, onClose }: NavWindowProps) => {
               <Button
                 className="border border-light-main text-white cursor-pointer"
                 border
+                // ✨ make it work
+                onClick={() => {
+                  navigator.navigate("/login", "push");
+                  onClose();
+                }}
               >
                 <Button.Text>Sign in</Button.Text>
               </Button>
+
               <div ref={addCtaRef as any}>
                 <Button
                   className="border border-light-main"
                   variant="secondary"
-                  onClick={() => navigator.navigate("/signup", "push")}
+                  onClick={() => {
+                    navigator.navigate("/signup", "push");
+                    onClose();
+                  }}
                 >
                   <Button.Text className="hover:text-white">
-                    Become a contractor
+                    Subscribe now
                   </Button.Text>
                 </Button>
               </div>

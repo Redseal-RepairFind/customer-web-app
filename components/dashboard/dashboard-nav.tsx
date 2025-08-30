@@ -4,17 +4,23 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { BsBell } from "react-icons/bs";
 import Badge from "../ui/badge";
+import Image from "next/image";
+import { icons } from "@/lib/constants";
+import { FaAlignCenter, FaAlignJustify, FaHamburger } from "react-icons/fa";
 
 type DashboardNavProps = {
   onBellClick?: () => void;
   notificationsCount?: number;
+  onOpen: () => void;
 };
 
 const DashboardNav = ({
   onBellClick,
   notificationsCount = 0,
+  onOpen,
 }: DashboardNavProps) => {
   const bellRef = useRef<HTMLButtonElement | null>(null);
+  const burgerRef = useRef<HTMLButtonElement | null>(null);
 
   // micro interaction (optional, safe without ScrollTrigger)
   const bounce = () => {
@@ -41,8 +47,17 @@ const DashboardNav = ({
       aria-label="Dashboard"
       style={{ willChange: "backdrop-filter, background-color" }}
     >
-      <div className="h-full mx-auto max-w-screen-2xl flex items-center justify-end">
+      <div className="h-full mx-auto max-w-screen-2xl flex items-center justify-between lg:justify-end">
         {/* Notifications */}
+        <button
+          ref={burgerRef}
+          className="relative h-5 w-5 cursor-pointer lg:hidden z-50 ml-2 "
+          onClick={onOpen}
+          aria-label="Open menu"
+        >
+          <FaAlignJustify />
+        </button>
+
         <button
           ref={bellRef}
           onClick={(e) => {

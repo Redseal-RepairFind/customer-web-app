@@ -5,7 +5,24 @@ import { quickActions } from "@/lib/dasboard-constatns";
 import Link from "next/link";
 import Image from "next/image";
 
-const PlanLog = () => {
+const PlanLog = ({
+  plans,
+}: {
+  plans: {
+    autoRenew: boolean;
+    coverageAddress: {
+      address: string;
+      city: string;
+      country: string;
+      latitude: string;
+      longitude: string;
+    };
+    equipmentAge: number;
+    planId: string;
+    planType: string;
+    status: string;
+  };
+}) => {
   return (
     <div className="md:grid-cols-2 grid lg:gap-2 xl:gap-4 gap-4">
       <Box className="h-[142px] ">
@@ -20,7 +37,7 @@ const PlanLog = () => {
             </div>
           </div>
           <div className="flex flex-col gap-9 h-full">
-            <PlanBadge planName="Premium" />
+            <PlanBadge planName={plans?.planType?.toLowerCase()} />
             <ProgressBar startDate="2025-08-01" endDate="2025-08-31" />
           </div>
         </div>
@@ -65,7 +82,7 @@ export default PlanLog;
 
 export const PlanBadge = ({ planName }: { planName: string }) => {
   return (
-    <div className="px-8 flex items-center justify-center  min-h-[38px] border border-light-10 rounded-full">
+    <div className="px-8 flex items-center justify-center  min-h-[38px] border border-light-10 rounded-full capitalize">
       <Text.SmallText>{planName}</Text.SmallText>
     </div>
   );

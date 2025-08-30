@@ -232,6 +232,7 @@ export const useAuthentication = () => {
   const handleUserLogin = async (data: { email: string; password: string }) => {
     sessionStorage.removeItem(OTP_STRING);
     sessionStorage.removeItem(IS_OTP);
+    readCookie(usr);
     setIsVing((vy) => ({
       ...vy,
       verify: true,
@@ -252,7 +253,12 @@ export const useAuthentication = () => {
       const accessToken = res?.accessToken;
 
       setCookie(tok, accessToken);
-      navigator.navigate("/home", "replace");
+
+      if (res?.data?.subscription?.planId) {
+        navigator.navigate("/dashboard", "replace");
+      } else {
+        navigator.navigate("/pricing", "replace");
+      }
     } catch (error) {
       const errMsg = formatError(error);
       console.error("Login error", error);

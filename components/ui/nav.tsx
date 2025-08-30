@@ -185,7 +185,7 @@ const Navigation = ({ onMenuOpen }: { onMenuOpen: () => void }) => {
             className="hover:text-white"
             onClick={() => navigator.navigate("/signup", "push")}
           >
-            Become a premium customer
+            Subscribe now
           </Button.Text>
         </Button>
       </div>

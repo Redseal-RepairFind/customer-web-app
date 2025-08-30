@@ -2,13 +2,11 @@
 
 import { InputContainer } from "@/components/auth/signup-item";
 import Button from "@/components/ui/custom-btn";
-import Dropdown from "@/components/ui/dropdown";
 import PlacesAutocomplete from "@/components/ui/places-autocomplete";
 import LoadingTemplate from "@/components/ui/spinner";
 import Text from "@/components/ui/text";
 import { useUser } from "@/hook/useMe";
 import { usePricing } from "@/hook/usePricing";
-import { equipmentAge } from "@/lib/constants";
 import { formatCurrency } from "@/lib/helpers";
 import { SubscriptionType } from "@/utils/types";
 import { useState } from "react";
@@ -19,7 +17,6 @@ const PaymentModal = ({
   onClose,
   subPlan,
   dropdown,
-  setDropdown,
   selectedPredictions,
   setSelectedPredictions,
 }: {
