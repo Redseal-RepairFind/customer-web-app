@@ -72,6 +72,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       ? "bg-orange-500"
       : "bg-emerald-500";
 
+  // console.log(daysLeft);
   return (
     <div className={["w-full", className].filter(Boolean).join(" ")}>
       {/* {showText && (

@@ -4,25 +4,41 @@ import { ProgressBar } from "./progress-bar";
 import { quickActions } from "@/lib/dasboard-constatns";
 import Link from "next/link";
 import Image from "next/image";
+import dayjs from "dayjs";
 
-const PlanLog = ({
-  plans,
-}: {
-  plans: {
-    autoRenew: boolean;
-    coverageAddress: {
-      address: string;
-      city: string;
-      country: string;
-      latitude: string;
-      longitude: string;
-    };
-    equipmentAge: number;
-    planId: string;
-    planType: string;
-    status: string;
+// currency: "cad";
+// equipmentAge: 4;
+// nextBillingDate: "2026-08-30T02:35:41.000Z";
+// paymentAmount: 5279.89;
+// paymentMethodId: "pm_1S1edkD7EKG0EIKuPTonkte2";
+// planId: "68b047ca359e42ee4651a5a5";
+// planType: "LEGACY";
+// providerId: "sub_1S1edlD7EKG0EIKueOoNlTzt";
+// startDate: "2025-08-30T02:35:41.000Z";
+// status: "PENDING";
+// subscriptionType: "RESIDENTIAL";
+
+export type PLANSTYPE = {
+  autoRenew: boolean;
+  coverageAddress: {
+    address: string;
+    city: string;
+    country: string;
+    latitude: string;
+    longitude: string;
   };
-}) => {
+  equipmentAge: number;
+  planId: string;
+  planType: string;
+  status: string;
+  startDate: string;
+  nextBillingDate: string;
+  paymentAmount: number;
+};
+const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
+  const startDate = dayjs(plans?.startDate);
+  const nextBillDate = dayjs(plans?.nextBillingDate);
+
   return (
     <div className="md:grid-cols-2 grid lg:gap-2 xl:gap-4 gap-4">
       <Box className="h-[142px] ">
@@ -32,13 +48,16 @@ const PlanLog = ({
             <div>
               <Text.SmallText>Days remaining</Text.SmallText>
               <Text.Paragraph className="font-semibold text-base">
-                23 days
+                {nextBillDate?.diff(startDate, "days") || "0"} days
               </Text.Paragraph>
             </div>
           </div>
           <div className="flex flex-col gap-9 h-full">
             <PlanBadge planName={plans?.planType?.toLowerCase()} />
-            <ProgressBar startDate="2025-08-01" endDate="2025-08-31" />
+            <ProgressBar
+              startDate={new Date(plans?.startDate)}
+              endDate={new Date(plans?.nextBillingDate)}
+            />
           </div>
         </div>
       </Box>

@@ -4,10 +4,13 @@ import { dummyMetrics } from "@/lib/dasboard-constatns";
 import Box from "./box";
 import Image from "next/image";
 import Text from "@/components/ui/text";
-import { formatCurrency } from "@/lib/helpers";
+import { formatCurrency, formatDate } from "@/lib/helpers";
+import { PLANSTYPE } from "./plan-log";
+import dayjs from "dayjs";
 
 const Metrics = ({
   stats,
+  plans,
 }: {
   stats: {
     jobsCompleted: number;
@@ -20,12 +23,16 @@ const Metrics = ({
     creditBalance: string;
     planType: string;
   };
+  plans: PLANSTYPE;
 }) => {
   const allRatings = stats.reviewSummary
     .map((rt) => rt.averageRating)
     .reduce((cnt, rv) => cnt + rv, 0);
 
   const avgRating = allRatings / stats.reviewSummary?.length;
+
+  const date = dayjs(plans?.startDate || new Date()?.toDateString());
+  const nextDate = date?.add(30, "day");
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 lg:gap-2 xl:gap-4  ">
@@ -60,6 +67,8 @@ const Metrics = ({
                 ? stats.jobsCompleted
                 : mtrc.name === "Available Credits"
                 ? formatCurrency(Number(stats.creditBalance || 0))
+                : mtrc?.name === "Next Maintenance Date"
+                ? nextDate?.format("YYYY/MM/DD")
                 : mtrc.metric}
             </Text.SmallHeading>
           </div>

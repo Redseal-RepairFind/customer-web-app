@@ -66,3 +66,20 @@ export function getUserTimezone(): string {
     return "UTC"; // fallback
   }
 }
+
+import dayjs from "dayjs";
+
+/**
+ * Format a given date
+ * @param {string|Date|dayjs.Dayjs} date - The date input
+ * @param {string} formatStr - The format string (default: "YYYY-MM-DD")
+ * @returns {string} Formatted date
+ */
+export function formatDate(date: string | Date, formatStr = "DD/MM/YYYY") {
+  return dayjs(date).format(formatStr);
+}
+
+// // Example usage:
+// console.log(formatDate("2023-01-01"));            // 2023-01-01
+// console.log(formatDate(new Date(), "DD/MM/YYYY")); // 30/08/2025 (today’s date)
+// console.log(formatDate("2023-01-01", "MMMM D, YYYY")); // January 1, 2023
