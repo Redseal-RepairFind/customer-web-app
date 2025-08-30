@@ -32,12 +32,12 @@ export const usePricing = () => {
         res?.message || res?.data?.message || "Session created successfully"
       );
 
-      console.log(res);
+      // console.log(res);
 
       const url = res?.url || res?.data?.url;
-      window.open(url, "_blank", "noopener,noreferrer");
+      window.location.href = url; // or: window.location.assign(href)
 
-      navigator.navigate("/home", "replace");
+      // navigator.navigate("/home", "replace");
     } catch (error) {
       const errMsg = formatError(error);
       console.error("CheckoutError", error);
