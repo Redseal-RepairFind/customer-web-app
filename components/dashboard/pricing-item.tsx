@@ -45,11 +45,11 @@ const PricingItem = ({
       <span className="flex-rows gap-2 mb-1">
         {item?.billingFrequency === "ANNUALLY" ? (
           <Text.SubHeading className="text-red-500 font-semibold line-through">
-            {formatCurrency(item?.priceDetails?.discountedPrice || "")}
+            {formatCurrency(item?.priceDetails?.basePrice || "")}
           </Text.SubHeading>
         ) : null}
         <Text.Heading className="font-black">
-          {formatCurrency(item?.priceDetails?.basePrice)}
+          {formatCurrency(item?.priceDetails?.discountedPrice)}
         </Text.Heading>
 
         <Text.SubHeading>/{cycle}</Text.SubHeading>

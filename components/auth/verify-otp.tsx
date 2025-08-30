@@ -35,7 +35,7 @@ export default function VerifyOtpPage() {
     <main className="flex-col md:px-5 gap-10 w-full">
       <h1 className="text-2xl font-semibold">Account Verification</h1>
       <Text.Paragraph className=" text-dark-400 text-sm">
-        Enter the 6-digit code sent to your email for verification, check
+        Enter the 4-digit code sent to your email for verification, check
         spam/promotions if you can’t find the email.
       </Text.Paragraph>
 

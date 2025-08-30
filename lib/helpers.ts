@@ -38,7 +38,7 @@ export const formatError = (error: any) => {
   return error?.response?.data?.message;
 };
 
-export const setCookie = (name: string, item: any) => {
+export const setCookie = async (name: string, item: any) => {
   Cookies.set(name, item, {
     expires: 7,
     path: "/",

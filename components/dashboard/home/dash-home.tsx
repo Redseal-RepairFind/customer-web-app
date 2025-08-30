@@ -21,7 +21,7 @@ const DashboardHome = () => {
 
   const userData = curUser?.data;
   const trxData = trxSummary?.data;
-  console.log(userData?.subscription);
+  // console.log(userData?.subscription);
   // console.log(trxSummary);
 
   const metrics = {

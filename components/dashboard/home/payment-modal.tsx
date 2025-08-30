@@ -154,7 +154,12 @@ const PaymentModal = ({
               className="text-input"
               placeholder=""
               disabled
-              value={selectedPredictions?.prediction?.country || ""}
+              value={
+                selectedPredictions?.prediction?.country?.split(" ")?.[
+                  selectedPredictions?.prediction?.country?.split(" ")?.length -
+                    1
+                ] || ""
+              }
             />
 
             <CgChevronDown />
@@ -170,7 +175,7 @@ const PaymentModal = ({
             subPlan?.billingFrequency
           }`}</Text.SmallText>
           <Text.SmallText>
-            {formatCurrency(subPlan?.priceDetails?.basePrice)}
+            {formatCurrency(subPlan?.priceDetails?.discountedPrice)}
           </Text.SmallText>
         </div>
         <div className="  flex-row-between py-3">
@@ -178,7 +183,7 @@ const PaymentModal = ({
             Total
           </Text.SmallText>
           <Text.SmallText className="font-semibold text-sm">
-            {formatCurrency(subPlan?.priceDetails?.basePrice)}
+            {formatCurrency(subPlan?.priceDetails?.discountedPrice)}
           </Text.SmallText>
         </div>
       </div>

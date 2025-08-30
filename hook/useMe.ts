@@ -15,9 +15,18 @@ export const useUser = () => {
     queryFn: pricingActions.getMe,
   });
 
+  console.log(curUser);
+
   useEffect(() => {
+    // equipmentAgeCategory;
     // console.log(curUser?.data?.subscription?.planId);
-    if (curUser && !curUser?.data?.subscription?.planId)
+
+    const plan = curUser?.data?.subscription;
+    if (
+      curUser &&
+      !plan?.equipmentAgeCategory.toLowerCase().includes("unknown") &&
+      !plan?.planId
+    )
       navigator.navigate("/pricing", "replace");
   }, [curUser]);
 

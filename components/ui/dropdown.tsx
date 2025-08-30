@@ -295,7 +295,7 @@ const Content: React.FC<
         ref={menuRef}
         onKeyDown={onMenuKeyDown}
         className={cx(
-          "mt-2 origin-top rounded-md border border-black/10 bg-white backdrop-blur p-1 shadow-xl ring-1 ring-black/5",
+          "mt-2 origin-top rounded-md border border-black/10 bg-white backdrop-blur p-1 shadow-xl ring-1 ring-black/5 max-h-[300px] z-50 overflow-y-auto",
           align === "end" ? "right-0" : "left-0",
           className
         )}

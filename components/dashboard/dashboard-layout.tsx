@@ -1,6 +1,7 @@
+// DO NOT put "use client" here unless you need client-only hooks.
+// This file uses useState, so it **does** need "use client".
 "use client";
 
-// NO "use client" here
 import { useState, type ReactNode } from "react";
 import DashboardNav from "./dashboard-nav";
 import DashNav from "./dash-nav";
@@ -15,9 +16,12 @@ export default function ClientDashboardLayout({
   const [navOpen, setNavOpen] = useState(false);
 
   return (
-    <div className="grid min-h-dvh + lg:grid-cols-[240px_1fr] relative">
+    // No grid needed on lg since sidebar is fixed.
+    <div className="min-h-dvh">
       <DashNav />
-      <main className="min-w-full">
+
+      {/* Reserve space for the fixed 280px sidebar on lg+ */}
+      <main className="lg:ml-[240px]">
         <NavWindow
           open={navOpen}
           onClose={() => setNavOpen(false)}
@@ -26,7 +30,14 @@ export default function ClientDashboardLayout({
         />
 
         <DashboardNav onOpen={() => setNavOpen(true)} />
-        <div className=" overflow-y-auto p-4">{children}</div>
+
+        {/* Let the main content scroll; use calc to fill the rest of the viewport */}
+        <div
+          className="p-4"
+          style={{ height: "calc(100dvh - 56px)", overflowY: "auto" }}
+        >
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -16,8 +16,8 @@ const DashNav = () => {
   const { handleLogout } = useAuthentication();
 
   return (
-    <aside className="hidden lg:block border-r bg-black p-4 overflow-y-hidden relative z-[100]">
-      <div className="fixed top-0 h-dvh overflow-y-auto no-scrollbar">
+    <aside className="hidden lg:block border-r bg-black  overflow-y-hidden relative z-[100] w-[240px] ">
+      <div className="fixed top-0 h-screen overflow-y-auto no-scrollbar p-4 bg-black">
         <div className="mt-4">
           <RepairfindLogo nav />
         </div>

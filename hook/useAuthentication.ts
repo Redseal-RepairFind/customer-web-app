@@ -69,10 +69,18 @@ export const useAuthentication = () => {
       const token = process.env.NEXT_PUBLIC_TOKEN_COOKIE!;
       toast.success(res?.message || "Successfully verified otp");
 
-      navigator.navigate("/pricing", "replace");
-
       removeCookie(usr);
-      setCookie(token, JSON.stringify(res?.accessToken));
+      await setCookie(token, JSON.stringify(res?.accessToken));
+
+      const plan = res?.data?.subscription;
+      if (
+        plan?.planId ||
+        plan?.equipmentAgeCategory.toLowerCase().includes("unknown")
+      ) {
+        navigator.navigate("/dashboard", "replace");
+      }
+
+      navigator.navigate("/pricing", "replace");
     } catch (error: any) {
       const errMsg = formatError(error);
       console.error("Otp error", error);
@@ -252,9 +260,12 @@ export const useAuthentication = () => {
 
       const accessToken = res?.accessToken;
 
-      setCookie(tok, accessToken);
-
-      if (res?.data?.subscription?.planId) {
+      await setCookie(tok, accessToken);
+      const plan = res?.data?.subscription;
+      if (
+        plan?.planId ||
+        plan?.equipmentAgeCategory.toLowerCase().includes("unknown")
+      ) {
         navigator.navigate("/dashboard", "replace");
       } else {
         navigator.navigate("/pricing", "replace");
