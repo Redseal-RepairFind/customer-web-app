@@ -35,7 +35,7 @@ const DashboardHome = () => {
       <DashboardHeader />
       <section className="flex-cols gap-5 mt-8">
         <PlanLog plans={userData?.subscription} />
-        <Metrics stats={metrics} />
+        <Metrics stats={metrics} plans={userData?.subscription} />
 
         {isRec ? (
           <RecentRequests />

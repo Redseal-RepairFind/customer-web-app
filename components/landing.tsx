@@ -397,7 +397,7 @@ export const NavWindow = ({
         <div className="flex items-center justify-center  w-full">
           <div className="w-[90%]  flex flex-col items-center gap-4 bg-white shadow-lg rounded-lg py-4">
             <ul className="w-full flex flex-col items-center gap-4">
-              {nav.map((nv) => (
+              {nav.map((nv: any) => (
                 <li className="" key={nv.name}>
                   <button
                     ref={addLinkRef}

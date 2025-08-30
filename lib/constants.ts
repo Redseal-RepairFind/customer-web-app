@@ -267,7 +267,16 @@ export const equipmentAge = [
   },
 ];
 
-export const residentialAcctType = [
+export const residentialAcctType: {
+  title: string;
+  type: string;
+  placeHolder: string;
+  list: any[];
+  icon: any;
+  notice: string;
+  inputType: string;
+  id: string;
+}[] = [
   {
     title: "Account Type",
     type: "drop_down",
@@ -360,7 +369,16 @@ export const residentialAcctType = [
     list: [],
   },
 ];
-export const businessAcctType = [
+export const businessAcctType: {
+  title: string;
+  type: string;
+  placeHolder: string;
+  list: any[];
+  icon: any;
+  notice: string;
+  inputType: string;
+  id: string;
+}[] = [
   {
     title: "Account Type",
     type: "drop_down",

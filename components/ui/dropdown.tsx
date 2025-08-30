@@ -288,7 +288,7 @@ const Content: React.FC<
 
   return (
     <SlideDown show={!!open} className="absolute z-50 w-56" duration={200}>
-      <div
+      <ul
         role="menu"
         id={menuId}
         tabIndex={-1}
@@ -300,10 +300,10 @@ const Content: React.FC<
           className
         )}
       >
-        <ul className="max-h-[320px] overflow-auto outline-none">
-          {injectedChildren}
-        </ul>
-      </div>
+        {/* <ul className="max-h-[320px] overflow-auto outline-none"> */}
+        {injectedChildren}
+        {/* </ul> */}
+      </ul>
     </SlideDown>
   );
 };

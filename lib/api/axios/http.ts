@@ -1,10 +1,10 @@
+// lib/api/axios/http.ts
 // Axios client (browser) with cookie-based auth opt-in
-// Usage:
-//   await http.get("/public");                     // no token
-//   await http.get("/users/me", withAuth());       // attaches Bearer <token>
-//   saveToken("..."); clearToken();
-
-import axios, { InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosHeaders,
+  type AxiosRequestConfig,
+  type InternalAxiosRequestConfig,
+} from "axios";
 import Cookies from "js-cookie";
 
 const TOKEN_COOKIE = process.env.NEXT_PUBLIC_TOKEN_COOKIE!;
@@ -12,7 +12,7 @@ const TOKEN_COOKIE = process.env.NEXT_PUBLIC_TOKEN_COOKIE!;
 type CookieOptions = Parameters<typeof Cookies.set>[2];
 
 const cookieOpts: CookieOptions = {
-  expires: 1, // 1 day (tune as needed)
+  expires: 1,
   sameSite: "lax",
   secure: process.env.NODE_ENV === "production",
   path: "/",
@@ -21,48 +21,52 @@ const cookieOpts: CookieOptions = {
 export function saveToken(token: string, days = 7) {
   Cookies.set(TOKEN_COOKIE, token, { ...cookieOpts, expires: days });
 }
-
 export function clearToken() {
   Cookies.remove(TOKEN_COOKIE, { path: "/" });
 }
-
 export function getToken() {
   return Cookies.get(TOKEN_COOKIE) ?? null;
 }
 
-/** Helper to mark a request as requiring Authorization */
-export function withAuth<T extends object>(config?: T) {
-  return {
-    ...config,
-    headers: { ...(config as any)?.headers, "x-auth": "true" },
-  } as T;
+/** Mark a request as requiring Authorization */
+export function withAuth(config: AxiosRequestConfig = {}): AxiosRequestConfig {
+  const headers =
+    config.headers instanceof AxiosHeaders
+      ? config.headers
+      : new AxiosHeaders(config.headers);
+  headers.set("x-auth", "true");
+  return { ...config, headers };
 }
 
 // ---- Axios instance
 export const http = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
-  // withCredentials: true, // sends cookies when your API needs them
   timeout: 60000,
-  headers: { "X-Requested-With": "XMLHttpRequest" },
+  headers: new AxiosHeaders({ "X-Requested-With": "XMLHttpRequest" }),
 });
 
 // Attach Authorization ONLY when caller opts in via x-auth: true
 http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const needsAuth = config.headers?.["x-auth"] === "true";
+  const headers =
+    config.headers instanceof AxiosHeaders
+      ? config.headers
+      : new AxiosHeaders(config.headers);
+
+  const needsAuth = headers.get("x-auth") === "true";
   if (needsAuth) {
     const token = getToken();
     if (token) {
-      config.headers = config.headers ?? {};
-      (config.headers as any).Authorization = `Bearer ${String(
-        token
-          .replace(/^"(.*)"$/, "$1")
-          .trim()
-          .replace(/^Bearer\s+/i, "")
-      )}`;
+      const clean = String(token)
+        .replace(/^"(.*)"$/, "$1")
+        .trim()
+        .replace(/^Bearer\s+/i, "");
+      headers.set("Authorization", `Bearer ${clean}`);
     }
-    // Remove the hint header before sending to your API
-    if (config.headers) delete (config.headers as any)["x-auth"];
+    // remove the hint header before sending
+    headers.delete("x-auth");
   }
+
+  config.headers = headers; // keep as AxiosHeaders
   return config;
 });
 
@@ -71,7 +75,7 @@ http.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err?.response?.status === 401) {
-      // e.g., clearToken(); // and maybe route to /login
+      // clearToken(); // maybe redirect to /login
     }
     return Promise.reject(err);
   }
