@@ -12,6 +12,7 @@ import RepairfindLogo from "./ui/logo";
 import { CgClose } from "react-icons/cg";
 import { useEffect, useRef, useState } from "react";
 import { usePageNavigator } from "@/hook/navigator";
+import { useAuthentication } from "@/hook/useAuthentication";
 
 gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger); // ✨ register
 
@@ -195,9 +196,19 @@ const Home = () => {
 
 export default Home;
 
-type NavWindowProps = { open: boolean; onClose: () => void; nav: any };
+type NavWindowProps = {
+  open: boolean;
+  onClose: () => void;
+  nav: any;
+  isDashboard?: boolean;
+};
 
-export const NavWindow = ({ open, onClose, nav }: NavWindowProps) => {
+export const NavWindow = ({
+  open,
+  onClose,
+  nav,
+  isDashboard,
+}: NavWindowProps) => {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const scrimRef = useRef<HTMLButtonElement | null>(null);
@@ -208,6 +219,8 @@ export const NavWindow = ({ open, onClose, nav }: NavWindowProps) => {
   linkRefs.current = [];
   ctaRefs.current = [];
   const { navigator } = usePageNavigator();
+
+  const { handleLogout } = useAuthentication();
   const addLinkRef = (el: HTMLButtonElement | null) => {
     if (el && !linkRefs.current.includes(el)) linkRefs.current.push(el);
   };
@@ -217,7 +230,6 @@ export const NavWindow = ({ open, onClose, nav }: NavWindowProps) => {
 
   // Build a single timeline and toggle play/reverse based on `open`
   const tlRef = useRef<gsap.core.Timeline | null>(null);
-
   useGSAP(
     (ctx) => {
       const mm = gsap.matchMedia();
@@ -393,6 +405,13 @@ export const NavWindow = ({ open, onClose, nav }: NavWindowProps) => {
                     onClick={() => {
                       // ✨ navigate if href exists, still closes
                       // if (nv.href) navigator.navigate(nv.href, "push");
+
+                      if (nv.isLogout) {
+                        handleLogout();
+                      } else {
+                        navigator.navigate(nv.route, "push");
+                      }
+
                       onClose();
                     }}
                   >
@@ -401,38 +420,39 @@ export const NavWindow = ({ open, onClose, nav }: NavWindowProps) => {
                 </li>
               ))}
             </ul>
-
-            <div
-              ref={addCtaRef}
-              className="w-full flex flex-col items-center gap-3"
-            >
-              <Button
-                className="border border-light-main text-white cursor-pointer"
-                border
-                // ✨ make it work
-                onClick={() => {
-                  navigator.navigate("/login", "push");
-                  onClose();
-                }}
+            {isDashboard ? null : (
+              <div
+                ref={addCtaRef}
+                className="w-full flex flex-col items-center gap-3"
               >
-                <Button.Text>Sign in</Button.Text>
-              </Button>
-
-              <div ref={addCtaRef as any}>
                 <Button
-                  className="border border-light-main"
-                  variant="secondary"
+                  className="border border-light-main text-white cursor-pointer"
+                  border
+                  // ✨ make it work
                   onClick={() => {
-                    navigator.navigate("/signup", "push");
+                    navigator.navigate("/login", "push");
                     onClose();
                   }}
                 >
-                  <Button.Text className="hover:text-white">
-                    Subscribe now
-                  </Button.Text>
+                  <Button.Text>Sign in</Button.Text>
                 </Button>
+
+                <div ref={addCtaRef as any}>
+                  <Button
+                    className="border border-light-main"
+                    variant="secondary"
+                    onClick={() => {
+                      navigator.navigate("/signup", "push");
+                      onClose();
+                    }}
+                  >
+                    <Button.Text className="hover:text-white">
+                      Subscribe now
+                    </Button.Text>
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
