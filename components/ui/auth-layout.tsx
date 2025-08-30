@@ -23,10 +23,10 @@ const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div
-      className="grid lg:grid-cols-2 pt-8 items-center min-h-[900px] relative mb-12"
-      style={{
-        minHeight: height ? `968px` : "968px",
-      }}
+      className="grid lg:grid-cols-2  items-center pt-4 lg:min-h-[900px] relative mb-12 px-3 lg:mt-8"
+      // style={{
+      //   minHeight: height ? `968px` : "968px",
+      // }}
     >
       <div className="h-full hidden lg:flex lg:items-center">
         <div className="relative h-[968px] w-full  ">
