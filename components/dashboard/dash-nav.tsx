@@ -27,7 +27,7 @@ const DashNav = () => {
             MAIN MENU
           </Text.SmallText>
 
-          <div className="flex-col flex justify-between  h-[900px] mt-4 overflow-y-hidden w-full">
+          <div className="flex-col flex justify-between  h-[750px] mt-4 overflow-y-hidden w-full">
             <div className="flex-cols gap-3 ">
               {dashboardNav.map((dash) => (
                 <Link
