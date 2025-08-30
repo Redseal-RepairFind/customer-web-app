@@ -51,7 +51,7 @@ select:-moz-autofill {
 /* Tailwind v4 tokens */
 @theme inline {
   /* light shades */
-  --color-light-main: var(--foreground);
+  --color-light-main: #ffffff;
   --color-light-500: #f7f7f7a8;
   --color-light-400: #f5f4f4;
   --color-light-200: #fafafa;
@@ -62,7 +62,7 @@ select:-moz-autofill {
   --color-light-0: #cdcfd0;
 
   /* dark shades */
-  --color-dark: var(--background);
+  --color-dark: #000000;
   --color-dark-00: #090a0a;
   --color-dark-600: #0a0d14;
   --color-dark-500: #72777a;
@@ -111,7 +111,7 @@ html {
 /* Firefox */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-color: #000000 #ffffff;
 }
 /* WebKit (Chrome, Edge, Safari desktop) */
 ::-webkit-scrollbar {
@@ -119,15 +119,15 @@ html {
   height: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--scrollbar-track);
+  background: #ffffff;
 }
 ::-webkit-scrollbar-thumb {
-  background-color: var(--scrollbar-thumb);
+  background-color: #000000;
   border-radius: 9999px;
-  border: 2px solid var(--scrollbar-track);
+  border: 2px solid #ffffff;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--scrollbar-thumb-hover);
+  background-color: #000000;
 }
 
 /* Dark mode defaults */
@@ -229,8 +229,8 @@ html {
 
 /* Your own CSS */
 body {
-  color: var(--background);
-  background: var(--foreground);
+  color: #000000;
+  background: #ffffff;
   font-family: var(--font-jost), var(--font-sans);
 }
 
