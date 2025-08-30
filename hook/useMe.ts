@@ -24,7 +24,7 @@ export const useUser = () => {
     const plan = curUser?.data?.subscription;
     if (
       curUser &&
-      !plan?.equipmentAgeCategory.toLowerCase().includes("unknown") &&
+      !plan?.equipmentAgeCategory?.toLowerCase()?.includes("unknown") &&
       !plan?.planId
     )
       navigator.navigate("/pricing", "replace");

@@ -75,7 +75,7 @@ export const useAuthentication = () => {
       const plan = res?.data?.subscription;
       if (
         plan?.planId ||
-        plan?.equipmentAgeCategory.toLowerCase().includes("unknown")
+        plan?.equipmentAgeCategory?.toLowerCase()?.includes("unknown")
       ) {
         navigator.navigate("/dashboard", "replace");
       }
@@ -264,7 +264,7 @@ export const useAuthentication = () => {
       const plan = res?.data?.subscription;
       if (
         plan?.planId ||
-        plan?.equipmentAgeCategory.toLowerCase().includes("unknown")
+        plan?.equipmentAgeCategory?.toLowerCase()?.includes("unknown")
       ) {
         navigator.navigate("/dashboard", "replace");
       } else {
