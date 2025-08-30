@@ -9,7 +9,6 @@ import { useState } from "react";
 import { useUser } from "@/hook/useMe";
 import LoadingTemplate from "@/components/ui/spinner";
 import { useDashboard } from "@/hook/useDashboard";
-import { NavWindow } from "@/components/landing";
 
 const DashboardHome = () => {
   const [isRec, setIsRec] = useState(true);
@@ -32,7 +31,7 @@ const DashboardHome = () => {
   };
   return (
     <main className="w-full">
-      <DashboardHeader />
+      <DashboardHeader user={userData} />
       <section className="flex-cols gap-5 mt-8">
         <PlanLog plans={userData?.subscription} />
         <Metrics stats={metrics} plans={userData?.subscription} />

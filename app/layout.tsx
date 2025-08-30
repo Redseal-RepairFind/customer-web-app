@@ -12,7 +12,10 @@ const jost = Jost({
 });
 
 export const metadata: Metadata = {
-  title: "Repairfind Premium Customer",
+  title: {
+    default: "Repairfind Premium Customer",
+    template: "Repairfind Premium Customer | %s",
+  },
   description: "Repairfind Premium Customer Platform",
 };
 

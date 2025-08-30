@@ -9,7 +9,7 @@ import { icons, images } from "@/lib/constants";
 
 const ROTATE_MS = 4000; // auto-advance every 4s
 
-const DashboardHeader = () => {
+const DashboardHeader = ({ user }: { user: any }) => {
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const total = slideImages?.length ?? 0;
@@ -36,8 +36,8 @@ const DashboardHeader = () => {
   if (!total) {
     return (
       <div className="flex flex-col gap-5 w-full">
-        <Text.Paragraph className="font-semibold text-sm md:text-base">
-          Welcome back, Stark
+        <Text.Paragraph className="font-semibold text-sm md:text-base capitalize">
+          Welcome back, {user?.firstName?.toLowerCase()}
         </Text.Paragraph>
         <div className="relative w-full h-[120px] rounded-lg bg-light-300 animate-pulse" />
       </div>
@@ -49,8 +49,8 @@ const DashboardHeader = () => {
 
   return (
     <div className="flex flex-col gap-5 w-full">
-      <Text.SubHeading className="font-semibold">
-        Welcome back, Stark
+      <Text.SubHeading className="font-semibold capitalize">
+        Welcome back, {user?.firstName?.toLowerCase()}
       </Text.SubHeading>
 
       <section
