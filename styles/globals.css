@@ -131,17 +131,6 @@ html {
 }
 
 /* Dark mode defaults */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground: #ffffff;
-    --background: #000000;
-
-    /* tweak scrollbar theme for dark */
-    --scrollbar-track: #0a0d14; /* dark-600 */
-    --scrollbar-thumb: #72777a; /* dark-500 */
-    --scrollbar-thumb-hover: #757575; /* dark-400 */
-  }
-}
 
 /* Your utilities (fixed: added missing dots) */
 
@@ -240,8 +229,8 @@ html {
 
 /* Your own CSS */
 body {
-  color: "#000000";
-  background: "#ffffff";
+  color: var(--background);
+  background: var(--foreground);
   font-family: var(--font-jost), var(--font-sans);
 }
 
