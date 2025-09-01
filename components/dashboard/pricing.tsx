@@ -14,13 +14,15 @@ import Modal from "../ui/customModal";
 import PaymentModal from "./home/payment-modal";
 import Button from "../ui/custom-btn";
 import { usePageNavigator } from "@/hook/navigator";
+import { useAuthentication } from "@/hook/useAuthentication";
 
 const Pricingg = () => {
   const { curUser, loadingCurUser } = useUser();
   const { navigator } = usePageNavigator();
   const user = curUser?.data;
+  const { handleLogout } = useAuthentication();
 
-  console.log(user);
+  // console.log(user);
 
   const initAgeCat = equipmentAge.find(
     (eq) => eq.id === user?.subscription?.equipmentAgeCategory
@@ -77,6 +79,9 @@ const Pricingg = () => {
         />
       </Modal>
       <div className="flex-col-center w-full mb-8 ">
+        <button onClick={handleLogout} className="border py-2 px-3 rounded-lg">
+          Temp logout
+        </button>
         <Text.Heading className="text-xl lg:text-3xl text-center">
           RepairFind Subscription Plans
         </Text.Heading>
