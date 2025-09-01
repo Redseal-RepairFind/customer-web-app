@@ -53,7 +53,7 @@ const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
             </div>
           </div>
           <div className="flex flex-col gap-9 h-full">
-            <PlanBadge planName={plans?.planType?.toLowerCase()} />
+            <PlanBadge planName={plans?.planType?.toLowerCase() || "Pending"} />
             <ProgressBar
               startDate={new Date(plans?.startDate)}
               endDate={new Date(plans?.nextBillingDate)}

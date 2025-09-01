@@ -9,6 +9,8 @@ import { useState } from "react";
 import { useUser } from "@/hook/useMe";
 import LoadingTemplate from "@/components/ui/spinner";
 import { useDashboard } from "@/hook/useDashboard";
+import { FcDisclaimer } from "react-icons/fc";
+import Text from "@/components/ui/text";
 
 const DashboardHome = () => {
   const [isRec, setIsRec] = useState(true);
@@ -21,7 +23,7 @@ const DashboardHome = () => {
 
   const userData = curUser?.data;
   const trxData = trxSummary?.data;
-  // console.log(userData?.subscription);
+  // console.log(userData?.subscription?.equipmentAgeCategory);
   // console.log(trxSummary);
 
   const metrics = {
@@ -29,9 +31,11 @@ const DashboardHome = () => {
     ...trxData,
     planType: userData?.subscription,
   };
+
   return (
     <main className="w-full">
       <DashboardHeader user={userData} />
+
       <section className="flex-cols gap-5 mt-8">
         <PlanLog plans={userData?.subscription} />
         <Metrics stats={metrics} plans={userData?.subscription} />

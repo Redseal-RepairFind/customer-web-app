@@ -12,11 +12,15 @@ import LoadingTemplate from "../ui/spinner";
 import { usePricing } from "@/hook/usePricing";
 import Modal from "../ui/customModal";
 import PaymentModal from "./home/payment-modal";
+import Button from "../ui/custom-btn";
+import { usePageNavigator } from "@/hook/navigator";
 
 const Pricingg = () => {
   const { curUser, loadingCurUser } = useUser();
-
+  const { navigator } = usePageNavigator();
   const user = curUser?.data;
+
+  // console.log(curUser);
 
   const initAgeCat = equipmentAge.find(
     (eq) => eq.id === user?.subscription?.equipmentAgeCategory
@@ -47,7 +51,7 @@ const Pricingg = () => {
         modal: false,
       });
     }
-  }, [user, equipmentAge]);
+  }, [user]);
   if (loadingCurUser || loadingSubsPlans) return <LoadingTemplate />;
 
   // console.log(yearlylyPlans);
@@ -158,6 +162,21 @@ const Pricingg = () => {
         </Dropdown>
       </div>
 
+      {dropdown?.id === "unknown" ? (
+        <div className="flex-cols gap-2 my-4">
+          <Text.Paragraph>
+            *If you are not sure of your equipment age range, kindly proceed
+            without subscription for now, an agent will visit your address to
+            confirm, before you can proceed with your subscription
+          </Text.Paragraph>
+          <div>
+            <Button onClick={() => navigator.navigate("/dashboard", "replace")}>
+              <Button.Text>Proceed</Button.Text>
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       <div className="grid-3 w-full">
         {plansToRender.map((pla: any, i: number) => {
           let ids: string[] = [];
@@ -166,7 +185,7 @@ const Pricingg = () => {
               ids = [plansToRender[0]?._id];
             } else if (dropdown?.id === "9+") {
               ids = [plansToRender[0]?._id, plansToRender[1]?._id];
-            } else if (dropdown?.id === "Unknown") {
+            } else if (dropdown?.id === "unknown") {
               ids = plansToRender.map((id: any) => id?._id);
             } else {
               ids = [];

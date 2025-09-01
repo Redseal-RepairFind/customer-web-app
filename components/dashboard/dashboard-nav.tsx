@@ -4,9 +4,12 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { BsBell } from "react-icons/bs";
 import Badge from "../ui/badge";
+import { FaAlignJustify } from "react-icons/fa6";
+import { FcDisclaimer } from "react-icons/fc";
+import Text from "../ui/text";
+import { useUser } from "@/hook/useMe";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
-import { FaAlignCenter, FaAlignJustify, FaHamburger } from "react-icons/fa";
 
 type DashboardNavProps = {
   onBellClick?: () => void;
@@ -21,7 +24,10 @@ const DashboardNav = ({
 }: DashboardNavProps) => {
   const bellRef = useRef<HTMLButtonElement | null>(null);
   const burgerRef = useRef<HTMLButtonElement | null>(null);
+  const { curUser, loadingCurUser } = useUser();
 
+  const userData = curUser?.data;
+  const unknown = userData?.subscription?.equipmentAgeCategory === "unknown";
   // micro interaction (optional, safe without ScrollTrigger)
   const bounce = () => {
     if (!bellRef.current) return;
@@ -47,8 +53,23 @@ const DashboardNav = ({
       aria-label="Dashboard"
       style={{ willChange: "backdrop-filter, background-color" }}
     >
-      <div className="h-full mx-auto max-w-screen-2xl flex items-center justify-between lg:justify-end">
+      <div
+        className={`h-full mx-auto max-w-screen-2xl flex items-center justify-between ${
+          unknown ? "lg:justify-between" : "lg:justify-end"
+        }`}
+      >
         {/* Notifications */}
+
+        {unknown ? (
+          <div className="flex-rows gap-3 mt-4">
+            <Image src={icons.disclaimer} height={24} width={24} alt="Image" />
+            <Text.Paragraph className="font-bold">
+              {" "}
+              Your account is currently pending, a staff will be coming over to
+              confirm age of equipment
+            </Text.Paragraph>
+          </div>
+        ) : null}
         <button
           ref={burgerRef}
           className="relative h-5 w-5 cursor-pointer lg:hidden z-50 ml-2 "

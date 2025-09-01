@@ -15,19 +15,27 @@ export const useUser = () => {
     queryFn: pricingActions.getMe,
   });
 
-  console.log(curUser);
+  // console.log(
+  //   curUser?.data?.subscription?.equipmentAgeCategory
+  //     ?.toLowerCase()
+  //     ?.includes("unknown")
+  // );
 
   useEffect(() => {
     // equipmentAgeCategory;
     // console.log(curUser?.data?.subscription?.planId);
 
     const plan = curUser?.data?.subscription;
+    // console.log(plan);
+
     if (
-      curUser &&
-      !plan?.equipmentAgeCategory?.toLowerCase()?.includes("unknown") &&
-      !plan?.planId
-    )
+      plan &&
+      plan?.equipmentAgeCategory?.toLowerCase()?.includes("unknown")
+    ) {
+      navigator.navigate("/dashboard", "replace");
+    } else if (plan && !plan?.planId) {
       navigator.navigate("/pricing", "replace");
+    }
   }, [curUser]);
 
   return {

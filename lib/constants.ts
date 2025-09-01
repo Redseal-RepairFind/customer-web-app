@@ -7,6 +7,7 @@ import home from "@/public/image/pricing-home.png";
 import linkedin from "@/public/icons/linkedin.png";
 import facebook from "@/public/icons/facebook.png";
 import instagram from "@/public/icons/instagram.png";
+import disclaimer from "@/public/icons/disclaimer.png";
 
 import canada from "@/public/icons/canada.png";
 import spain from "@/public/icons/spain.png";
@@ -113,6 +114,7 @@ export const icons = {
   checkIcon,
   starIcon,
   illustrationIcon,
+  disclaimer,
 };
 
 export const socialIcons = {
@@ -259,7 +261,7 @@ export const equipmentAge = [
   },
   {
     name: "I don't know",
-    id: "Unknown",
+    id: "unknown",
 
     tag: "Tailored plans for businesses managing multiple properties and equipment.",
     variant: "green",
