@@ -32,7 +32,7 @@ export const usePricing = () => {
         res?.message || res?.data?.message || "Session created successfully"
       );
 
-      // console.log(res);
+      console.log(res);
 
       const url = res?.url || res?.data?.url;
       window.location.href = url; // or: window.location.assign(href)

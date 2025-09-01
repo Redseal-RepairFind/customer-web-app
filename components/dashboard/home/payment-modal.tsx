@@ -41,6 +41,8 @@ const PaymentModal = ({
   const { handleCheckout, isCheckingout } = usePricing();
 
   const { curUser } = useUser();
+
+  const user = curUser?.data;
   // console.log(curUser?.data?.subscription?.subscriptionType);
 
   const onSubmit = async () => {
@@ -50,7 +52,7 @@ const PaymentModal = ({
       toast.error("Enter a valid address");
       return;
     }
-    if (!dropdown.id) {
+    if (!dropdown?.id) {
       toast.error("Select equipment age");
       return;
     }
@@ -66,6 +68,7 @@ const PaymentModal = ({
       planId: subPlan?._id,
       equipmentAgeRange: dropdown?.id,
       subscriptionType: curUser?.data?.subscription?.subscriptionType,
+      ...(user?.businessName ? { businessName: user?.businessName } : null),
     };
 
     await handleCheckout(payload as SubscriptionType);

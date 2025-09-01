@@ -42,7 +42,6 @@ const DashboardHome = () => {
         <div className="flex items-center gap-3 mt-4  lg:hidden">
           <Image src={icons.disclaimer} height={24} width={24} alt="Image" />
           <Text.Paragraph className="font-bold">
-            {" "}
             Your account is currently pending, a staff will be coming over to
             confirm age of equipment
           </Text.Paragraph>

@@ -22,7 +22,7 @@ const Pricingg = () => {
   const user = curUser?.data;
   const { handleLogout } = useAuthentication();
 
-  // console.log(user);
+  console.log(user);
 
   const initAgeCat = equipmentAge.find(
     (eq) => eq.id === user?.subscription?.equipmentAgeCategory
@@ -109,7 +109,7 @@ const Pricingg = () => {
       <div className="flex-col gap-4 mb-4 ">
         <div className="flex-rows mb-2">
           <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
-            Home Address{" "}
+            {user?.businessName ? "Business Address" : " Home Address"}
             <span className="font-light text-xs sm:ml-1">
               (This is the address that will be linked to your subscription)
             </span>

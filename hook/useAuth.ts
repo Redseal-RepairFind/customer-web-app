@@ -136,7 +136,7 @@ export const useAuth = () => {
           number: data.number,
         },
         acceptTerms: extraInfo.acceptTerms,
-        ...(data?.businessName && data?.acctType === "BUSINESS"
+        ...(extraInfo?.subscriptionType === "BUSINESS"
           ? { businessName: data?.businessName }
           : null),
       };
