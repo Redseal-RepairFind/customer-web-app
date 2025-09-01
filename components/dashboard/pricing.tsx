@@ -79,9 +79,9 @@ const Pricingg = () => {
         />
       </Modal>
       <div className="flex-col-center w-full mb-8 ">
-        <button onClick={handleLogout} className="border py-2 px-3 rounded-lg">
+        {/* <button onClick={handleLogout} className="border py-2 px-3 rounded-lg">
           Temp logout
-        </button>
+        </button> */}
         <Text.Heading className="text-xl lg:text-3xl text-center">
           RepairFind Subscription Plans
         </Text.Heading>
