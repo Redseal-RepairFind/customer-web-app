@@ -50,6 +50,7 @@ export type SubscriptionType = {
     state: string;
     country: string;
   };
+  businessName?: string;
 };
 
 // {
