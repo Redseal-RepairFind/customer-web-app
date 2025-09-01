@@ -11,6 +11,8 @@ import LoadingTemplate from "@/components/ui/spinner";
 import { useDashboard } from "@/hook/useDashboard";
 import { FcDisclaimer } from "react-icons/fc";
 import Text from "@/components/ui/text";
+import Image from "next/image";
+import { icons } from "@/lib/constants";
 
 const DashboardHome = () => {
   const [isRec, setIsRec] = useState(true);
@@ -23,6 +25,7 @@ const DashboardHome = () => {
 
   const userData = curUser?.data;
   const trxData = trxSummary?.data;
+  const unknown = userData?.subscription?.equipmentAgeCategory === "unknown";
   // console.log(userData?.subscription?.equipmentAgeCategory);
   // console.log(trxSummary);
 
@@ -35,7 +38,16 @@ const DashboardHome = () => {
   return (
     <main className="w-full">
       <DashboardHeader user={userData} />
-
+      {unknown ? (
+        <div className="flex items-center gap-3 mt-4  lg:hidden">
+          <Image src={icons.disclaimer} height={24} width={24} alt="Image" />
+          <Text.Paragraph className="font-bold">
+            {" "}
+            Your account is currently pending, a staff will be coming over to
+            confirm age of equipment
+          </Text.Paragraph>
+        </div>
+      ) : null}
       <section className="flex-cols gap-5 mt-8">
         <PlanLog plans={userData?.subscription} />
         <Metrics stats={metrics} plans={userData?.subscription} />

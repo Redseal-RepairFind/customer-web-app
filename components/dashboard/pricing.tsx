@@ -20,7 +20,7 @@ const Pricingg = () => {
   const { navigator } = usePageNavigator();
   const user = curUser?.data;
 
-  // console.log(curUser);
+  console.log(user);
 
   const initAgeCat = equipmentAge.find(
     (eq) => eq.id === user?.subscription?.equipmentAgeCategory

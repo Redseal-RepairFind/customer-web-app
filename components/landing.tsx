@@ -401,7 +401,11 @@ export const NavWindow = ({
                 <li className="" key={nv.name}>
                   <button
                     ref={addLinkRef}
-                    className="cursor-pointer w-full"
+                    className={`cursor-pointer w-full ${
+                      nv.isLogout
+                        ? "py-2 px-4 bg-black text-white rounded-lg"
+                        : ""
+                    }`}
                     onClick={() => {
                       // ✨ navigate if href exists, still closes
                       // if (nv.href) navigator.navigate(nv.href, "push");

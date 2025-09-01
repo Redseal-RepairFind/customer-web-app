@@ -28,6 +28,8 @@ const DashboardHeader = ({ user }: { user: any }) => {
     }
   };
 
+  // console.log(user);
+
   useEffect(() => {
     start();
     return stop;
@@ -37,7 +39,8 @@ const DashboardHeader = ({ user }: { user: any }) => {
     return (
       <div className="flex flex-col gap-5 w-full">
         <Text.Paragraph className="font-semibold text-sm md:text-base capitalize">
-          Welcome back, {user?.firstName?.toLowerCase()}
+          Welcome back,{" "}
+          {user?.businessName?.toLowerCase() || user?.firstName?.toLowerCase()}
         </Text.Paragraph>
         <div className="relative w-full h-[120px] rounded-lg bg-light-300 animate-pulse" />
       </div>
@@ -50,7 +53,8 @@ const DashboardHeader = ({ user }: { user: any }) => {
   return (
     <div className="flex flex-col gap-5 w-full">
       <Text.SubHeading className="font-semibold capitalize">
-        Welcome back, {user?.firstName?.toLowerCase()}
+        Welcome back,{" "}
+        {user?.businessName?.toLowerCase() || user?.firstName?.toLowerCase()}
       </Text.SubHeading>
 
       <section
@@ -66,21 +70,18 @@ const DashboardHeader = ({ user }: { user: any }) => {
         }}
       >
         <div className="relative w-full  min-h-[120px]">
-          {slideImages.map((src, i) => (
-            <Image
-              key={i}
-              src={src}
-              alt={`Slide ${i + 1} of ${total}`}
-              fill
-              priority={i === 0}
-              loading={i === 0 ? "eager" : "lazy"}
-              className={`absolute inset-0 object-cover transition-opacity duration-700 ${
-                i === index ? "opacity-100" : "opacity-0"
-              }`}
-              sizes="100vw"
-            />
-          ))}
-
+          {/* {slideImages.map((src, i) => ( */}
+          <Image
+            // key={i}
+            src={slideImages[2]}
+            alt={`Header image`}
+            fill
+            // priority={i === 0}
+            loading={"lazy"}
+            className={`absolute inset-0 object-cover transition-opacity duration-700  `}
+            sizes="100vw"
+          />
+          {/* ))}${i === index ? "opacity-100" : "opacity-0"} */}
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
         </div>
 
@@ -108,7 +109,7 @@ const DashboardHeader = ({ user }: { user: any }) => {
           </div>
         </div>
 
-        <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1.5">
+        {/* <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1.5">
           {slideImages.map((_, i) => (
             <button
               key={`dot-${i}`}
@@ -121,7 +122,7 @@ const DashboardHeader = ({ user }: { user: any }) => {
               }`}
             />
           ))}
-        </div>
+        </div> */}
       </section>
     </div>
   );

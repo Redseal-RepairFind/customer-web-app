@@ -443,7 +443,7 @@ export const businessAcctType: {
     list: [],
   },
   {
-    title: "Home Address",
+    title: "Business Address",
     type: "drop_down",
     placeHolder: "Enter Address",
     id: "homeAddress",

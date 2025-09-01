@@ -78,9 +78,9 @@ export const useAuthentication = () => {
         plan?.equipmentAgeCategory?.toLowerCase()?.includes("unknown")
       ) {
         navigator.navigate("/dashboard", "replace");
+      } else {
+        navigator.navigate("/pricing", "replace");
       }
-
-      navigator.navigate("/pricing", "replace");
     } catch (error: any) {
       const errMsg = formatError(error);
       console.error("Otp error", error);

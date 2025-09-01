@@ -61,7 +61,7 @@ const DashboardNav = ({
         {/* Notifications */}
 
         {unknown ? (
-          <div className="flex-rows gap-3 mt-4">
+          <div className="hidden lg:flex lg:items-center gap-3 mt-4">
             <Image src={icons.disclaimer} height={24} width={24} alt="Image" />
             <Text.Paragraph className="font-bold">
               {" "}

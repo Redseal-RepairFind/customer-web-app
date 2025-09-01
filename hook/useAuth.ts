@@ -10,11 +10,15 @@ import { signupSchema, SignupValues } from "@/lib/signup-schema";
 import { countriesPhoneCodes } from "@/lib/countries";
 import { authActions } from "@/lib/api/actions/auth-actions/auth";
 import { usePageNavigator } from "./navigator";
+import { useSearchParams } from "next/navigation";
 
 export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const initCnt = countriesPhoneCodes.find((cnt) => cnt.name === "Canada");
   const { navigator } = usePageNavigator();
+  const params = useSearchParams();
+  const field = params.get("type");
+
   const {
     register,
     handleSubmit,
@@ -41,7 +45,7 @@ export const useAuth = () => {
 
   const [extraInfo, setExtraInfo] = useState<ExtraInfo>({
     acceptTerms: false,
-    subscriptionType: "RESIDENTIAL",
+    subscriptionType: field as "BUSINESS",
     equipmentAgeCategory: "",
     coverageAddress: {
       latitude: "",
@@ -53,6 +57,8 @@ export const useAuth = () => {
     },
     country: initCnt,
   });
+
+  // console.log(extraInfo);
 
   const [extraError, setExtraError] = useState({
     businessName: "",
@@ -117,7 +123,7 @@ export const useAuth = () => {
     setIsLoading(true);
     try {
       const payload = {
-        subscriptionType: data.acctType,
+        subscriptionType: extraInfo.subscriptionType,
         equipmentAgeCategory: data.eqAge,
         coverageAddress: extraInfo.coverageAddress,
         email: data.email,
@@ -134,6 +140,8 @@ export const useAuth = () => {
           ? { businessName: data?.businessName }
           : null),
       };
+
+      console.log(payload);
 
       const res = await authActions.signup(payload as SignupType);
       // reset();

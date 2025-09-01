@@ -82,7 +82,7 @@ const UserInformation = () => {
     handleSetExtraInfo("acceptTerms", acceptTerms);
   }, [selectedPredictions, acceptTerms]);
 
-  // console.log(selectCnt);
+  // console.log(extraI);
 
   const fieldsInput = field?.toUpperCase()?.includes("RESIDENTIAL")
     ? residentialAcctType
