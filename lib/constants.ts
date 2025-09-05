@@ -20,11 +20,14 @@ import tool1 from "@/public/image/tool-1.jpg";
 import tool2 from "@/public/image/tool-2.jpg";
 import tool3 from "@/public/image/tool-3.jpg";
 import subpic from "@/public/image/subpic.png";
+import technician from "@/public/image/technician.png";
+import Vector from "@/public/icons/Vector.png";
 
 import eyeIcon from "@/public/icons/openeyeIcon.png";
 import smsIcon from "@/public/icons/sms.png";
 import downIcon from "@/public/icons/downIcon.png";
 import infoIcon from "@/public/icons/info.png";
+import moreIcon from "@/public/icons/more.png";
 import hamburger from "@/public/icons/hamburger.png";
 
 import dollarIcon from "@/public/icons/dollar-02.png";
@@ -35,6 +38,7 @@ import illustrationIcon from "@/public/icons/Illustration.png";
 
 import chatIcon from "@/public/icons/chat.png";
 import chatIconActive from "@/public/icons/chat-active.png";
+import chatIconActive2 from "@/public/icons/messages-2.png";
 
 import requestIcon from "@/public/icons/request.png";
 import requestIconActive from "@/public/icons/request-active.png";
@@ -52,6 +56,7 @@ import maintenanceIcon from "@/public/icons/maintenance.png";
 import maintenanceIconActive from "@/public/icons/maintenance-active.png";
 
 import logoutIcon from "@/public/icons/logout.png";
+import callIcon from "@/public/icons/call.png";
 
 export const accountType = [
   {
@@ -81,6 +86,7 @@ export const images = {
   tool2,
   tool3,
   subpic,
+  technician,
 };
 
 export const icons = {
@@ -115,6 +121,10 @@ export const icons = {
   starIcon,
   illustrationIcon,
   disclaimer,
+  moreIcon,
+  callIcon,
+  chatIconActive2,
+  Vector,
 };
 
 export const socialIcons = {

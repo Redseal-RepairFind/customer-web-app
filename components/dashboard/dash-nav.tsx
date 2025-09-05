@@ -16,7 +16,7 @@ const DashNav = () => {
   const { handleLogout } = useAuthentication();
 
   return (
-    <aside className="hidden lg:block border-r bg-black  overflow-y-hidden relative z-[100] w-[240px] ">
+    <aside className="hidden lg:block border-r bg-black  overflow-y-hidden relative z-[100] w-[240px]">
       <div className="fixed top-0 h-screen overflow-y-auto no-scrollbar p-4 bg-black">
         <div className="mt-4">
           <RepairfindLogo nav />
@@ -58,10 +58,10 @@ const DashNav = () => {
                     {dash.name}
                   </Text.SmallText>
 
-                  {dash.name.toLowerCase().includes("inbox") ||
+                  {/* {dash.name.toLowerCase().includes("inbox") ||
                   dash.name.toLowerCase().includes("log") ? (
                     <Badge isActive count={20} />
-                  ) : null}
+                  ) : null} */}
                 </Link>
               ))}
             </div>

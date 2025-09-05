@@ -5,6 +5,7 @@ import { Jost } from "next/font/google";
 import MainLayout from "@/components/ui/main-layout";
 import { GoogleMapsProvider } from "@/components/ui/google-maps-provider";
 import { Toaster } from "react-hot-toast";
+import { ToastProvider } from "@/contexts/toast-contexts";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -29,9 +30,11 @@ export default function RootLayout({
       <body
         className={`${jost.variable}  antialiased min-h-dvh flex-col flex justify-between`}
       >
-        <MainLayout>
-          <GoogleMapsProvider>{children}</GoogleMapsProvider>
-        </MainLayout>
+        <ToastProvider>
+          <MainLayout>
+            <GoogleMapsProvider>{children}</GoogleMapsProvider>
+          </MainLayout>
+        </ToastProvider>
 
         <Toaster
           toastOptions={{

@@ -3,15 +3,20 @@
 type ToggleBtnProps = {
   toggle: boolean;
   onClick: () => void;
+  emergency?: boolean;
 };
 
-export default function ToggleBtn({ toggle, onClick }: ToggleBtnProps) {
+export default function ToggleBtn({
+  toggle,
+  onClick,
+  emergency,
+}: ToggleBtnProps) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={`relative h-5 min-w-8 rounded-4xl flex items-center ${
-        !toggle ? "bg-light-100" : " bg-dark"
+        !toggle ? "bg-light-100" : emergency ? "bg-red-500" : " bg-dark"
       } transition-colors duration-300 ease-in-out cursor-pointer`}
     >
       <span

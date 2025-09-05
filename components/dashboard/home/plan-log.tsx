@@ -36,7 +36,7 @@ export type PLANSTYPE = {
   paymentAmount: number;
 };
 const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
-  const startDate = dayjs(plans?.startDate);
+  const startDate = dayjs(Date.now());
   const nextBillDate = dayjs(plans?.nextBillingDate);
 
   return (

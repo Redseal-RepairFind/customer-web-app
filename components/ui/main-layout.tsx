@@ -3,6 +3,7 @@
 import { usePageNavigator } from "@/hook/navigator";
 import Footer from "./footer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ThemeRegistry from "@/contexts/theme-context";
 
 export default function MainLayout({
   children,
@@ -33,7 +34,7 @@ export default function MainLayout({
               isHome || isAuth ? "lay-bg" : ""
             }`}
           >
-            {children}
+            <ThemeRegistry>{children}</ThemeRegistry>
           </div>
         </main>
 

@@ -9,10 +9,11 @@ import { useState } from "react";
 import { useUser } from "@/hook/useMe";
 import LoadingTemplate from "@/components/ui/spinner";
 import { useDashboard } from "@/hook/useDashboard";
-import { FcDisclaimer } from "react-icons/fc";
 import Text from "@/components/ui/text";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
+import { useToast } from "@/contexts/toast-contexts";
+import RequestSubmitToast from "./request-submit-toast";
 
 const DashboardHome = () => {
   const [isRec, setIsRec] = useState(true);
@@ -20,6 +21,7 @@ const DashboardHome = () => {
   const { curUser, loadingCurUser } = useUser();
   const { trxSummary, isLoadingTrxSummary } = useDashboard();
   // console.log(curUser);
+  // const { success, error, warning, info, toast, clearAll } = useToast();
 
   if (loadingCurUser || isLoadingTrxSummary) return <LoadingTemplate />;
 
@@ -37,7 +39,7 @@ const DashboardHome = () => {
 
   return (
     <main className="w-full">
-      <DashboardHeader user={userData} />
+      <DashboardHeader />
       {unknown ? (
         <div className="flex items-center gap-3 mt-4  lg:hidden">
           <Image src={icons.disclaimer} height={24} width={24} alt="Image" />

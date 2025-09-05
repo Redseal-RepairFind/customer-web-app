@@ -7,11 +7,23 @@ type ProgressBarProps = {
   startDate: Date | string;
   /** Subscription end/expiry date (Date or ISO string) */
   endDate: Date | string;
-  /** Show text labels (days left + %) */
-  showText?: boolean;
-  /** Height in px */
+
+  /** Height in px (default 5) */
   height?: number;
   className?: string;
+
+  /** Colors (CSS color strings). If omitted, defaults are used. */
+  trackColor?: string; // background of the track
+  fillColor?: string; // filled portion color
+
+  /** Accessible label for screen readers */
+  ariaLabel?: string;
+
+  /** Optional label shown BESIDE the bar */
+  showLabel?: boolean; // default false
+  label?: React.ReactNode; // custom text/content (e.g. "12 days left")
+  labelColor?: string; // CSS color for label text
+  labelPosition?: "left" | "right"; // default "right"
 };
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -45,9 +57,18 @@ function calcProgress(start: Date, end: Date, now = new Date()) {
 export const ProgressBar: React.FC<ProgressBarProps> = ({
   startDate,
   endDate,
-  showText = true,
   height = 5,
   className,
+
+  trackColor,
+  fillColor,
+
+  ariaLabel = "Subscription progress",
+
+  showLabel = false,
+  label,
+  labelColor,
+  labelPosition = "right",
 }) => {
   const start = toDate(startDate);
   const end = toDate(endDate);
@@ -57,55 +78,59 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   );
 
   useEffect(() => {
-    // Update roughly every minute so it rolls over near midnight
     const id = setInterval(() => setState(calcProgress(start, end)), 60_000);
-    // Also update immediately on mount/prop change
     setState(calcProgress(start, end));
     return () => clearInterval(id);
-  }, [startDate, endDate]); // re-run if dates change
+  }, [startDate, endDate]);
 
-  // Auto color: goes amber <30% time left, red <10% time left
-  const barColor =
-    daysLeft <= 3
-      ? "bg-red-500"
-      : daysLeft <= 7
-      ? "bg-orange-500"
-      : "bg-emerald-500";
+  // Default label if you enable it but don't pass one
+  const defaultLabel =
+    daysLeft > 0
+      ? `${daysLeft} day${daysLeft === 1 ? "" : "s"} left`
+      : "Expired";
 
-  // console.log(daysLeft);
-  return (
-    <div className={["w-full", className].filter(Boolean).join(" ")}>
-      {/* {showText && (
-        <div className="mb-1 flex items-center justify-between text-xs text-gray-600">
-          <span>Subscription</span>
-          <span>
-            {daysLeft > 0
-              ? `${daysLeft} day${daysLeft === 1 ? "" : "s"} left`
-              : "Expired"}
-          </span>
-        </div>
-      )} */}
-
+  // Layout: bar + optional label beside it
+  const content = (
+    <>
+      {/* progress track */}
       <div
-        className="w-full overflow-hidden rounded-full bg-light-100"
-        style={{ height }}
+        className="w-full overflow-hidden rounded-full bg-light-100 flex-1"
+        style={{ height, backgroundColor: trackColor }}
         role="progressbar"
-        aria-label="Subscription progress"
+        aria-label={ariaLabel}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(pct)}
       >
+        {/* fill */}
         <div
-          className={`bg-dark h-full rounded-full transition-[width] duration-500`}
-          style={{ width: `${pct}%` }}
+          className="bg-dark h-full rounded-full transition-[width] duration-500"
+          style={{ width: `${pct}%`, backgroundColor: fillColor }}
         />
       </div>
 
-      {/* {showText && (
-        <div className="mt-1 text-right text-[11px] text-gray-600">
-          {Math.round(pct)}%
-        </div>
-      )} */}
+      {/* optional label */}
+      {showLabel && (
+        <span style={{ color: labelColor }} className="text-xs shrink-0">
+          {label ?? defaultLabel}
+        </span>
+      )}
+    </>
+  );
+
+  return (
+    <div className={["w-full", className].filter(Boolean).join(" ")}>
+      <div className="flex items-center gap-2">
+        {labelPosition === "left"
+          ? React.cloneElement(
+              <div />,
+              {},
+              content.props?.children?.[1],
+              content.props?.children?.[0]
+            )
+          : content}
+        {/* ^ If left, render label first then bar; otherwise as-is (bar then label). */}
+      </div>
     </div>
   );
 };

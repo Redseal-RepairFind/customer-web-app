@@ -79,7 +79,29 @@ export function formatDate(date: string | Date, formatStr = "DD/MM/YYYY") {
   return dayjs(date).format(formatStr);
 }
 
-// // Example usage:
-// console.log(formatDate("2023-01-01"));            // 2023-01-01
-// console.log(formatDate(new Date(), "DD/MM/YYYY")); // 30/08/2025 (today’s date)
-// console.log(formatDate("2023-01-01", "MMMM D, YYYY")); // January 1, 2023
+export function formatDateProper(date: Date): string {
+  const userLocale = navigator.language || "en-US"; // Default to 'en-US' if locale is unavailable
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  };
+  return new Intl.DateTimeFormat(userLocale, options).format(date);
+}
+
+export function formatTo12Hour(date: Date) {
+  if (!(date instanceof Date)) {
+    date = new Date(date); // allow string or timestamp too
+  }
+
+  let hours = date.getHours();
+  const minutes = date.getMinutes();
+  const ampm = hours >= 12 ? "PM" : "AM";
+
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+
+  const minutesStr = minutes < 10 ? "0" + minutes : minutes;
+
+  return `${hours}:${minutesStr} ${ampm}`;
+}

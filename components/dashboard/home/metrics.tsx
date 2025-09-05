@@ -25,9 +25,11 @@ const Metrics = ({
   };
   plans: PLANSTYPE;
 }) => {
-  const allRatings = stats.reviewSummary
-    .map((rt) => rt.averageRating)
-    .reduce((cnt, rv) => cnt + rv, 0);
+  const allRatings =
+    stats &&
+    stats?.reviewSummary
+      ?.map((rt) => rt.averageRating)
+      ?.reduce((cnt, rv) => cnt + rv, 0);
 
   const avgRating = allRatings / stats.reviewSummary?.length;
 

@@ -1,5 +1,7 @@
+import RepairRequestHome from "@/components/dashboard/repair-requests/repair-home";
+
 const RepairHome = () => {
-  return <main>Lorem ipsum dolor sit amet.</main>;
+  return <RepairRequestHome />;
 };
 
 export default RepairHome;

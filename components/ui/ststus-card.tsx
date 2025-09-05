@@ -6,18 +6,20 @@ const StatusCard = ({
   status,
   className,
 }: {
-  status: "ONGOING" | "COMPLETED" | "DISPUTE";
+  status: "ONGOING" | "COMPLETED" | "DISPUTE" | "PENDING";
   className?: string;
 }) => {
   return (
     <div
-      className={`${className} py-2 px-5 flex items-center justify-center rounded-full text-light-main ${
+      className={`${className} py-2 px-2 md:px-5 flex items-center justify-center rounded-full text-light-main ${
         status === "ONGOING"
           ? "bg-yellow-500"
           : status === "COMPLETED"
           ? "bg-green-500"
+          : status === "PENDING"
+          ? "bg-dark-200"
           : "bg-red-500"
-      } min-w-[114px] `}
+      } max-w-[114px] `}
     >
       <Text.SmallText className="capitalize">
         {status.toLowerCase()}

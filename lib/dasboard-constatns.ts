@@ -95,3 +95,108 @@ export const dummyMetrics = [
     metric: "26/10/2025",
   },
 ];
+
+export const repTableH = [
+  {
+    name: "Job ID",
+    size: "all",
+    id: "1",
+  },
+  {
+    name: "Services",
+
+    size: "all",
+    id: "2",
+  },
+  {
+    name: "Technician",
+
+    size: "sm",
+    id: "3",
+  },
+  {
+    name: "Progress",
+
+    size: "sm",
+    id: "4",
+  },
+  {
+    name: "Status",
+    size: "all",
+    id: "5",
+  },
+  {
+    name: "Contact Technician",
+    size: "sm",
+    id: "6",
+  },
+  {
+    name: "Action",
+    size: "all",
+    id: "7",
+  },
+];
+
+export const repairTable = [
+  {
+    id: "#123",
+    service: "Plumbing",
+    technician: "Jasper Stark",
+    status: "completed",
+    progress: "Job is completed",
+    contact: "available",
+  },
+  {
+    id: "#1234",
+    service: "Electrical",
+    technician: "",
+    status: "pending",
+    progress: "Scheduling in Progress",
+    contact: "",
+  },
+  {
+    id: "#12345",
+    service: "Painting",
+    technician: "Olalekan Phillip",
+    status: "ongoing",
+    progress: "Awaiting Technician’s Arrival",
+    contact: "availabe",
+  },
+];
+
+export const messageTemplates = [
+  "Hi, I’d like an update on progress of my repair request.",
+  "When do you expect to arrive at my location?",
+  "Could you please provide an estimated competition time?",
+  "I have some additional questions about the work beign dobe.",
+  "The issue seems to have gotten worse. Can you come back?",
+  "Thank you for the great work! Everything looks perfect.",
+];
+
+export const dummyCommHistory = [
+  {
+    type: "message",
+    item: {
+      initiator: "You",
+      message: "Hi whats up with the repairs",
+      createdAt: new Date(),
+    },
+  },
+  {
+    type: "message",
+    item: {
+      initiator: "You",
+      message: "I have arrived come get me",
+
+      createdAt: new Date(),
+    },
+  },
+  {
+    type: "call",
+    item: {
+      initiator: "Mike Johnson",
+      message: "Outgoing call - 3 min duration",
+      createdAt: new Date(),
+    },
+  },
+];

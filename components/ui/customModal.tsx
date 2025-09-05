@@ -53,7 +53,7 @@ export default function Modal({
             onClick={onClose}
           >
             <div
-              className={`relative w-full ${maxWidth}  rounded-lg bg-white shadow-lg p-6`}
+              className={`relative w-full ${maxWidth} max-h-[600px] md:max-h-[700px] overflow-y-auto  rounded-lg bg-white shadow-lg p-6`}
               onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
             >
               {/* Close button */}

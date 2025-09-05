@@ -6,13 +6,39 @@ import { slideImages } from "@/lib/dasboard-constatns";
 import { useEffect, useRef, useState } from "react";
 import Button from "../ui/custom-btn";
 import { icons, images } from "@/lib/constants";
+import { useUser } from "@/hook/useMe";
+import LoadingTemplate from "../ui/spinner";
+import Modal from "../ui/customModal";
+import RequestModal from "./repair-requests/request-modal";
+import { useToast } from "@/contexts/toast-contexts";
+import RequestSubmitToast from "./home/request-submit-toast";
+import { useSubCalc } from "@/hook/useSubCalc";
 
 const ROTATE_MS = 4000; // auto-advance every 4s
 
-const DashboardHeader = ({ user }: { user: any }) => {
+const DashboardHeader = () => {
+  const { curUser, loadingCurUser } = useUser();
+  const [openModal, setOpenModal] = useState(false);
+  const user = curUser?.data;
+  const { warning } = useToast();
+  const { daysLeft } = useSubCalc(user?.subscription);
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const total = slideImages?.length ?? 0;
+
+  const handleCloseModal = () => setOpenModal(false);
+  const handleOpenModal = () => {
+    if (daysLeft > 0)
+      warning({
+        render: (api) => (
+          <RequestSubmitToast subscription={user?.subscription} />
+        ),
+        vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
+      });
+    else {
+      setOpenModal(true);
+    }
+  };
 
   const stop = () => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -35,6 +61,8 @@ const DashboardHeader = ({ user }: { user: any }) => {
     return stop;
   }, [total]);
 
+  if (loadingCurUser) return <LoadingTemplate />;
+
   if (!total) {
     return (
       <div className="flex flex-col gap-5 w-full">
@@ -51,65 +79,69 @@ const DashboardHeader = ({ user }: { user: any }) => {
   const goNext = () => setIndex((i) => (i + 1) % total);
 
   return (
-    <div className="flex flex-col gap-5 w-full">
-      <Text.SubHeading className="font-semibold capitalize">
-        Welcome back,{" "}
-        {user?.businessName?.toLowerCase() || user?.firstName?.toLowerCase()}
-      </Text.SubHeading>
+    <>
+      <Modal isOpen={openModal} onClose={handleCloseModal}>
+        <RequestModal />
+      </Modal>
+      <div className="flex flex-col gap-5 w-full">
+        <Text.SubHeading className="font-semibold capitalize">
+          Welcome back,{" "}
+          {user?.businessName?.toLowerCase() || user?.firstName?.toLowerCase()}
+        </Text.SubHeading>
 
-      <section
-        className="relative w-full rounded-lg overflow-hidden shadow-sm"
-        aria-roledescription="carousel"
-        aria-label="Dashboard highlights"
-        onMouseEnter={stop}
-        onMouseLeave={start}
-        tabIndex={0}
-        onKeyDown={(e) => {
-          if (e.key === "ArrowLeft") goPrev();
-          if (e.key === "ArrowRight") goNext();
-        }}
-      >
-        <div className="relative w-full  min-h-[120px]">
-          {/* {slideImages.map((src, i) => ( */}
-          <Image
-            // key={i}
-            src={slideImages[2]}
-            alt={`Header image`}
-            fill
-            // priority={i === 0}
-            loading={"lazy"}
-            className={`absolute inset-0 object-cover transition-opacity duration-700  `}
-            sizes="100vw"
-          />
-          {/* ))}${i === index ? "opacity-100" : "opacity-0"} */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
-        </div>
-
-        <div className="absolute inset-0 ">
-          <div className="flex-row-between gap-2 h-full md:px-4 px-2 py-2">
-            <div className="py-2">
-              <Text.Paragraph className="text-light-main font-semibold text-sm md:text-base leading-tight">
-                Get your repair requests handled by trusted contractors
-              </Text.Paragraph>
-
-              <Text.SmallText className="text-dark-100 text-xs md:text-sm leading-tight">
-                Submit detailed repair requests and track progress from start to
-                finish
-              </Text.SmallText>
-            </div>
-
-            <Button variant="tertiary">
-              <Button.Icon className="h-4 w-4 relative">
-                <Image src={icons.requestIconActive} fill alt="button icon" />
-              </Button.Icon>
-              <Button.Text className="text-xs md:text-sm">
-                Submit a request
-              </Button.Text>
-            </Button>
+        <section
+          className="relative w-full rounded-lg overflow-hidden shadow-sm"
+          aria-roledescription="carousel"
+          aria-label="Dashboard highlights"
+          onMouseEnter={stop}
+          onMouseLeave={start}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") goPrev();
+            if (e.key === "ArrowRight") goNext();
+          }}
+        >
+          <div className="relative w-full  min-h-[120px]">
+            {/* {slideImages.map((src, i) => ( */}
+            <Image
+              // key={i}
+              src={slideImages[2]}
+              alt={`Header image`}
+              fill
+              // priority={i === 0}
+              loading={"lazy"}
+              className={`absolute inset-0 object-cover transition-opacity duration-700  `}
+              sizes="100vw"
+            />
+            {/* ))}${i === index ? "opacity-100" : "opacity-0"} */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 to-transparent" />
           </div>
-        </div>
 
-        {/* <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1.5">
+          <div className="absolute inset-0 ">
+            <div className="flex-row-between gap-2 h-full md:px-4 px-2 py-2">
+              <div className="py-2">
+                <Text.Paragraph className="text-light-main font-semibold text-sm md:text-base leading-tight">
+                  Get your repair requests handled by trusted contractors
+                </Text.Paragraph>
+
+                <Text.SmallText className="text-dark-100 text-xs md:text-sm leading-tight">
+                  Submit detailed repair requests and track progress from start
+                  to finish
+                </Text.SmallText>
+              </div>
+
+              <Button variant="tertiary" onClick={handleOpenModal}>
+                <Button.Icon className="h-4 w-4 relative">
+                  <Image src={icons.requestIconActive} fill alt="button icon" />
+                </Button.Icon>
+                <Button.Text className="text-xs md:text-sm">
+                  Submit a request
+                </Button.Text>
+              </Button>
+            </div>
+          </div>
+
+          {/* <div className="absolute bottom-2 inset-x-0 flex justify-center gap-1.5">
           {slideImages.map((_, i) => (
             <button
               key={`dot-${i}`}
@@ -123,8 +155,9 @@ const DashboardHeader = ({ user }: { user: any }) => {
             />
           ))}
         </div> */}
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   );
 };
 
