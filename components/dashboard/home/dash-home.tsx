@@ -16,7 +16,7 @@ import { useToast } from "@/contexts/toast-contexts";
 import RequestSubmitToast from "./request-submit-toast";
 
 const DashboardHome = () => {
-  const [isRec, setIsRec] = useState(true);
+  const [isRec, setIsRec] = useState(false);
 
   const { curUser, loadingCurUser } = useUser();
   const { trxSummary, isLoadingTrxSummary } = useDashboard();
