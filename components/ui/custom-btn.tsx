@@ -3,7 +3,14 @@ import * as React from "react";
 type BaseProps<E extends HTMLElement = HTMLElement> =
   React.HTMLAttributes<E> & { className?: string };
 
-type Variant = "primary" | "secondary" | "tertiary";
+type Variant =
+  | "primary"
+  | "secondary"
+  | "secondary_2"
+  | "tertiary"
+  | "danger"
+  | "danger_filled"
+  | "green";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: Variant;
@@ -36,7 +43,15 @@ function ButtonBase({
       rest.border ? "border border-white" : ""
     }`,
     secondary:
-      "bg-white text-black border border-black hover:bg-black/5 hover:text-white transition-all duration-300 cursor-pointer",
+      "bg-white text-black border border-black hover:bg-black/5 hover:text-black transition-all duration-300 cursor-pointer",
+    secondary_2:
+      "bg-white text-green-main border border-green-main hover:bg-green-main hover:text-white transition-all duration-300 cursor-pointer",
+    danger:
+      "bg-white text-red-500 border border-red-500 hover:bg-red-500 hover:text-white transition-all duration-300 cursor-pointer",
+    danger_filled:
+      "bg-red-500 text-white  hover:bg-red-500/5 hover:text-white transition-all duration-300 cursor-pointer",
+    green:
+      "bg-green-main text-white border border-green-main hover:bg-green-main/5 hover:text-green-main transition-all duration-300 cursor-pointer",
 
     tertiary:
       "bg-white text-black  hover:bg-black hover:text-white transition-all duration-300 cursor-pointer",

@@ -40,6 +40,7 @@ type RootCtx = {
   menuId: string;
   onTriggerKeyDown: (e: React.KeyboardEvent) => void;
   onMenuKeyDown: (e: React.KeyboardEvent) => void;
+  isNormal?: boolean;
 };
 
 /* --------------------------- Utils --------------------------- */
@@ -254,20 +255,25 @@ const Trigger: React.FC<
       aria-haspopup="menu"
       aria-expanded={open}
       aria-controls={menuId}
-      onClick={() => setOpen(!open)}
+      onClick={(e) => {
+        e.stopPropagation();
+        setOpen(!open);
+      }}
       onKeyDown={onTriggerKeyDown}
-      className={cx("input-container", className)}
+      className={cx(rest?.isNormal ? "" : "input-container", className)}
       type="button"
     >
       {children}
-      <svg
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className={cx("h-4 w-4 transition-transform", open && "rotate-180")}
-        aria-hidden="true"
-      >
-        <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.085l3.71-3.854a.75.75 0 111.08 1.04l-4.24 4.4a.75.75 0 01-1.08 0l-4.24-4.4a.75.75 0 01.02-1.06z" />
-      </svg>
+      {rest.isNormal ? null : (
+        <svg
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          className={cx("h-4 w-4 transition-transform", open && "rotate-180")}
+          aria-hidden="true"
+        >
+          <path d="M5.23 7.21a.75.75 0 011.06.02L10 11.085l3.71-3.854a.75.75 0 111.08 1.04l-4.24 4.4a.75.75 0 01-1.08 0l-4.24-4.4a.75.75 0 01.02-1.06z" />
+        </svg>
+      )}
     </button>
   );
 };
@@ -344,6 +350,7 @@ const Item: React.FC<
   const handleKeyDown = (e: React.KeyboardEvent<HTMLLIElement>) => {
     onKeyDown?.(e);
     if (e.key === "Enter" || e.key === " ") {
+      e.stopPropagation();
       e.preventDefault();
       select(e);
     }

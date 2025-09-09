@@ -7,7 +7,7 @@ import { useState } from "react";
 export const useSubCalc = (subscription: PLANSTYPE) => {
   const [st, setSt] = useState();
   const startDate = dayjs(subscription?.startDate ?? Date.now());
-  const endDate = startDate.add(29, "day");
+  const endDate = startDate.add(30, "day");
 
   // progress right now
   const now = dayjs();

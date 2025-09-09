@@ -12,29 +12,29 @@ import { useDashboard } from "@/hook/useDashboard";
 import Text from "@/components/ui/text";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
-import { useToast } from "@/contexts/toast-contexts";
-import RequestSubmitToast from "./request-submit-toast";
+import MultiBranch from "./multi-branch";
 
 const DashboardHome = () => {
   const [isRec, setIsRec] = useState(false);
 
   const { curUser, loadingCurUser } = useUser();
   const { trxSummary, isLoadingTrxSummary } = useDashboard();
-  // console.log(curUser);
-  // const { success, error, warning, info, toast, clearAll } = useToast();
 
   if (loadingCurUser || isLoadingTrxSummary) return <LoadingTemplate />;
 
   const userData = curUser?.data;
   const trxData = trxSummary?.data;
-  const unknown = userData?.subscription?.equipmentAgeCategory === "unknown";
-  // console.log(userData?.subscription?.equipmentAgeCategory);
-  // console.log(trxSummary);
+  const unknown =
+    userData?.subscriptions[0]?.equipmentAgeCategory === "unknown";
+
+  const planType = userData?.subscriptions?.find((user: any) =>
+    user?.status?.toLowerCase()?.includes("active")
+  );
 
   const metrics = {
     ...userData?.stats,
     ...trxData,
-    planType: userData?.subscription,
+    planType,
   };
 
   return (
@@ -50,9 +50,9 @@ const DashboardHome = () => {
         </div>
       ) : null}
       <section className="flex-cols gap-5 mt-8">
-        <PlanLog plans={userData?.subscription} />
-        <Metrics stats={metrics} plans={userData?.subscription} />
-
+        <PlanLog plans={planType} />
+        <Metrics stats={metrics} plans={planType} />
+        <MultiBranch />
         {isRec ? (
           <RecentRequests />
         ) : (

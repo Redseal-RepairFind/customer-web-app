@@ -15,6 +15,7 @@ import PaymentModal from "./home/payment-modal";
 import Button from "../ui/custom-btn";
 import { usePageNavigator } from "@/hook/navigator";
 import { useAuthentication } from "@/hook/useAuthentication";
+import toast from "react-hot-toast";
 
 const Pricingg = () => {
   const { curUser, loadingCurUser } = useUser();
@@ -22,11 +23,13 @@ const Pricingg = () => {
   const user = curUser?.data;
   const { handleLogout } = useAuthentication();
 
-  console.log(user);
+  // console.log(user);
 
   const initAgeCat = equipmentAge.find(
-    (eq) => eq.id === user?.subscription?.equipmentAgeCategory
+    (eq) => eq.id === user?.subscriptions[0]?.equipmentAgeCategory
   );
+
+  // console.log(initAgeCat);
   const [toggle, setToggle] = useState(false);
   const [selectedPredictions, setSelectedPredictions] = useState<any>({
     prediction: user?.subscription?.coverageAddress,
@@ -42,14 +45,14 @@ const Pricingg = () => {
   });
 
   useEffect(() => {
-    if (user?.subscription) {
+    if (user?.subscriptions[0]) {
       const initAgeCat = equipmentAge.find(
-        (eq) => eq.id === user.subscription.equipmentAgeCategory
+        (eq) => eq.id === user.subscriptions[0].equipmentAgeCategory
       );
 
       setDropdown(initAgeCat || null);
       setSelectedPredictions({
-        prediction: user.subscription.coverageAddress || "",
+        prediction: user.subscriptions[0].coverageAddress || "",
         modal: false,
       });
     }
@@ -63,8 +66,13 @@ const Pricingg = () => {
   // console.log(plansToRender);
 
   const handleCloseInfoModal = () => setPaymentInfo({ info: {}, open: false });
-  const handleOpenInfoModal = (item: any) =>
+  const handleOpenInfoModal = (item: any) => {
+    if (!selectedPredictions?.prediction || !dropdown?.id) {
+      toast.error("Kindly enter address and equipment age range");
+      return;
+    }
     setPaymentInfo({ info: item, open: true });
+  };
 
   return (
     <main className="w-full my-12 xl:px-16 lg:px-8">

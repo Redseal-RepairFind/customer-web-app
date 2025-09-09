@@ -10,6 +10,7 @@ import Text from "../ui/text";
 import { useUser } from "@/hook/useMe";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
+import { usePageNavigator } from "@/hook/navigator";
 
 type DashboardNavProps = {
   onBellClick?: () => void;
@@ -22,12 +23,14 @@ const DashboardNav = ({
   notificationsCount = 0,
   onOpen,
 }: DashboardNavProps) => {
+  const { navigator } = usePageNavigator();
   const bellRef = useRef<HTMLButtonElement | null>(null);
   const burgerRef = useRef<HTMLButtonElement | null>(null);
   const { curUser, loadingCurUser } = useUser();
 
   const userData = curUser?.data;
-  const unknown = userData?.subscription?.equipmentAgeCategory === "unknown";
+  const unknown =
+    userData?.subscriptions[0]?.equipmentAgeCategory === "unknown";
   // micro interaction (optional, safe without ScrollTrigger)
   const bounce = () => {
     if (!bellRef.current) return;
@@ -41,6 +44,8 @@ const DashboardNav = ({
     // clean up timeline
     setTimeout(() => ctx.revert(), 400);
   };
+
+  const gotoNotif = () => navigator.navigate("/notifications", "push");
 
   return (
     <nav
@@ -84,6 +89,7 @@ const DashboardNav = ({
           onClick={(e) => {
             bounce();
             onBellClick?.();
+            gotoNotif();
           }}
           className="
             relative h-10 w-10 rounded-full

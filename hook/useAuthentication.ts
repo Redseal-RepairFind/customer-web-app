@@ -73,10 +73,11 @@ export const useAuthentication = () => {
       await setCookie(token, JSON.stringify(res?.accessToken));
 
       const plan = res?.data?.subscription;
-      if (
-        plan?.planId ||
-        plan?.equipmentAgeCategory?.toLowerCase()?.includes("unknown")
-      ) {
+
+      const isUnknown = res?.data?.equipmentAgeCategory
+        ?.toLowerCase()
+        ?.includes("unknown");
+      if (isUnknown) {
         navigator.navigate("/dashboard", "replace");
       } else {
         navigator.navigate("/pricing", "replace");
@@ -261,11 +262,18 @@ export const useAuthentication = () => {
       const accessToken = res?.accessToken;
 
       await setCookie(tok, accessToken);
-      const plan = res?.data?.subscription;
-      if (
-        plan?.planId ||
-        plan?.equipmentAgeCategory?.toLowerCase()?.includes("unknown")
-      ) {
+
+      const plans = res?.data?.subscriptions ?? [];
+      const isUnknown =
+        plans.length > 0 &&
+        plans.some((p: any) =>
+          p?.equipmentAgeCategory?.toLowerCase?.().includes("unknown")
+        );
+      const isActive =
+        plans.length > 0 &&
+        plans.some((p: any) => p?.status?.toLowerCase?.().includes("active"));
+
+      if (isActive || isUnknown) {
         navigator.navigate("/dashboard", "replace");
       } else {
         navigator.navigate("/pricing", "replace");

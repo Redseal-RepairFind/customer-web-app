@@ -9,8 +9,6 @@ import AuthQuestion from "./question";
 import { useState } from "react";
 import { FaEye } from "react-icons/fa6";
 import { FaEyeSlash } from "react-icons/fa6";
-import { authActions } from "@/lib/api/actions/auth-actions/auth";
-import { getUserTimezone } from "@/lib/helpers";
 import { useAuthentication } from "@/hook/useAuthentication";
 import { useForm } from "react-hook-form";
 import LoadingTemplate from "../ui/spinner";

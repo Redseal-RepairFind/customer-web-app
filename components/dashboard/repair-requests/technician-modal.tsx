@@ -20,7 +20,7 @@ const TechModal = ({
   open: boolean;
   close: () => void;
 }) => {
-  const [switched, setSwitched] = useState<"message" | "history">("message");
+  const [switched, setSwitched] = useState("Send Message");
 
   return (
     <Modal onClose={close} isOpen={open}>
@@ -88,40 +88,18 @@ const TechModal = ({
         </Box>
 
         <div className="border-t border-t-light-50 mt-4 py-2 flex-cols gap-2">
-          <div className="relative w-full h-12 rounded-full bg-light-400 grid grid-cols-2 p-2 overflow-hidden">
-            {/* Highlight Background */}
-            <div
-              className={`absolute left-2 right-2 top-2 h-8 w-[calc(50%-0.5rem)] rounded-full bg-white shadow-md transition-transform duration-300 ease-in-out ${
-                switched === "message" ? "translate-x-0" : "translate-x-full"
-              }`}
-            />
+          <PageToggler
+            setSwitched={setSwitched}
+            switched={switched}
+            btn1={"Send Message"}
+            btn2="Communication History"
+          />
 
-            {/* Buttons */}
-            <button
-              className={`relative z-10 transition-colors duration-300 ease-in-out ${
-                switched === "message" ? "text-black" : "text-dark-500"
-              } cursor-pointer text-xs md:text-sm`}
-              onClick={() => setSwitched("message")}
-            >
-              Send Message
-            </button>
-            <button
-              className={`relative z-10 transition-colors duration-300 ease-in-out ${
-                switched === "history" ? "text-black" : "text-dark-500"
-              } cursor-pointer text-xs md:text-sm`}
-              onClick={() => setSwitched("history")}
-            >
-              Communication History
-            </button>
-          </div>
-
-          {/* Content Switch with Fade Transition */}
-          <div
-            className="transition-opacity duration-300 ease-in-out"
-            key={switched} // forces re-render on switch
-          >
-            {switched === "message" ? <Messaging /> : <CommHistory />}
-          </div>
+          {switched.toLowerCase().includes("message") ? (
+            <Messaging />
+          ) : (
+            <CommHistory />
+          )}
         </div>
       </div>
     </Modal>
@@ -229,5 +207,54 @@ const CommItem = ({ item }: Item) => {
         {formatTo12Hour(item?.item.createdAt)}
       </Text.Paragraph>
     </div>
+  );
+};
+
+export const PageToggler = ({
+  setSwitched,
+  switched,
+  btn1,
+  btn2,
+}: {
+  setSwitched: any;
+  switched: string;
+  btn1: string;
+  btn2: string;
+}) => {
+  return (
+    <>
+      <div className="relative w-full h-12 rounded-full bg-light-400 grid grid-cols-2 p-2 overflow-hidden">
+        {/* Highlight Background */}
+        <div
+          className={`absolute left-2 right-2 top-2 h-8 w-[calc(50%-0.5rem)] rounded-full bg-white shadow-md transition-transform duration-300 ease-in-out ${
+            switched === btn1 ? "translate-x-0" : "translate-x-full"
+          }`}
+        />
+
+        {/* Buttons */}
+        <button
+          className={`relative z-10 transition-colors duration-300 ease-in-out ${
+            switched === btn1 ? "text-black" : "text-dark-500"
+          } cursor-pointer text-xs md:text-sm`}
+          onClick={() => setSwitched(btn1)}
+        >
+          {btn1}
+        </button>
+        <button
+          className={`relative z-10 transition-colors duration-300 ease-in-out ${
+            switched === btn2 ? "text-black" : "text-dark-500"
+          } cursor-pointer text-xs md:text-sm`}
+          onClick={() => setSwitched(btn2)}
+        >
+          {btn2}
+        </button>
+      </div>
+
+      {/* Content Switch with Fade Transition */}
+      <div
+        className="transition-opacity duration-300 ease-in-out"
+        key={switched} // forces re-render on switch
+      ></div>
+    </>
   );
 };

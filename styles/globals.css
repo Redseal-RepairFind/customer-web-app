@@ -74,12 +74,15 @@ select:-moz-autofill {
   --color-dark-150: #525866;
   --color-dark-100: #667185;
   --color-dark-50: #727070;
+  --color-dark-10: #d1d1d1;
 
   /* green shades */
   --color-green-main: #28a745;
   --color-green-500: #008000;
+  --color-green-400: #1a7a30;
   --color-green-300: #1a4331;
   --color-green-200: #dffae5;
+  --color-green-150: #e7ffec;
   --color-green-100: #e2efe7;
 
   /* red shades */
@@ -87,12 +90,15 @@ select:-moz-autofill {
   --color-red-600: #dc3545;
   --color-red-500: #d90000;
   --color-red-300: #f56630;
+  --color-red-100: #ffece5;
+  --color-red-50: #fee4e9;
 
   /* purple shades */
   --color-purple-main: #430999;
   --color-purple-600: #5e5ef4;
   --color-purple-200: #d4dbe3;
   --color-purple-blue-100: #e2e4e9;
+  --color-purple-blue-50: #f8fafc;
 
   /* yellow shades */
   --color-yellow-main: #ffc107;

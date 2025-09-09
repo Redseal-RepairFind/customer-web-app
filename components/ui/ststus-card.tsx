@@ -5,9 +5,11 @@ import Text from "./text";
 const StatusCard = ({
   status,
   className,
+  name,
 }: {
   status: "ONGOING" | "COMPLETED" | "DISPUTE" | "PENDING";
   className?: string;
+  name?: string;
 }) => {
   return (
     <div
@@ -22,7 +24,7 @@ const StatusCard = ({
       } max-w-[114px] `}
     >
       <Text.SmallText className="capitalize">
-        {status.toLowerCase()}
+        {name || status.toLowerCase()}
       </Text.SmallText>
     </div>
   );

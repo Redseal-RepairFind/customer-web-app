@@ -40,7 +40,7 @@ export type ExtraInfo = {
 export type SubscriptionType = {
   planId: string;
   equipmentAgeRange: string;
-  equipmentAge: string;
+  equipmentAgeCategory: string;
   subscriptionType: "BUSINESS" | "RESIDENTIAL";
   coverageAddress: {
     latitude: string;

@@ -8,6 +8,7 @@ import linkedin from "@/public/icons/linkedin.png";
 import facebook from "@/public/icons/facebook.png";
 import instagram from "@/public/icons/instagram.png";
 import disclaimer from "@/public/icons/disclaimer.png";
+import card from "@/public/icons/card.png";
 
 import canada from "@/public/icons/canada.png";
 import spain from "@/public/icons/spain.png";
@@ -45,6 +46,7 @@ import requestIconActive from "@/public/icons/request-active.png";
 
 import referIcon from "@/public/icons/refer.png";
 import referIconActive from "@/public/icons/refer-active.png";
+import star from "@/public/icons/star.svg";
 
 import dashboardIcon from "@/public/icons/dashboard.png";
 import dashboardIconActive from "@/public/icons/dashboard-active.png";
@@ -55,8 +57,13 @@ import accountIconActive from "@/public/icons/account-active.png";
 import maintenanceIcon from "@/public/icons/maintenance.png";
 import maintenanceIconActive from "@/public/icons/maintenance-active.png";
 
+import subIcon from "@/public/icons/sub.png";
+import subIconActive from "@/public/icons/sub_active.png";
+
 import logoutIcon from "@/public/icons/logout.png";
 import callIcon from "@/public/icons/call.png";
+import noticeIcon from "@/public/icons/notice.png";
+import completeIcon from "@/public/icons/complete.png";
 
 export const accountType = [
   {
@@ -125,6 +132,12 @@ export const icons = {
   callIcon,
   chatIconActive2,
   Vector,
+  star,
+  noticeIcon,
+  completeIcon,
+  subIcon,
+  subIconActive,
+  card,
 };
 
 export const socialIcons = {

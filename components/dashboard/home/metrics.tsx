@@ -36,6 +36,8 @@ const Metrics = ({
   const date = dayjs(plans?.startDate || new Date()?.toDateString());
   const nextDate = date?.add(30, "day");
 
+  // console.log(stats);
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 lg:gap-2 xl:gap-4  ">
       {dummyMetrics.map((mtrc, i) => (

@@ -13,6 +13,8 @@ import RequestModal from "./repair-requests/request-modal";
 import { useToast } from "@/contexts/toast-contexts";
 import RequestSubmitToast from "./home/request-submit-toast";
 import { useSubCalc } from "@/hook/useSubCalc";
+import { useSkills } from "@/hook/useSkills";
+import { usePricing } from "@/hook/usePricing";
 
 const ROTATE_MS = 4000; // auto-advance every 4s
 
@@ -25,19 +27,32 @@ const DashboardHeader = () => {
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const total = slideImages?.length ?? 0;
+  const { request_subscriptions, isLoadingRequestSub } = usePricing();
+
+  const { skills, loadingSkills } = useSkills();
+
+  console.log(request_subscriptions);
+
+  const allSkils = skills?.data || [];
+
+  // console.log(allSkils);
 
   const handleCloseModal = () => setOpenModal(false);
   const handleOpenModal = () => {
-    if (daysLeft > 0)
-      warning({
-        render: (api) => (
-          <RequestSubmitToast subscription={user?.subscription} />
-        ),
-        vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
-      });
-    else {
-      setOpenModal(true);
-    }
+    const planType = user?.subscriptions?.find((user: any) =>
+      user?.status?.toLowerCase()?.includes("active")
+    );
+
+    setOpenModal(true);
+
+    // if (daysLeft > 0)
+    //   warning({
+    //     render: (api) => <RequestSubmitToast subscription={planType} />,
+    //     vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
+    //   });
+    // else {
+    //   setOpenModal(true);
+    // }
   };
 
   const stop = () => {
@@ -61,7 +76,8 @@ const DashboardHeader = () => {
     return stop;
   }, [total]);
 
-  if (loadingCurUser) return <LoadingTemplate />;
+  if (loadingCurUser || loadingSkills || isLoadingRequestSub)
+    return <LoadingTemplate />;
 
   if (!total) {
     return (
@@ -81,7 +97,7 @@ const DashboardHeader = () => {
   return (
     <>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
-        <RequestModal />
+        <RequestModal skillsList={allSkils} />
       </Modal>
       <div className="flex flex-col gap-5 w-full">
         <Text.SubHeading className="font-semibold capitalize">

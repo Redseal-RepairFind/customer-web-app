@@ -39,6 +39,8 @@ const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
   const startDate = dayjs(Date.now());
   const nextBillDate = dayjs(plans?.nextBillingDate);
 
+  // console.log(plans);
+
   return (
     <div className="md:grid-cols-2 grid lg:gap-2 xl:gap-4 gap-4">
       <Box className="h-[142px] ">

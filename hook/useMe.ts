@@ -22,21 +22,45 @@ export const useUser = () => {
   // );
 
   useEffect(() => {
-    // equipmentAgeCategory;
-    // console.log(curUser?.data?.subscription?.planId);
+    if (!curUser?.data) return; // wait for user data
 
-    const plan = curUser?.data?.subscription;
-    // console.log(plan);
+    const location = typeof window !== "undefined" ? window.location : null;
+    const pathname = location?.pathname || "/";
+    const allowList = [
+      "/pricing",
+      "/subscriptions",
+      "/subscriptions/new",
+      "/plans",
+    ];
 
-    if (
-      plan &&
-      plan?.equipmentAgeCategory?.toLowerCase()?.includes("unknown")
-    ) {
-      navigator.navigate("/dashboard", "replace");
-    } else if (plan && !plan?.planId) {
-      navigator.navigate("/pricing", "replace");
+    // allow subscription-related pages at will
+    const onAllowedPage = allowList.some((base) => pathname.startsWith(base));
+    if (onAllowedPage) return;
+
+    const plans = curUser?.data?.subscriptions ?? [];
+    const isUnknown =
+      plans.length > 0 &&
+      plans.some((p: any) =>
+        p?.equipmentAgeCategory?.toLowerCase?.().includes("unknown")
+      );
+    const isActive =
+      plans.length > 0 &&
+      plans.some((p: any) => p?.status?.toLowerCase?.().includes("active"));
+
+    const target = isUnknown || isActive ? "/dashboard" : "/pricing";
+
+    // avoid pointless navigate if we're already there
+    if (pathname === target) return;
+
+    // avoid double navigate in Strict Mode
+    let didNav = (window as any).__didInitialNav__;
+    if (didNav && pathname !== target) {
+      // already navigated once this render cycle
+    } else {
+      (window as any).__didInitialNav__ = true;
+      navigator.navigate(target, "replace");
     }
-  }, [curUser]);
+  }, [curUser?.data]);
 
   return {
     isRefetchingCurUser,

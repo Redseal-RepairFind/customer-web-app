@@ -66,10 +66,13 @@ const PaymentModal = ({
         state: predictions?.region || "",
       },
       planId: subPlan?._id,
-      equipmentAgeRange: dropdown?.id,
-      subscriptionType: curUser?.data?.subscription?.subscriptionType,
+      equipmentAgeCategory: dropdown?.id,
+      subscriptionType:
+        curUser?.data?.subscriptions[0]?.subscriptionType || "RESIDENTIAL",
       ...(user?.businessName ? { businessName: user?.businessName } : null),
     };
+
+    // console.log(payload);
 
     await handleCheckout(payload as SubscriptionType);
   };

@@ -10,6 +10,11 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { FcCheckmark } from "react-icons/fc";
 import TechModal from "./technician-modal";
+import Dropdown from "@/components/ui/dropdown";
+import { BsEye } from "react-icons/bs";
+import { CgCloseO } from "react-icons/cg";
+import { useToast } from "@/contexts/toast-contexts";
+import { RequestCompletedToast } from "../home/request-submit-toast";
 
 interface IProps {
   children: React.ReactNode;
@@ -32,6 +37,7 @@ const RepairTable = ({ data }: DataType) => {
   const [check, setCheck] = useState(false);
   const [open, setOpen] = useState(false);
   const [tech, setTech] = useState<any>();
+  const { warning } = useToast();
 
   if (!data?.length)
     return (
@@ -42,132 +48,175 @@ const RepairTable = ({ data }: DataType) => {
       />
     );
 
+  const handleOpenModal = (status: string) => {
+    // const bg = status.toLowerCase()==='pending'
+    warning({
+      render: (api) => <RequestCompletedToast status={status} />,
+      vars: { bg: "#ffffff", fg: "#72777A" }, // still can theme even with custom render
+    });
+  };
+
   return (
-    <TableOverflow>
-      <TechModal
-        open={open}
-        close={() => {
-          setOpen(false);
-          setTech(null);
-        }}
-        tech={tech}
-      />
-      <Table>
-        <Thead>
-          <Tr className="bg-light-480">
-            {repTableH.map((rep) => (
-              <Th
-                key={rep.id}
-                className={rep.size === "sm" ? "hidden md:table-cell" : ""}
-              >
-                <div className="flex flex-row items-center gap-2 font-normal text-sm">
-                  {rep.id === "1" ? (
-                    <RadioCheck
-                      checked={check}
-                      setChecked={() => setCheck((ch) => !ch)}
-                    />
-                  ) : null}
-                  <span>{rep.name}</span>
-                </div>
-              </Th>
-            ))}
-          </Tr>
-        </Thead>
-
-        <Tbody>
-          {data.map((rep) => (
-            <Tr
-              key={rep.id}
-              onClick={() => {
-                setOpen(true);
-                setTech(rep);
-              }}
-            >
-              {/* Job ID (visible on mobile) */}
-              <Td className="flex items-center gap-2">
-                <RadioCheck
-                  checked={check}
-                  setChecked={() => setCheck((ch) => !ch)}
-                />
-                <div>
-                  <Text.SmallHeading className="text-sm font-semibold">
-                    {rep.id}
-                  </Text.SmallHeading>
-                  <Text.SmallText>
-                    {formatDateProper(new Date())}
-                  </Text.SmallText>
-                </div>
-              </Td>
-
-              {/* Service (visible on mobile) */}
-              <Td>{rep.service}</Td>
-
-              {/* Technician (hide on mobile) */}
-              <Td className="hidden md:table-cell">
-                <div className="flex items-center gap-2">
-                  <Image
-                    src={images.technician}
-                    height={24}
-                    width={24}
-                    className="rounded-full "
-                    alt="Technician"
-                  />
-
-                  <span>{rep.technician}</span>
-                </div>
-              </Td>
-
-              {/* Progress (hide on mobile) */}
-              <Td className="hidden md:table-cell">{rep.progress}</Td>
-
-              {/* Status (visible on mobile) */}
-              <Td>
-                <StatusCard status={rep.status.toUpperCase() as "ONGOING"} />
-              </Td>
-
-              {/* Actions (visible on mobile) */}
-              <Td className="hidden md:table-cell">
-                <div className="flex items-center">
-                  <button className="mr-2 items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer">
-                    <Image
-                      src={icons.callIcon}
-                      height={20}
-                      width={20}
-                      alt="Call icon"
-                    />
-                  </button>
-                  <button className="items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer">
-                    <Image
-                      src={icons.chatIconActive2}
-                      height={20}
-                      width={20}
-                      alt="Chat icon"
-                    />
-                  </button>
-                </div>
-              </Td>
-
-              {/* More (visible on mobile — part of actions) */}
-              <Td>
-                <button className="w-full flex items-center justify-center cursor-pointer">
-                  <Image
-                    src={icons.moreIcon}
-                    height={20}
-                    width={24}
-                    alt="Menu icon"
-                  />
-                </button>
-              </Td>
+    <>
+      <TableOverflow>
+        <TechModal
+          open={open}
+          close={() => {
+            setOpen(false);
+            setTech(null);
+          }}
+          tech={tech}
+        />
+        <Table>
+          <Thead>
+            <Tr className="bg-light-480">
+              {repTableH.map((rep) => (
+                <Th
+                  key={rep.id}
+                  className={rep.size === "sm" ? "hidden md:table-cell" : ""}
+                >
+                  <div className="flex flex-row items-center gap-2 font-normal text-sm">
+                    {rep.id === "1" ? (
+                      <RadioCheck
+                        checked={check}
+                        setChecked={() => setCheck((ch) => !ch)}
+                      />
+                    ) : null}
+                    <span>{rep.name}</span>
+                  </div>
+                </Th>
+              ))}
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
-    </TableOverflow>
+          </Thead>
+
+          <Tbody>
+            {data.map((rep) => (
+              <Tr key={rep.id}>
+                {/* Job ID (visible on mobile) */}
+                <Td className="flex items-center gap-2">
+                  <RadioCheck
+                    checked={check}
+                    setChecked={() => setCheck((ch) => !ch)}
+                  />
+                  <div>
+                    <Text.SmallHeading className="text-sm font-semibold">
+                      {rep.id}
+                    </Text.SmallHeading>
+                    <Text.SmallText>
+                      {formatDateProper(new Date())}
+                    </Text.SmallText>
+                  </div>
+                </Td>
+
+                {/* Service (visible on mobile) */}
+                <Td>{rep.service}</Td>
+
+                {/* Technician (hide on mobile) */}
+                <Td className="hidden md:table-cell">
+                  <div className="flex items-center gap-2">
+                    <Image
+                      src={images.technician}
+                      height={24}
+                      width={24}
+                      className="rounded-full "
+                      alt="Technician"
+                    />
+
+                    <span>{rep.technician}</span>
+                  </div>
+                </Td>
+
+                {/* Progress (hide on mobile) */}
+                <Td className="hidden md:table-cell">{rep.progress}</Td>
+
+                {/* Status (visible on mobile) */}
+                <Td className="hidden md:table-cell">
+                  <StatusCard status={rep.status.toUpperCase() as "ONGOING"} />
+                </Td>
+
+                {/* Actions (visible on mobile) */}
+                <Td className="hidden md:table-cell">
+                  <div className="flex items-center">
+                    <button
+                      className="mr-2 items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer"
+                      onClick={() => {
+                        setOpen(true);
+                        setTech(rep);
+                      }}
+                    >
+                      <Image
+                        src={icons.callIcon}
+                        height={20}
+                        width={20}
+                        alt="Call icon"
+                      />
+                    </button>
+                    <button
+                      className="items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer"
+                      onClick={() => {
+                        setOpen(true);
+                        setTech(rep);
+                      }}
+                    >
+                      <Image
+                        src={icons.chatIconActive2}
+                        height={20}
+                        width={20}
+                        alt="Chat icon"
+                      />
+                    </button>
+                  </div>
+                </Td>
+
+                {/* More (visible on mobile — part of actions) */}
+                <Td>
+                  <Dropdown className="">
+                    <Dropdown.Trigger className="w-10 cursor-pointer" isNormal>
+                      <Image
+                        src={icons.moreIcon}
+                        height={20}
+                        width={24}
+                        alt="Menu icon"
+                      />
+                    </Dropdown.Trigger>
+                    <Dropdown.Content className="w-[120px] bg-white">
+                      <Dropdown.Item
+                        className="w-full"
+                        onClick={() => handleOpenModal(rep.status)}
+                      >
+                        <div className="flex-rows items-center gap-2">
+                          <BsEye />
+                          <Text.Paragraph className="text-sm">
+                            View Status
+                          </Text.Paragraph>
+                        </div>
+                      </Dropdown.Item>
+                      <Dropdown.Item className="w-full">
+                        <div className="flex-rows items-center gap-2">
+                          <CgCloseO />
+                          <Text.Paragraph className="text-sm">
+                            Cancel
+                          </Text.Paragraph>
+                        </div>
+                      </Dropdown.Item>
+                    </Dropdown.Content>
+                  </Dropdown>
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </TableOverflow>
+    </>
   );
 };
 
-export const TableOverflow: React.FC<IProps> = ({ children }) => {
-  return <div className="w-full overflow-x-auto">{children}</div>;
+export const TableOverflow: React.FC<IProps> = ({ children, className }) => {
+  return (
+    <div className={`w-full overflow-x-auto h-full pb-20 ${className}`}>
+      {children}
+    </div>
+  );
 };
 
 export const Table: React.FC<IProps> = ({ children }) => {

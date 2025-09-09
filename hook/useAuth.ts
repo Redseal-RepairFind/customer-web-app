@@ -141,12 +141,12 @@ export const useAuth = () => {
           : null),
       };
 
-      console.log(payload);
+      // console.log(payload);
 
       const res = await authActions.signup(payload as SignupType);
       // reset();
 
-      console.log(res);
+      // console.log(res);
 
       const USR = process.env.NEXT_PUBLIC_USER_COOKIE!;
 

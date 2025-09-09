@@ -14,6 +14,12 @@ export const dashboardNav = [
     activeIcon: icons.requestIconActive,
   },
   {
+    name: "Manage Subscription",
+    route: "/manage-subscription",
+    icon: icons.subIcon,
+    activeIcon: icons.subIconActive,
+  },
+  {
     name: "Inbox",
     route: "/inbox",
     icon: icons.chatIcon,
@@ -122,7 +128,7 @@ export const repTableH = [
   },
   {
     name: "Status",
-    size: "all",
+    size: "sm",
     id: "5",
   },
   {
@@ -199,4 +205,26 @@ export const dummyCommHistory = [
       createdAt: new Date(),
     },
   },
+];
+
+export const recommend = [
+  "Yes, I would recommend",
+  "No, I would not recommend",
+];
+
+export const issueType = [
+  "Work not completed as agreed",
+  "Quality of work is unsatisfactory",
+  "Damage to property",
+  "Billing/Pricing dispute",
+  "Unprofessional behavior",
+  "Safety concerns",
+  "Others",
+];
+
+export const nextAct = [
+  "We'll review your report within 24 hours",
+  "Our team will contact you to discuss resolution options",
+  "We may reach out to the contractor for their perspective",
+  "We'll work to find a fair solution for all parties",
 ];

@@ -15,35 +15,45 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
+import { usePricing } from "@/hook/usePricing";
 
-const RequestModal = () => {
+type SkilsTYpe = {
+  name: string;
+  distance: number | string;
+  contractorCount: number;
+}[];
+
+const RequestModal = ({ skillsList }: { skillsList: SkilsTYpe }) => {
   const [toggle, setToggle] = useState<boolean>(false);
-  const [dropdown, setDropdown] = useState({
-    name: "",
-    id: "",
-  });
+  const [dropdown, setDropdown] = useState<{
+    name: string;
+    distance: number | string;
+    contractorCount: number;
+  }>();
   const [value, setValue] = useState<Dayjs | null>(dayjs());
   const [time, setTime] = useState<Dayjs | null>(dayjs());
   const [open, setOpen] = useState({
     time: false,
     date: false,
   });
+
+  const [serviceType, setServiceType] = useState<SkilsTYpe>(skillsList);
   const isWeekend = value ? value.day() === 0 || value.day() === 6 : false;
 
-  const shouldDisableTime = (
-    value: Dayjs,
-    view: "hours" | "minutes" | "seconds"
-  ) => {
-    if (view !== "hours") return false;
+  // const shouldDisableTime = (
+  //   value: Dayjs,
+  //   view: "hours" | "minutes" | "seconds"
+  // ) => {
+  //   if (view !== "hours") return false;
 
-    const hour = value.hour();
+  //   const hour = value.hour();
 
-    if (isWeekend) {
-      return hour < 14 || hour > 18; // only 2–6 PM
-    } else {
-      return hour < 9 || hour > 17; // only 9 AM–5 PM
-    }
-  };
+  //   //   if (isWeekend) {
+  //   //     return hour < 14 || hour > 18; // only 2–6 PM
+  //   //   } else {
+  //   //     return hour < 9 || hour > 17; // only 9 AM–5 PM
+  //   //   }
+  // };
 
   return (
     <form action="" className="w-full flex-cols gap-4 z-[1000]">
@@ -70,23 +80,46 @@ const RequestModal = () => {
             </Text.Paragraph>
           </Dropdown.Trigger>
           <Dropdown.Content className="w-full bg-white">
-            <Dropdown.Label>
-              <Text.Paragraph className="text-dark-500">
+            <Dropdown.Label className="flex-cols gap-2">
+              <Text.Paragraph className="text-dark-500 ">
                 {"Select Service type"}
               </Text.Paragraph>
+
+              <div className="input-container flex-rows items-center">
+                <input
+                  className="text-input"
+                  placeholder="Search service type"
+                  autoFocus
+                  onChange={(e) => {
+                    const value = e.target.value.toLowerCase();
+                    const filtered = skillsList.filter((item) =>
+                      item.name.toLowerCase().includes(value)
+                    );
+                    setServiceType(filtered);
+                  }}
+                />
+              </div>
             </Dropdown.Label>
 
-            {/* {equipmentAge.map((eq, i) => (
+            {serviceType?.length === 0 && (
+              <Dropdown.Item className="p-4">
+                <Text.Paragraph className="text-dark-500 ">
+                  No service type found for the search inputs
+                </Text.Paragraph>
+              </Dropdown.Item>
+            )}
+
+            {serviceType?.map((eq, i) => (
               <Dropdown.Item
-                key={eq.id}
-                className={`  `}
+                key={eq.name}
+                className={` border-b border-b-light-50`}
                 onClick={() => setDropdown?.(eq)}
               >
                 <Text.Paragraph className="text-dark-500">
                   {eq.name}
                 </Text.Paragraph>
               </Dropdown.Item>
-            ))} */}
+            ))}
           </Dropdown.Content>
         </Dropdown>
       </div>
@@ -157,8 +190,8 @@ const RequestModal = () => {
               label="Select time"
               value={time}
               onChange={setTime}
-              ampm // 12-hour clock; remove for 24h
-              shouldDisableTime={shouldDisableTime}
+              // ampm // 12-hour clock; remove for 24h
+              // shouldDisableTime={shouldDisableTime}
               open={open.time}
               onClose={() =>
                 setOpen((op) => ({
