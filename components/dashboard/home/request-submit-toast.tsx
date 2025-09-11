@@ -5,8 +5,13 @@ import { PLANSTYPE } from "./plan-log";
 import { useSubCalc } from "@/hook/useSubCalc";
 import Image from "next/image";
 import { icons, images } from "@/lib/constants";
+import { Subscription } from "@/utils/types";
 
-const RequestSubmitToast = ({ subscription }: { subscription: PLANSTYPE }) => {
+const RequestSubmitToast = ({
+  subscription,
+}: {
+  subscription: Subscription;
+}) => {
   const { startDate, endDate, percentComplete, daysLeft } =
     useSubCalc(subscription);
   return (

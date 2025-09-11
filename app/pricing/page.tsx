@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 const PricingPage = () => {
-  return <Pricingg />;
+  return <Pricingg isUpgrade={false} />;
 };
 
 export default PricingPage;

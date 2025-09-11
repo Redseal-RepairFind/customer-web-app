@@ -203,6 +203,32 @@ export type UpgradeType = {
   newPlanId?: string;
 };
 
+export type Notification = {
+  _id: string;
+  category: string; // e.g., "GENERAL"
+  createdAt: string; // ISO date string
+  updatedAt: string; // ISO date string
+  readAt: string | null;
+  entity: any; // You can specify a more accurate type if you know the structure
+  type: string; // e.g., "SUBSCRIPTION_PAYMENT"
+  message: string;
+  user: string; // User ID
+  userType: "customers" | string; // If you only expect "customers", make it a union
+  heading: {
+    name: string;
+    image: string;
+  };
+  data: {
+    subscriptionId: string;
+    planName: string;
+    planType: string;
+    amount: number;
+    currency: string;
+    [key: string]: any; // in case there are additional dynamic properties
+  };
+  __v: number;
+};
+
 export const LANG_ID = "rpf_lng";
 
 export const SUB_EXTRA_ID = "extra_sub";

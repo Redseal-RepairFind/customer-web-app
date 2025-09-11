@@ -12,14 +12,15 @@ importScripts(
 // Initialize the Firebase app in the service worker by passing in
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
+
 firebase.initializeApp({
-  apiKey: process.env.NEXT_PUBLIC_FCM_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  apiKey: "AIzaSyCRMJz1ld9AExywcQfVI4lYSlQrGKMi29o",
+  authDomain: "lustrous-maxim-419405.firebaseapp.com",
+  projectId: "lustrous-maxim-419405",
+  storageBucket: "lustrous-maxim-419405.firebasestorage.app",
+  messagingSenderId: "264013304597",
+  appId: "1:264013304597:web:0f93f7dde107ed4eb3cf1c",
+  measurementId: "G-5RH3KNE3SY",
 });
 
 // Retrieve an instance of Firebase Messaging so that it can handle background

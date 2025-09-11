@@ -7,15 +7,35 @@ import { PlanBadge } from "../home/plan-log";
 import { SpecialBox } from "../home/job-toast-modal";
 import { HiUser } from "react-icons/hi";
 import Button from "@/components/ui/custom-btn";
+import { useNotification } from "@/hook/useNotification";
+import LoadingTemplate from "@/components/ui/spinner";
+import { ClipLoader } from "react-spinners";
+import { Notification } from "@/utils/types";
+import { getTimeAgo } from "@/lib/helpers";
 
 const Notifs = () => {
   const [switched, setSwitched] = useState("Notifications");
+
+  const {
+    // handleAllReadNotifs,
+    handleReadNotifs,
+    allNotifications,
+    isFetchingNextPage,
+    // hasNextPage,
+    isLoading,
+    sentinelRef,
+    unreadCount,
+  } = useNotification();
+
+  // console.log(allNotifications);
+
+  if (isLoading) return <LoadingTemplate />;
   return (
     <main className="flex-cols gap-4">
       <div className="flex-row-between">
         <Text.SmallHeading>Notifications</Text.SmallHeading>
 
-        <PlanBadge planName="3 unread" />
+        <PlanBadge planName={`${unreadCount} unread`} />
       </div>
       <PageToggler
         setSwitched={setSwitched}
@@ -28,7 +48,9 @@ const Notifs = () => {
         <div className="gap-2 flex-cols">
           <Text.SmallHeading>Recent Notification</Text.SmallHeading>
 
-          <NotifItem />
+          {allNotifications?.map((not) => (
+            <NotifItem key={not._id} notif={not} onRead={handleReadNotifs} />
+          ))}
         </div>
       ) : (
         <div className="gap-2 flex-cols">
@@ -39,35 +61,50 @@ const Notifs = () => {
           <ActionsItem />
         </div>
       )}
+      <div ref={sentinelRef} className="h-12" />
+
+      <div className="flex-row-center w-full">
+        {isFetchingNextPage && <ClipLoader size={24} color="#000" />}
+      </div>
     </main>
   );
 };
 
 export default Notifs;
 
-const NotifItem = () => {
+const NotifItem = ({
+  notif,
+  onRead,
+}: {
+  notif: Notification;
+  onRead: (id: string) => void;
+}) => {
   return (
-    <SpecialBox className="border border-dark-10 flex-row-between px-2 md:px-4 py-2">
+    <SpecialBox
+      className={`border border-dark-10 flex-row-between px-2 md:px-4 py-2`}
+      isBtn
+      onClick={() => onRead(notif?._id)}
+      isRead={Boolean(notif.readAt)}
+    >
       <div className="flex-rows gap-2 w-[80%]">
         <div className="h-8 min-w-8 rounded-full flex-row-center bg-red-100">
           <HiUser />
         </div>
 
         <div className="">
-          <Text.SmallText className="text-sm md:text-base text-dark-500 font-semibold">
-            Customer has viewed your site
+          <Text.SmallText className="text-sm md:text-base text-dark-500 font-semibold capitalize text-start">
+            {notif.type?.replaceAll("_", " ")?.toLowerCase()}
           </Text.SmallText>
 
           <Text.SmallText className="text-xs md:text-sm text-dark-500 ">
-            Customer has viewed your site visit request for a job on RepairFind.
-            stay active and expect a response soon.{" "}
+            {notif.message}
           </Text.SmallText>
         </div>
       </div>
 
       <div className=" ">
         <Text.SmallText className="text-xs md:text-sm text-dark-500 ">
-          2 min ago
+          {getTimeAgo(new Date(notif.createdAt)?.toISOString())}
         </Text.SmallText>
       </div>
     </SpecialBox>

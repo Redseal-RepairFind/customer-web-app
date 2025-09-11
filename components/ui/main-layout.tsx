@@ -9,6 +9,8 @@ import { generateToken, messaging } from "@/lib/firebase/firebase";
 import { onMessage } from "firebase/messaging";
 import { useToast } from "@/contexts/toast-contexts";
 import Text from "./text";
+import { dashboard } from "@/lib/api/actions/dashboard-actions/dashboard/dashboard";
+import { useFCMNotifications } from "@/hook/useFcmToken";
 
 export default function MainLayout({
   children,
@@ -20,24 +22,6 @@ export default function MainLayout({
   const isHome = curPathname === "/";
   const queryClient = new QueryClient();
 
-  useEffect(() => {
-    const token = generateToken();
-    onMessage(messaging, (payload) => {
-      warning({
-        render: (api) => (
-          <div>
-            <Text.SubHeading> {payload.notification.title}</Text.SubHeading>
-            <Text.SubParagraph>{payload.notification.body}</Text.SubParagraph>
-          </div>
-        ),
-        vars: { bg: "#ffffff", fg: "#05e405" }, // still can theme even with custom render
-        // title: payload.notification.title,
-        // description: payload.notification.body,
-      });
-    });
-    // console.log(token);
-  }, []);
-
   const isAuth =
     curPathname === "/login" ||
     curPathname === "/otp" ||
@@ -47,6 +31,9 @@ export default function MainLayout({
     curPathname === "/pricing" ||
     curPathname === "/resetPassword" ||
     curPathname === "/upgrade_subscription";
+
+  useFCMNotifications();
+
   return (
     <QueryClientProvider client={queryClient}>
       <div

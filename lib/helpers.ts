@@ -109,3 +109,40 @@ export function formatTo12Hour(date: Date) {
 
   return `${hours}:${minutesStr} ${ampm}`;
 }
+
+export const getTimeAgo = (dateString: string): string => {
+  const actionDate = new Date(dateString);
+  const now = new Date();
+
+  const diffInSeconds = Math.floor(
+    (now.getTime() - actionDate.getTime()) / 1000
+  );
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} sec${diffInSeconds === 1 ? "" : "s"} ago`;
+  }
+
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} min${diffInMinutes === 1 ? "" : "s"} ago`;
+  }
+
+  if (diffInHours < 24) {
+    return `${diffInHours} hr${diffInHours === 1 ? "" : "s"} ago`;
+  }
+
+  if (diffInDays === 1) {
+    return "Yesterday";
+  }
+
+  // More than 2 days ago — use local time and locale
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+    year: "2-digit",
+  };
+
+  return actionDate.toLocaleDateString(undefined, options); // Uses browser's locale
+};
