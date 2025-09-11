@@ -1,3 +1,5 @@
+"use client";
+
 import ForgPassword from "@/components/auth/forgot-password";
 
 const ForgotPassword = () => {

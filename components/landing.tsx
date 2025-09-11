@@ -14,7 +14,11 @@ import { useEffect, useRef, useState } from "react";
 import { usePageNavigator } from "@/hook/navigator";
 import { useAuthentication } from "@/hook/useAuthentication";
 
-gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger); // ✨ register
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger);
+  }
+}, []);
 
 const Home = () => {
   const [navOpen, setNavOpen] = useState(false);

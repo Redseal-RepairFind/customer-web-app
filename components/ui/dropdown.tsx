@@ -1,4 +1,3 @@
-// components/dropdown.tsx
 "use client";
 
 import * as React from "react";
@@ -159,7 +158,10 @@ const DropdownBase: React.FC<DropdownProps> = ({
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
   const menuRef = React.useRef<HTMLUListElement | null>(null);
-  const menuId = React.useId();
+  const reactId = React.useId();
+  const [menuId] = React.useState(
+    () => `dropdown-${Math.random().toString(36).slice(2, 9)}`
+  );
 
   useClickOutside(rootRef as any, () => setOpen(false));
 

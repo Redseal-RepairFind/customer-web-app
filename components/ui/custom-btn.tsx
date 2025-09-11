@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 
 type BaseProps<E extends HTMLElement = HTMLElement> =
