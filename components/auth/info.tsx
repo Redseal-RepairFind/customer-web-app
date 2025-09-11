@@ -251,6 +251,7 @@ const UserInformation = () => {
                 ) : null}
               </InputContainer>
             </div>
+
             {errors?.[inps.id as keyof SignupValues]?.message && (
               <Text.SmallText className="text-red-500">
                 {String(errors[inps.id as keyof SignupValues]?.message)}
@@ -376,6 +377,7 @@ const UserInformation = () => {
       <Button
         className="cursor-pointer w-full mb-4 mt-8 min-h-12 relative"
         disabled={isLoading}
+        type="submit"
       >
         {isLoading ? (
           <LoadingTemplate isMessage={false} variant="small" />

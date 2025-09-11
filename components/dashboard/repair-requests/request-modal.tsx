@@ -16,6 +16,11 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { usePricing } from "@/hook/usePricing";
+import { LANG_ID, Subscription, SubscriptionResponse } from "@/utils/types";
+import { useRepairs } from "@/hook/useRepairs";
+import LoadingTemplate from "@/components/ui/spinner";
+import { readCookie, readStringCookie } from "@/lib/helpers";
+import { ClipLoader } from "react-spinners";
 
 type SkilsTYpe = {
   name: string;
@@ -23,13 +28,23 @@ type SkilsTYpe = {
   contractorCount: number;
 }[];
 
-const RequestModal = ({ skillsList }: { skillsList: SkilsTYpe }) => {
+const RequestModal = ({
+  skillsList,
+  subsList,
+  closeModal,
+}: {
+  skillsList: SkilsTYpe;
+  subsList: SubscriptionResponse;
+  closeModal: () => void;
+}) => {
   const [toggle, setToggle] = useState<boolean>(false);
   const [dropdown, setDropdown] = useState<{
     name: string;
     distance: number | string;
     contractorCount: number;
   }>();
+
+  const [subs, setSubs] = useState<Subscription>();
   const [value, setValue] = useState<Dayjs | null>(dayjs());
   const [time, setTime] = useState<Dayjs | null>(dayjs());
   const [open, setOpen] = useState({
@@ -38,7 +53,15 @@ const RequestModal = ({ skillsList }: { skillsList: SkilsTYpe }) => {
   });
 
   const [serviceType, setServiceType] = useState<SkilsTYpe>(skillsList);
+  const [message, setMessage] = useState("");
+  const language = readStringCookie(LANG_ID);
   const isWeekend = value ? value.day() === 0 || value.day() === 6 : false;
+
+  // console.log();
+
+  const { creatingRequest, handleCreateRequest } = useRepairs();
+
+  // console.log(subsList);
 
   // const shouldDisableTime = (
   //   value: Dayjs,
@@ -56,7 +79,7 @@ const RequestModal = ({ skillsList }: { skillsList: SkilsTYpe }) => {
   // };
 
   return (
-    <form action="" className="w-full flex-cols gap-4 z-[1000]">
+    <form className="w-full flex-cols gap-4 z-[1000]">
       <div className="flex-cols gap-2">
         <Text.SubHeading className="text-lg font-semibold">
           Confirm payment information for your subscription
@@ -123,6 +146,43 @@ const RequestModal = ({ skillsList }: { skillsList: SkilsTYpe }) => {
           </Dropdown.Content>
         </Dropdown>
       </div>
+      <div className="flex-col gap-4 mb-4">
+        <div className="flex-rows mb-2">
+          <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
+            Select Plan
+          </Text.Paragraph>
+        </div>
+        <Dropdown className="w-full">
+          <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
+            <Text.Paragraph className="text-dark-500">
+              {subs?.subscriptionType && subs.planType && subs.billingFrequency
+                ? `${subs.subscriptionType} - ${subs.planType} (${subs.billingFrequency})`
+                : "Select Subscription Plan"}
+            </Text.Paragraph>
+          </Dropdown.Trigger>
+          <Dropdown.Content className="w-full bg-white">
+            <Dropdown.Label className="flex-cols gap-2">
+              <Text.Paragraph className="text-dark-500 ">
+                {"Select Subscription Plan"}
+              </Text.Paragraph>
+            </Dropdown.Label>
+
+            {subsList?.data?.map((eq, i) => (
+              <Dropdown.Item
+                key={eq.id}
+                className={` border-b border-b-light-50`}
+                onClick={() => setSubs?.(eq)}
+              >
+                <Text.Paragraph className="text-dark-500">
+                  {`
+                  ${eq.subscriptionType} - ${eq.planType} (${eq.billingFrequency})
+                 `}
+                </Text.Paragraph>
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Content>
+        </Dropdown>
+      </div>
       <div className="flex-rows gap-2">
         <Text.Paragraph className="font-semibold">Emergency</Text.Paragraph>
         <ToggleBtn
@@ -131,14 +191,18 @@ const RequestModal = ({ skillsList }: { skillsList: SkilsTYpe }) => {
           emergency
         />
       </div>
-
       <div className="flex-col gap-4 mb-4 w-full relative">
-        <Text.Paragraph className="font-semibold">Location</Text.Paragraph>
+        <Text.Paragraph className="font-semibold">
+          Plan Address{" "}
+          <span className="text-xs text-dark-200">(Auto filled by plan)</span>{" "}
+        </Text.Paragraph>
         <InputContainer>
           <input
             type="text"
             className="text-input"
-            placeholder="e.g Kitchen, Bedroom, Living room"
+            placeholder="The address associated to your selected plan"
+            disabled
+            value={subs ? `${subs?.coverageAddress?.address},` : ""}
           />
         </InputContainer>
       </div>
@@ -222,17 +286,42 @@ const RequestModal = ({ skillsList }: { skillsList: SkilsTYpe }) => {
           <textarea
             rows={4}
             cols={4}
-            className="text-input"
-            // onChange={(e) => setMessage(e.target.value)}
-            // value={message}
+            className="text-input py-2"
+            onChange={(e) => setMessage(e.target.value)}
+            value={message}
+            placeholder="Describe the issue you want fixed"
           />
         </InputContainer>
       </div>
       <div className="flex-rows gap-2">
-        <Button>
-          <Button.Text>Submit Request</Button.Text>
+        <Button
+          disabled={creatingRequest}
+          onClick={async () => {
+            const payload = {
+              serviceType: dropdown?.name,
+              date: dayjs(value).format("YYYY-MM-DD"),
+              time: dayjs(time).format("HH:mm"),
+              description: message,
+              language,
+              subscriptionId: subs?.id,
+              emergency: toggle,
+            };
+
+            // console.log(payload);
+
+            await handleCreateRequest(payload, closeModal);
+          }}
+        >
+          {creatingRequest ? (
+            <Button.Icon>
+              <ClipLoader size={20} color="#fff" />
+            </Button.Icon>
+          ) : null}
+          <Button.Text>
+            {creatingRequest ? "Submitting..." : "Submit Request"}
+          </Button.Text>
         </Button>
-        <Button variant="secondary">
+        <Button variant="secondary" disabled={creatingRequest}>
           <Button.Text>Cancel</Button.Text>
         </Button>
       </div>

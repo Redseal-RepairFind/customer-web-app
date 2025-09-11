@@ -15,6 +15,8 @@ import { BsEye } from "react-icons/bs";
 import { CgCloseO } from "react-icons/cg";
 import { useToast } from "@/contexts/toast-contexts";
 import { RequestCompletedToast } from "../home/request-submit-toast";
+import { RepairJob } from "@/utils/types";
+import { useSearchParams } from "next/navigation";
 
 interface IProps {
   children: React.ReactNode;
@@ -33,17 +35,19 @@ type DataType = {
   }[];
 };
 
-const RepairTable = ({ data }: DataType) => {
+const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const [check, setCheck] = useState(false);
   const [open, setOpen] = useState(false);
   const [tech, setTech] = useState<any>();
   const { warning } = useToast();
+  const params = useSearchParams();
+  const status = params.get("status");
 
   if (!data?.length)
     return (
       <EmptyPage
-        tytle="No Recent Request"
-        message="Your recent activity appears here."
+        tytle={`No ${status ? status : ""} Repair Requests`}
+        message="Your repair activities appears here."
         className="min-h-[350px]"
       />
     );
@@ -91,7 +95,7 @@ const RepairTable = ({ data }: DataType) => {
 
           <Tbody>
             {data.map((rep) => (
-              <Tr key={rep.id}>
+              <Tr key={rep.reference}>
                 {/* Job ID (visible on mobile) */}
                 <Td className="flex items-center gap-2">
                   <RadioCheck
@@ -109,25 +113,37 @@ const RepairTable = ({ data }: DataType) => {
                 </Td>
 
                 {/* Service (visible on mobile) */}
-                <Td>{rep.service}</Td>
+                <Td>{rep.category}</Td>
 
                 {/* Technician (hide on mobile) */}
                 <Td className="hidden md:table-cell">
                   <div className="flex items-center gap-2">
-                    <Image
+                    {/* <Image
                       src={images.technician}
                       height={24}
                       width={24}
                       className="rounded-full "
                       alt="Technician"
-                    />
+                    /> */}
 
-                    <span>{rep.technician}</span>
+                    <span>
+                      {rep?.status === "PENDING" ? "- -" : "TEchnicians name"}
+                    </span>
                   </div>
                 </Td>
 
                 {/* Progress (hide on mobile) */}
-                <Td className="hidden md:table-cell">{rep.progress}</Td>
+                <Td className="hidden md:table-cell">
+                  <Text.SmallText>
+                    {rep?.status === "PENDING"
+                      ? "Scheduling in Progress"
+                      : rep?.status === "ONGOING"
+                      ? "Awaiting Technician’s Arrival"
+                      : rep?.status === "COMPLETED"
+                      ? "Completed"
+                      : "In dispute"}
+                  </Text.SmallText>
+                </Td>
 
                 {/* Status (visible on mobile) */}
                 <Td className="hidden md:table-cell">
@@ -213,7 +229,7 @@ const RepairTable = ({ data }: DataType) => {
 
 export const TableOverflow: React.FC<IProps> = ({ children, className }) => {
   return (
-    <div className={`w-full overflow-x-auto h-full pb-20 ${className}`}>
+    <div className={`w-full overflow-x-auto h-full md:pb-20 ${className}`}>
       {children}
     </div>
   );

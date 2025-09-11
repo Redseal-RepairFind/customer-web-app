@@ -62,6 +62,7 @@ function ButtonBase({
       className={cx(base, variants[variant], className)}
       disabled={disabled}
       {...rest}
+      type={rest.type || "button"}
     >
       {children}
     </button>

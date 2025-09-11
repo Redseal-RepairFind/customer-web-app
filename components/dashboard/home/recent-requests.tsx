@@ -12,35 +12,19 @@ import {
 } from "./job-toast-modal";
 import Modal from "@/components/ui/customModal";
 import { useState } from "react";
+import { RepairJob } from "@/utils/types";
+import { formatDateProper } from "@/lib/helpers";
+import { SeemoreBtn } from "./multi-branch";
 
-const recReq = [
-  {
-    name: "Plumbing - Kitchen",
-    date: "Aug 5, 2025",
-    status: "ONGOING",
-    id: "#12345",
-  },
-  {
-    name: "Electrical - Living Room",
-    date: "Aug 20, 2025",
-    status: "COMPLETED",
-    id: "#123456",
-  },
-  {
-    name: "HVAC - Bedroom",
-    date: "Aug 16, 2025",
-    status: "DISPUTE",
-    id: "#1234567",
-  },
-];
-
-const RecentRequests = () => {
+const RecentRequests = ({ requestData }: { requestData: RepairJob[] }) => {
   const { warning } = useToast();
   const [openModals, setOpenModals] = useState({
-    completed: true,
+    completed: false,
     rating: false,
     report: false,
   });
+
+  // console.log(requestData);
 
   const handleModal = (
     action: "open" | "close",
@@ -114,7 +98,7 @@ const RecentRequests = () => {
       <div className="flex-cols gap-4">
         <Text.SmallHeading>Recent Requests</Text.SmallHeading>
 
-        {recReq.map((req) => (
+        {requestData?.slice(0, 5).map((req) => (
           <button
             key={req.id}
             className="cursor-pointer"
@@ -132,20 +116,30 @@ const RecentRequests = () => {
             }}
           >
             <Box className="flex-row-between p-4" key={req.id}>
-              <div className="flex-cols gap-1">
-                <Text.SubHeading className="text-xl  font-semibold">
-                  {req.name}
+              <div className="flex-col flex items-start gap-1">
+                <Text.SubHeading className="text-xl font-semibold text-start">
+                  {req.category} -{" "}
+                  <span className="block sm:inline text-dark-100 text-xs md:text-sm font-normal">
+                    {req?.location?.address}
+                  </span>
                 </Text.SubHeading>
 
                 <Text.Paragraph className="text-dark-100 text-sm">
-                  {req.id} - {req.date}
+                  #{req?.id?.slice(0, 7)} -{" "}
+                  {formatDateProper(new Date(req?.date))}
                 </Text.Paragraph>
               </div>
 
-              <StatusCard status={req.status as "ONGOING"} />
+              <StatusCard status={req.status?.toUpperCase() as "ONGOING"} />
             </Box>
           </button>
         ))}
+
+        <SeemoreBtn
+          title="View all Requests"
+          url="/repair-request"
+          className="hover:bg-dark-600 hover:text-light-10 transition-all duration-300"
+        />
       </div>
     </>
   );

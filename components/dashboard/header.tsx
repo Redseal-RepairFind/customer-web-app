@@ -15,6 +15,9 @@ import RequestSubmitToast from "./home/request-submit-toast";
 import { useSubCalc } from "@/hook/useSubCalc";
 import { useSkills } from "@/hook/useSkills";
 import { usePricing } from "@/hook/usePricing";
+import { usePageNavigator } from "@/hook/navigator";
+import { BiPlus } from "react-icons/bi";
+import { SUB_EXTRA_ID } from "@/utils/types";
 
 const ROTATE_MS = 4000; // auto-advance every 4s
 
@@ -30,29 +33,38 @@ const DashboardHeader = () => {
   const { request_subscriptions, isLoadingRequestSub } = usePricing();
 
   const { skills, loadingSkills } = useSkills();
-
-  console.log(request_subscriptions);
+  const { curPathname, navigator } = usePageNavigator();
+  // console.log();
 
   const allSkils = skills?.data || [];
 
-  // console.log(allSkils);
+  const isSubsPage = curPathname.includes("manage-subscription");
+
+  // console.log(request_subscriptions);
 
   const handleCloseModal = () => setOpenModal(false);
   const handleOpenModal = () => {
+    if (isSubsPage) {
+      const extraSub = "new_sub";
+      navigator?.navigate(`/pricing?new=${extraSub}`, "push");
+      sessionStorage.setItem(SUB_EXTRA_ID, extraSub);
+      return;
+    }
+
     const planType = user?.subscriptions?.find((user: any) =>
       user?.status?.toLowerCase()?.includes("active")
     );
 
-    setOpenModal(true);
+    // setOpenModal(true);
 
-    // if (daysLeft > 0)
-    //   warning({
-    //     render: (api) => <RequestSubmitToast subscription={planType} />,
-    //     vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
-    //   });
-    // else {
-    //   setOpenModal(true);
-    // }
+    if (daysLeft > 0)
+      warning({
+        render: (api) => <RequestSubmitToast subscription={planType} />,
+        vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
+      });
+    else {
+      setOpenModal(true);
+    }
   };
 
   const stop = () => {
@@ -97,7 +109,11 @@ const DashboardHeader = () => {
   return (
     <>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
-        <RequestModal skillsList={allSkils} />
+        <RequestModal
+          skillsList={allSkils}
+          subsList={request_subscriptions}
+          closeModal={handleCloseModal}
+        />
       </Modal>
       <div className="flex flex-col gap-5 w-full">
         <Text.SubHeading className="font-semibold capitalize">
@@ -148,10 +164,18 @@ const DashboardHeader = () => {
 
               <Button variant="tertiary" onClick={handleOpenModal}>
                 <Button.Icon className="h-4 w-4 relative">
-                  <Image src={icons.requestIconActive} fill alt="button icon" />
+                  {isSubsPage ? (
+                    <BiPlus size={16} className="font-black" />
+                  ) : (
+                    <Image
+                      src={icons.requestIconActive}
+                      fill
+                      alt="button icon"
+                    />
+                  )}
                 </Button.Icon>
                 <Button.Text className="text-xs md:text-sm">
-                  Submit a request
+                  {isSubsPage ? "Add New Location" : " Submit a request"}
                 </Button.Text>
               </Button>
             </div>

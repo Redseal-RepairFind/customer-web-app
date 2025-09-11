@@ -52,18 +52,157 @@ export type SubscriptionType = {
   };
   businessName?: string;
 };
+export type CoverageAddress = {
+  latitude: string;
+  longitude: string;
+  address: string;
+  city: string;
+  country: string;
+  [key: string]: any; // Optional: if there are other fields
+};
 
-// {
-//     "planId": "68b047c7359e42ee4651a567",
-//     "equipmentAgeRange": "3-5",
-//     "equipmentAge": 4,
-//     "subscriptionType": "Business", // Residential
-//     "coverageAddress": {
-//         "latitude": "75.309",
-//         "longitude": "72.782",
-//         "address": "Aba, onitsha way, 11",
-//         "city": "Aba",
-//         "state": "BC",
-//         "country": "Canada"
-//     }
-// }
+export type JobCounts = {
+  total: number;
+  ongoing: number;
+  done: number;
+  booked: number;
+  pending: number;
+};
+
+export type Subscription = {
+  id: string;
+  autoRenew: boolean;
+  billingFrequency: "MONTHLY" | "YEARLY" | string;
+  coverageAddress: CoverageAddress;
+  currency: string;
+  equipmentAgeCategory: string | null;
+  jobCounts: JobCounts;
+  paymentAmount: number;
+  planId: string;
+  planType: "LEGACY" | "STANDARD" | string;
+  startDate: string; // ISO string
+  status: "ACTIVE" | "INACTIVE" | "CANCELLED" | string;
+  subscriptionType: "RESIDENTIAL" | "COMMERCIAL" | string;
+};
+
+export type SubscriptionResponse = {
+  data: Subscription[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+export type RepairType = {
+  serviceType: string;
+  date: string;
+  time: string;
+  description: string;
+  subscriptionId: string;
+  language: string;
+  emergency: boolean;
+};
+
+export type RepaairsGetParams = {
+  page: number;
+  limit: number;
+  type: "REPAIR";
+  date?: Date | string;
+  status?: string;
+  startDate?: Date | string;
+  endDate?: Date | string;
+  sorting?: string;
+  contractorId?: string;
+};
+export type SubGetParams = {
+  page: number;
+  limit: number;
+  planType?: "RESIDENTIAL" | "BUSINESS";
+  search?: string;
+  sort?: string;
+};
+
+interface Location {
+  address: string;
+  city: string;
+  country: string;
+  latitude: string;
+  longitude: string;
+  [key: string]: any; // For any extra fields
+}
+
+export interface RepairJob {
+  id: string;
+  jobId: string;
+  reference: string;
+  customer: string;
+  subscription: string;
+  category: string;
+  title: string;
+  description: string;
+  language: string;
+  type: "REPAIR" | string;
+  status: "PENDING" | "ACTIVE" | "DONE" | "CANCELLED" | string;
+
+  bookingViewedByContractor: boolean;
+  isPublicRequest: boolean;
+  isAssigned: boolean;
+  isDisputable: boolean;
+  isFromWeb: boolean;
+  isViewed: boolean;
+  isSaved: boolean;
+  isChangeOrder: boolean;
+  requiresSiteVisit: boolean;
+  revisitEnabled: boolean;
+  emergency: boolean;
+  hasUnrepliedEnquiry: boolean;
+
+  date: string; // ISO format date
+  createdAt: string;
+  updatedAt: string;
+  expiresIn: string | null;
+
+  distance: number;
+
+  location: Location;
+
+  myQuotation: any | null;
+
+  contractors: any[]; // could be typed if you know contractor structure
+  conversations: any[];
+  enquiries: any[];
+  quotations: any[];
+  jobHistory: any[];
+  media: any[];
+  payments: any[];
+  reminders: any[];
+  tags: any[];
+  hideFrom: any[];
+  viewedBy: any[];
+
+  [key: string]: any; // fallback for unexpected fields
+}
+
+export interface Subscriptions {
+  id: string;
+  autoRenew: boolean;
+  billingFrequency: "MONTHLY" | "YEARLY" | string;
+  coverageAddress: CoverageAddress;
+  currency: string; // e.g., "cad"
+  equipmentAgeCategory: string | null; // e.g., "1-4" or null
+  jobCounts: JobCounts;
+  paymentAmount: number;
+  planId: string;
+  planType: "LEGACY" | "BASIC" | "PREMIUM" | string;
+  startDate: string; // ISO date string
+  status: "ACTIVE" | "CANCELLED" | "EXPIRED" | string;
+  subscriptionType: "RESIDENTIAL" | "COMMERCIAL" | string;
+}
+export type UpgradeType = {
+  subscriptionId: string;
+  newPlanId?: string;
+};
+
+export const LANG_ID = "rpf_lng";
+
+export const SUB_EXTRA_ID = "extra_sub";

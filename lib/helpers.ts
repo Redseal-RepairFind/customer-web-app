@@ -38,9 +38,9 @@ export const formatError = (error: any) => {
   return error?.response?.data?.message;
 };
 
-export const setCookie = async (name: string, item: any) => {
+export const setCookie = async (name: string, item: any, dur?: number) => {
   Cookies.set(name, item, {
-    expires: 7,
+    expires: dur || 7,
     path: "/",
     sameSite: "lax",
     // secure: process.env.NODE_ENV === "production",
@@ -51,6 +51,10 @@ export const readCookie = (name: string) => {
   const token = Cookies.get(name); // string | undefined
 
   return token && JSON?.parse(token as string);
+};
+export const readStringCookie = (name: string) => {
+  const token = Cookies.get(name); // string | undefined
+  return token;
 };
 
 export const removeCookie = (name: string) => {

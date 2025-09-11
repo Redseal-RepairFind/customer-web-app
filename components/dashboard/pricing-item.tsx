@@ -11,12 +11,14 @@ const PricingItem = ({
   cycle,
   blurItems,
   onSelectPlan,
+  currentPlan,
 }: {
   item: any;
   isRecommended: boolean;
   cycle: "monthly" | "yearly";
   blurItems: string[];
   onSelectPlan: (item: any) => void;
+  currentPlan?: boolean;
 }) => {
   // console.log(blurItems);
   // return null;
@@ -37,7 +39,7 @@ const PricingItem = ({
         </Text.Paragraph>
         {isRecommended ? (
           <span className=" px-3 py-2 rounded-full text-base text-white bg-black">
-            Recommended
+            {currentPlan ? "Current Plan" : "Recommended"}
           </span>
         ) : null}
       </div>

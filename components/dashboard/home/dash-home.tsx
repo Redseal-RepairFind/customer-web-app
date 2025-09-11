@@ -5,22 +5,25 @@ import DashboardHeader from "../header";
 import Metrics from "./metrics";
 import PlanLog from "./plan-log";
 import RecentRequests from "./recent-requests";
-import { useState } from "react";
 import { useUser } from "@/hook/useMe";
 import LoadingTemplate from "@/components/ui/spinner";
 import { useDashboard } from "@/hook/useDashboard";
 import Text from "@/components/ui/text";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
+import { useRepairs } from "@/hook/useRepairs";
 import MultiBranch from "./multi-branch";
 
 const DashboardHome = () => {
-  const [isRec, setIsRec] = useState(false);
-
   const { curUser, loadingCurUser } = useUser();
   const { trxSummary, isLoadingTrxSummary } = useDashboard();
+  const { repairsData, loadingRepairs } = useRepairs();
 
-  if (loadingCurUser || isLoadingTrxSummary) return <LoadingTemplate />;
+  if (loadingCurUser || isLoadingTrxSummary || loadingRepairs)
+    return <LoadingTemplate />;
+
+  const repairs = repairsData?.data?.data;
+  // console.log(repairs);
 
   const userData = curUser?.data;
   const trxData = trxSummary?.data;
@@ -36,6 +39,8 @@ const DashboardHome = () => {
     ...trxData,
     planType,
   };
+
+  // console.log(repairsData);
 
   return (
     <main className="w-full">
@@ -53,8 +58,8 @@ const DashboardHome = () => {
         <PlanLog plans={planType} />
         <Metrics stats={metrics} plans={planType} />
         <MultiBranch />
-        {isRec ? (
-          <RecentRequests />
+        {repairs?.length > 0 ? (
+          <RecentRequests requestData={repairs} />
         ) : (
           <EmptyPage
             tytle="No Recent Request"

@@ -5,7 +5,7 @@ import Text from "../ui/text";
 import ToggleBtn from "../ui/toggle-btn";
 import PlacesAutocomplete from "../ui/places-autocomplete";
 import Dropdown from "../ui/dropdown";
-import { equipmentAge, plans } from "@/lib/constants";
+import { accountType, equipmentAge, icons, plans } from "@/lib/constants";
 import PricingItem from "./pricing-item";
 import { useUser } from "@/hook/useMe";
 import LoadingTemplate from "../ui/spinner";
@@ -16,36 +16,98 @@ import Button from "../ui/custom-btn";
 import { usePageNavigator } from "@/hook/navigator";
 import { useAuthentication } from "@/hook/useAuthentication";
 import toast from "react-hot-toast";
+import { SUB_EXTRA_ID } from "@/utils/types";
+import { useSearchParams } from "next/navigation";
+import { StaticImageData } from "next/image";
+import { ClipLoader } from "react-spinners";
 
-const Pricingg = () => {
+const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const { curUser, loadingCurUser } = useUser();
   const { navigator } = usePageNavigator();
   const user = curUser?.data;
   const { handleLogout } = useAuthentication();
+  const params = useSearchParams();
 
-  // console.log(user);
+  const isNewParams = params?.get("new") || "";
+  const isNew = sessionStorage?.getItem(SUB_EXTRA_ID) || isNewParams;
+
+  // console.log(isNew);
 
   const initAgeCat = equipmentAge.find(
     (eq) => eq.id === user?.subscriptions[0]?.equipmentAgeCategory
   );
 
   // console.log(initAgeCat);
-  const [toggle, setToggle] = useState(false);
-  const [selectedPredictions, setSelectedPredictions] = useState<any>({
-    prediction: user?.subscription?.coverageAddress,
-    modal: false,
-  });
+  const [selectedPredictions, setSelectedPredictions] = useState<any>(
+    isNew
+      ? {
+          prediction: "",
+          modal: false,
+        }
+      : {
+          prediction: user?.subscription?.coverageAddress,
+          modal: false,
+        }
+  );
 
-  const { loadingSubsPlans, monthlyPlans, yearlylyPlans } = usePricing();
+  const planId = params?.get("planId");
 
-  const [dropdown, setDropdown] = useState<any>(initAgeCat);
+  const {
+    loadingSubsPlans,
+    monthlyPlans,
+    yearlylyPlans,
+    singleSubPlans,
+    handleCheckoutUpgrade,
+    isCheckingout,
+  } = usePricing(isUpgrade ? decodeURIComponent(planId?.trim()) : "");
+
+  const stp = accountType?.find(
+    (acc) => acc?.id === user?.subscriptions[0]?.subscriptionType
+  );
+  const [toggle, setToggle] = useState(
+    isUpgrade && singleSubPlans?.billingFrequency === "ANNUALLY" ? true : false
+  );
+
+  useEffect(() => {
+    if (isUpgrade && singleSubPlans?.billingFrequency === "ANNUALLY") {
+      setToggle(true);
+    } else {
+      setToggle(false);
+    }
+  }, [isUpgrade, singleSubPlans]);
+  // console.log(singleSubPlans);
+
+  const [dropdown, setDropdown] = useState<any>(isNew ? null : initAgeCat);
+
   const [paymentInfo, setPaymentInfo] = useState({
     info: {},
     open: false,
   });
+  const [subType, setSubType] = useState<{
+    name: string;
+    tag: string;
+    variant: string;
+    icon: StaticImageData;
+    id: string;
+  }>(isNew ? null : stp);
+
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const handleOPENMODAL = (plan: any) => {
+    setOpenModal(true);
+    setSelectedPlan(plan);
+  };
+  const handleCLOSEMODAL = () => {
+    setOpenModal(false);
+    setSelectedPlan(null);
+  };
+
+  // console.log(user);
 
   useEffect(() => {
-    if (user?.subscriptions[0]) {
+    if (isUpgrade) return;
+    if (isNew) return;
+    if (user?.subscriptions[0] && !isNew) {
       const initAgeCat = equipmentAge.find(
         (eq) => eq.id === user.subscriptions[0].equipmentAgeCategory
       );
@@ -56,143 +118,252 @@ const Pricingg = () => {
         modal: false,
       });
     }
-  }, [user]);
+  }, [user, isNew, isUpgrade]);
   if (loadingCurUser || loadingSubsPlans) return <LoadingTemplate />;
-
-  // console.log(yearlylyPlans);
-
   const plansToRender = toggle ? yearlylyPlans : monthlyPlans;
-
-  // console.log(plansToRender);
-
   const handleCloseInfoModal = () => setPaymentInfo({ info: {}, open: false });
   const handleOpenInfoModal = (item: any) => {
+    if (!subType?.name) {
+      toast.error("Select a subscription type to proceed ");
+      return;
+    }
     if (!selectedPredictions?.prediction || !dropdown?.id) {
-      toast.error("Kindly enter address and equipment age range");
+      toast.error("Kindly enter address and equipment age range ");
       return;
     }
     setPaymentInfo({ info: item, open: true });
   };
 
+  // console.log(selectedPredictions?.prediction?.country);
+
+  // console.log(singleSubPlans);
+
+  // console.log(selectedPlan);
+
   return (
     <main className="w-full my-12 xl:px-16 lg:px-8">
-      <Modal isOpen={paymentInfo.open} onClose={handleCloseInfoModal}>
-        <PaymentModal
-          onClose={handleCloseInfoModal}
-          subPlan={paymentInfo?.info}
-          dropdown={dropdown}
-          selectedPredictions={selectedPredictions}
-          setDropdown={setDropdown}
-          setSelectedPredictions={setSelectedPredictions}
-        />
-      </Modal>
-      <div className="flex-col-center w-full mb-8 ">
-        {/* <button onClick={handleLogout} className="border py-2 px-3 rounded-lg">
+      {isUpgrade ? (
+        <Modal isOpen={openModal} onClose={handleCLOSEMODAL}>
+          <div className="flex-cols gap-3">
+            <Text.Paragraph className="my-2 text-dark-400 text-base text-center">
+              To Change your subscription Plan, kindly hit the proceed button
+              bellow
+            </Text.Paragraph>
+            <div className="flex-rows gap-2">
+              <Button
+                // onClick={() => onSubmit()}
+                // disabled={!acceptTerms || isCheckingout}
+                className="cursor-pointer  mb-4 mt-8 min-h-10 relative w-full"
+                onClick={() =>
+                  handleCheckoutUpgrade({
+                    subscriptionId: singleSubPlans?.id,
+                    newPlanId: selectedPlan?._id,
+                  })
+                }
+              >
+                <Button.Text>
+                  {isCheckingout ? "Checking out...." : "Proceed"}
+                </Button.Text>
+                {isCheckingout && (
+                  <Button.Icon>
+                    <ClipLoader size={20} color="#fff" />
+                  </Button.Icon>
+                )}
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleCLOSEMODAL}
+                // disabled={isCheckingout}
+                className="cursor-pointer  mb-4 mt-8 min-h-10 relative w-full"
+              >
+                <Button.Text>Cancel</Button.Text>
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      ) : (
+        <Modal isOpen={paymentInfo.open} onClose={handleCloseInfoModal}>
+          <PaymentModal
+            onClose={handleCloseInfoModal}
+            subPlan={paymentInfo?.info}
+            dropdown={dropdown}
+            selectedPredictions={selectedPredictions}
+            setDropdown={setDropdown}
+            setSelectedPredictions={setSelectedPredictions}
+          />
+        </Modal>
+      )}
+      {isUpgrade ? (
+        <>
+          {" "}
+          <Text.Heading className="text-xl lg:text-3xl text-center">
+            Change Your Subscription Plan
+          </Text.Heading>
+          <Text.Paragraph className="my-2 text-dark-400 text-sm text-center">
+            Select a different Plan from your current one
+          </Text.Paragraph>
+          <div className="flex items-center justify-center gap-2 text-dark-400 ">
+            <Text.Paragraph className="text-dark-400 text-sm lg:text-base text-nowrap">
+              Billed monthly
+            </Text.Paragraph>
+
+            <ToggleBtn toggle={toggle} onClick={() => setToggle((tg) => !tg)} />
+
+            <Text.Paragraph className="text-green-500 text-sm lg:text-base">
+              Bill annually
+              {"  "}
+              <span className="font-semibold sm:ml-1">
+                (Save one month, sign up annually, pay up front)
+              </span>
+            </Text.Paragraph>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="flex-col-center w-full mb-8 ">
+            {/* <button onClick={handleLogout} className="border py-2 px-3 rounded-lg">
           Temp logout
         </button> */}
-        <Text.Heading className="text-xl lg:text-3xl text-center">
-          RepairFind Subscription Plans
-        </Text.Heading>
-        <Text.Heading className="my-2 text-dark-400 text-xl lg:text-3xl text-center">
-          We don’t sell repairs, we sells peace of mind
-        </Text.Heading>
+            <Text.Heading className="text-xl lg:text-3xl text-center">
+              RepairFind Subscription Plans
+            </Text.Heading>
+            <Text.Heading className="my-2 text-dark-400 text-xl lg:text-3xl text-center">
+              We don’t sell repairs, we sells peace of mind
+            </Text.Heading>
 
-        <div className="flex items-center justify-center gap-2 text-dark-400 ">
-          <Text.Paragraph className="text-dark-400 text-sm lg:text-base text-nowrap">
-            Billed monthly
-          </Text.Paragraph>
-
-          <ToggleBtn toggle={toggle} onClick={() => setToggle((tg) => !tg)} />
-
-          <Text.Paragraph className="text-green-500 text-sm lg:text-base">
-            Bill annually
-            {"  "}
-            <span className="font-semibold sm:ml-1">
-              (Save one month, sign up annually, pay up front)
-            </span>
-          </Text.Paragraph>
-        </div>
-      </div>
-
-      <div className="flex-col gap-4 mb-4 ">
-        <div className="flex-rows mb-2">
-          <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
-            {user?.businessName ? "Business Address" : " Home Address"}
-            <span className="font-light text-xs sm:ml-1">
-              (This is the address that will be linked to your subscription)
-            </span>
-          </Text.Paragraph>
-
-          <Text.SmallText className="text-dark-100 text-xs"></Text.SmallText>
-        </div>
-        {paymentInfo?.open ? null : (
-          <PlacesAutocomplete
-            selectedPredictions={selectedPredictions}
-            setSelectedPredictions={setSelectedPredictions}
-            // modal
-          />
-        )}
-      </div>
-      <div className="flex-col gap-4 mb-4">
-        <div className="flex-rows mb-2">
-          <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
-            Age of Equipment
-            <span className="font-light text-xs sm:ml-1">
-              (Providing false information about your equipment’s age will void
-              your RepairFind subscription)
-            </span>
-          </Text.Paragraph>
-        </div>
-        <Dropdown className="w-full">
-          <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
-            <Text.Paragraph className="text-dark-500">
-              {dropdown?.name || "Select Equipment Age"}
-            </Text.Paragraph>
-          </Dropdown.Trigger>
-          <Dropdown.Content className="w-full bg-white">
-            <Dropdown.Label>
-              <Text.Paragraph className="text-dark-500">
-                {"Select Equipment Age"}
+            <div className="flex items-center justify-center gap-2 text-dark-400 ">
+              <Text.Paragraph className="text-dark-400 text-sm lg:text-base text-nowrap">
+                Billed monthly
               </Text.Paragraph>
-            </Dropdown.Label>
 
-            {equipmentAge.map((eq, i) => (
-              <Dropdown.Item
-                key={eq.id}
-                className={` ${
-                  i === equipmentAge?.length - 1
-                    ? ""
-                    : "border-b border-b-light-100"
-                } `}
-                onClick={() => setDropdown(eq)}
-              >
-                <Text.Paragraph className="text-dark-500">
-                  {eq.name}
-                </Text.Paragraph>
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Content>
-        </Dropdown>
-      </div>
+              <ToggleBtn
+                toggle={toggle}
+                onClick={() => setToggle((tg) => !tg)}
+              />
 
-      {dropdown?.id === "unknown" ? (
-        <div className="flex-cols gap-2 my-4">
-          <Text.Paragraph>
-            *If you are not sure of your equipment age range, kindly proceed
-            without subscription for now, an agent will visit your address to
-            confirm, before you can proceed with your subscription
-          </Text.Paragraph>
-          <div>
-            <Button onClick={() => navigator.navigate("/dashboard", "replace")}>
-              <Button.Text>Proceed</Button.Text>
-            </Button>
+              <Text.Paragraph className="text-green-500 text-sm lg:text-base">
+                Bill annually
+                {"  "}
+                <span className="font-semibold sm:ml-1">
+                  (Save one month, sign up annually, pay up front)
+                </span>
+              </Text.Paragraph>
+            </div>
           </div>
-        </div>
-      ) : null}
+          <div className="flex-col gap-4 mb-4 ">
+            <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00 ">
+              Subscription Type
+            </Text.Paragraph>
+            <Dropdown className="w-full">
+              <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
+                <Text.Paragraph className="text-dark-500">
+                  {subType?.name || "Select Subscription type"}
+                </Text.Paragraph>
+              </Dropdown.Trigger>
+              <Dropdown.Content className="w-full bg-white">
+                <Dropdown.Label>
+                  <Text.Paragraph className="text-dark-500">
+                    Select Subscription type
+                  </Text.Paragraph>
+                </Dropdown.Label>
 
+                {accountType?.map((item) => (
+                  <Dropdown.Item
+                    key={item.id}
+                    className="border-b border-b-dark-200"
+                    onClick={() => setSubType(item)}
+                  >
+                    <Text.Paragraph className="text-dark-200">
+                      {item?.name}
+                    </Text.Paragraph>
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </div>
+          <div className="flex-col gap-4 mb-4 ">
+            <div className="flex-rows mb-2">
+              <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
+                {subType && subType.id.includes("BUSINESS")
+                  ? "Business Address"
+                  : " Home Address"}
+                <span className="font-light text-xs sm:ml-1">
+                  (This is the address that will be linked to your subscription)
+                </span>
+              </Text.Paragraph>
+              <Text.SmallText className="text-dark-100 text-xs"></Text.SmallText>
+            </div>
+            {paymentInfo?.open ? null : (
+              <PlacesAutocomplete
+                selectedPredictions={selectedPredictions}
+                setSelectedPredictions={setSelectedPredictions}
+                // modal
+              />
+            )}
+          </div>
+          <div className="flex-col gap-4 mb-4">
+            <div className="flex-rows mb-2">
+              <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
+                Age of Equipment
+                <span className="font-light text-xs sm:ml-1">
+                  (Providing false information about your equipment’s age will
+                  void your RepairFind subscription)
+                </span>
+              </Text.Paragraph>
+            </div>
+            <Dropdown className="w-full">
+              <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
+                <Text.Paragraph className="text-dark-500">
+                  {dropdown?.name || "Select Equipment Age"}
+                </Text.Paragraph>
+              </Dropdown.Trigger>
+              <Dropdown.Content className="w-full bg-white">
+                <Dropdown.Label>
+                  <Text.Paragraph className="text-dark-500">
+                    {"Select Equipment Age"}
+                  </Text.Paragraph>
+                </Dropdown.Label>
+
+                {equipmentAge.map((eq, i) => (
+                  <Dropdown.Item
+                    key={eq.id}
+                    className={` ${
+                      i === equipmentAge?.length - 1
+                        ? ""
+                        : "border-b border-b-light-100"
+                    } `}
+                    onClick={() => setDropdown(eq)}
+                  >
+                    <Text.Paragraph className="text-dark-500">
+                      {eq.name}
+                    </Text.Paragraph>
+                  </Dropdown.Item>
+                ))}
+              </Dropdown.Content>
+            </Dropdown>
+          </div>
+          {dropdown?.id === "unknown" ? (
+            <div className="flex-cols gap-2 my-4">
+              <Text.Paragraph>
+                *If you are not sure of your equipment age range, kindly proceed
+                without subscription for now, an agent will visit your address
+                to confirm, before you can proceed with your subscription
+              </Text.Paragraph>
+              <div>
+                <Button
+                  onClick={() => navigator.navigate("/dashboard", "replace")}
+                >
+                  <Button.Text>Proceed</Button.Text>
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </>
+      )}
       <div className="grid-3 w-full">
         {plansToRender.map((pla: any, i: number) => {
           let ids: string[] = [];
+          let curPlan;
           if (dropdown)
             if (dropdown?.id === "5-8") {
               ids = [plansToRender[0]?._id];
@@ -203,6 +374,41 @@ const Pricingg = () => {
             } else {
               ids = [];
             }
+
+          if (isUpgrade) {
+            const index = plansToRender.findIndex(
+              (pl: any) =>
+                pl?.planType === singleSubPlans?.planType &&
+                pl?.billingFrequency === singleSubPlans?.billingFrequency
+            );
+
+            let slicedPlans: any[] = [];
+
+            if (index !== -1) {
+              slicedPlans = plansToRender.slice(0, index + 1);
+
+              // Stop at the first ANNUALLY plan (inclusive), if one exists in the slice
+              const annuallyIndex = slicedPlans.findIndex(
+                (pl: any) => pl?.billingFrequency === "ANNUALLY"
+              );
+
+              if (annuallyIndex !== -1) {
+                slicedPlans = slicedPlans.slice(0, annuallyIndex + 1);
+              }
+            }
+
+            // Apply equipmentAgeCategory filtering
+            if (singleSubPlans?.equipmentAgeCategory === "5-8") {
+              ids = [plansToRender[0]?._id];
+            } else if (singleSubPlans?.equipmentAgeCategory === "9+") {
+              ids = [plansToRender[0]?._id, plansToRender[1]?._id];
+            } else {
+              // Default fallback: use filtered sliced plans
+              ids = slicedPlans.map((pl: any) => pl?._id);
+            }
+          }
+
+          // console.log(curPlan);
           return (
             <PricingItem
               isRecommended={
@@ -214,11 +420,12 @@ const Pricingg = () => {
                   ? i === 2
                   : false
               }
+              currentPlan
               item={pla as any}
               key={i}
               cycle={toggle ? "yearly" : "monthly"}
               blurItems={ids}
-              onSelectPlan={handleOpenInfoModal}
+              onSelectPlan={isUpgrade ? handleOPENMODAL : handleOpenInfoModal}
             />
           );
         })}

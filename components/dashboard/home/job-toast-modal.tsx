@@ -313,13 +313,15 @@ const JobDisputeModal = ({
 const SpecialBox = ({
   children,
   className,
+  minHeight = "min-h-[96px]",
 }: {
   children: ReactNode;
   className?: string;
+  minHeight?: string;
 }) => {
   return (
     <div
-      className={`bg-purple-blue-50 w-full min-h-[96px] rounded-lg ${className}`}
+      className={`bg-purple-blue-50 w-full ${minHeight}  rounded-lg ${className}`}
     >
       {children}
     </div>

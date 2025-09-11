@@ -45,7 +45,8 @@ export default function MainLayout({
     curPathname === "/signup/info" ||
     curPathname === "/forgotPassword" ||
     curPathname === "/pricing" ||
-    curPathname === "/resetPassword";
+    curPathname === "/resetPassword" ||
+    curPathname === "/upgrade_subscription";
   return (
     <QueryClientProvider client={queryClient}>
       <div

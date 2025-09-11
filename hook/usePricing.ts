@@ -2,7 +2,7 @@
 
 import { pricingActions } from "@/lib/api/actions/dashboard-actions/pricing/pricing-action";
 import { formatError } from "@/lib/helpers";
-import { SubscriptionType } from "@/utils/types";
+import { SubscriptionType, UpgradeType } from "@/utils/types";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -14,21 +14,28 @@ type SubsPage = {
   meta?: { page: number; totalPages?: number; hasNextPage?: boolean };
 };
 
-export const usePricing = () => {
+export const usePricing = (planId?: string) => {
   const [isCheckingout, setIsCheckingOut] = useState(false);
   const { navigator, curPathname } = usePageNavigator();
+  const searchParams = useSearchParams();
+  const [singleSubPlans, setSubPlans] = useState<any>();
+  const limit = searchParams.get("limit") || "20";
+  const page = searchParams.get("page") || "1";
+  const planType = searchParams.get("planType");
+  const search = searchParams.get("search") || "";
 
   const { data: subPlans, isLoading: loadingSubsPlans } = useQuery({
     queryKey: ["subscription_plan"],
-    queryFn: pricingActions.getSubscriptionPlan,
+    queryFn: () => pricingActions.getSubscriptionPlan(),
+    // enabled: curPathname === "/pricing",
     staleTime: 5 * 60_000,
   });
-
-  const searchParams = useSearchParams();
-  const limit = searchParams.get("limit") || "20";
-  const page = searchParams.get("page") || "1";
-  const planType = searchParams.get("planType") || "";
-  const search = searchParams.get("search") || "";
+  // const { data: singlePlans, isLoading: loadingSingleSubsPlans } = useQuery({
+  //   queryKey: ["subscription_plan_single"],
+  //   queryFn: () => pricingActions.getSingleSubscriptionPlan(planId),
+  //   enabled: curPathname === "/upgrade_subscription" && Boolean(planId),
+  //   staleTime: 5 * 60_000,
+  // });
 
   const { data: request_subscriptions, isLoading: isLoadingRequestSub } =
     useQuery({
@@ -37,7 +44,7 @@ export const usePricing = () => {
         pricingActions.getUserSubscriptions({
           page: Number(page),
           limit: Number(limit),
-          planType,
+          planType: planType as "RESIDENTIAL",
           search,
         }),
       staleTime: 5 * 60_000,
@@ -60,7 +67,7 @@ export const usePricing = () => {
       pricingActions.getUserSubscriptions({
         page: Number(pageParam) || 1,
         limit: Number(limit) || 20,
-        planType,
+        planType: planType as "RESIDENTIAL",
         search,
       }),
     getNextPageParam: (lastPage) => {
@@ -69,7 +76,7 @@ export const usePricing = () => {
     },
     staleTime: 60_000,
     gcTime: 5 * 60_000,
-    enabled: curPathname?.includes("/manage-subscription"),
+    // enabled: curPathname?.includes("/manage-subscription"),
   });
 
   // Flatten all loaded pages
@@ -130,6 +137,56 @@ export const usePricing = () => {
       setIsCheckingOut(false);
     }
   };
+  const handleCheckoutUpgrade = async (payload: UpgradeType) => {
+    setIsCheckingOut(true);
+    try {
+      const res = await pricingActions.upgradeSubscriptionPlan(payload);
+      toast.success(
+        res?.message || res?.data?.message || "Session created successfully"
+      );
+
+      // console.log(res);
+
+      navigator.navigate("/manage-subscription", "replace");
+      // const url = res?.url || res?.data?.url;
+      // window.location.href = url;
+    } catch (error) {
+      const errMsg = formatError(error);
+      console.error("CheckoutError", error);
+      toast.error(errMsg || "checkout failed");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+  const handleCancelPlan = async (payload: UpgradeType) => {
+    setIsCheckingOut(true);
+    try {
+      const res = await pricingActions.cancelSubscriptionPlan(payload);
+      toast.success(
+        res?.message || res?.data?.message || "Plan cancelled successfully"
+      );
+      // const url = res?.url || res?.data?.url;
+      // window.location.href = url;
+
+      await refetch();
+    } catch (error) {
+      const errMsg = formatError(error);
+      console.error("CheckoutError", error);
+      toast.error(errMsg || "checkout failed");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
+  useEffect(() => {
+    if (curPathname === "/upgrade_subscription" && Boolean(planId)) {
+      const plan = subscriptions?.find((sub) => sub?.id === planId);
+
+      setSubPlans(plan);
+    }
+  }, [curPathname, planId, subscriptions]);
+
+  // console.log(subscriptions);
 
   return {
     // plans
@@ -158,5 +215,10 @@ export const usePricing = () => {
     handleCheckout,
     isCheckingout,
     curPathname,
+    handleCheckoutUpgrade,
+    handleCancelPlan,
+
+    singleSubPlans,
+    // loadingSingleSubsPlans,
   };
 };

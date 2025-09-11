@@ -7,10 +7,72 @@ import Button from "@/components/ui/custom-btn";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
 import { BranchCard } from "../home/multi-branch";
+import { usePricing } from "@/hook/usePricing";
+import LoadingTemplate from "@/components/ui/spinner";
+import Pagination from "@/components/ui/pagination";
+import { Subscriptions } from "@/utils/types";
+import { useState } from "react";
+import Modal from "@/components/ui/customModal";
+import UpdatePlanModal from "./update-plan-modal";
 
 const Branches = () => {
+  const {
+    subscriptions,
+    // status,
+    // error,
+    // fetchNextPage,
+    // hasNextPage,
+    // isFetchingNextPage,
+    isFetching,
+    // refetch,
+    handleCancelPlan,
+    isCheckingout,
+  } = usePricing();
+  const [openUpgradeModal, setOpenUpgradeModal] = useState<{
+    open: boolean;
+    plan: Subscriptions | null;
+  }>({
+    open: false,
+    plan: null,
+  });
+
+  const handleOpenModal = (item: Subscriptions) => {
+    setOpenUpgradeModal({
+      open: true,
+      plan: item,
+    });
+  };
+  const handleCloseModal = () => {
+    setOpenUpgradeModal({
+      open: false,
+      plan: null,
+    });
+  };
+  const handleChoosePlan = (item: Subscriptions) => {
+    setOpenUpgradeModal((pl) => ({
+      ...pl,
+      plan: item,
+    }));
+  };
+  // console.log(subscriptions);
+
+  if (isFetching) return <LoadingTemplate />;
   return (
     <main className="flex-cols gap-5">
+      <Modal
+        onClose={handleCloseModal}
+        isOpen={openUpgradeModal.open}
+        maxWidth="max-w-[540px]"
+      >
+        <UpdatePlanModal
+          close={handleCloseModal}
+          plan={openUpgradeModal.plan}
+          plans={subscriptions}
+          onUpdatePlanList={handleChoosePlan}
+          handleCancelPlan={handleCancelPlan}
+          isCheckingout={isCheckingout}
+        />
+      </Modal>
       <DashboardHeader />
 
       <SpecialBox className="flex justify-around items-center border border-light-10">
@@ -44,17 +106,14 @@ const Branches = () => {
       <PaymentMethodItem isDefault />
 
       <div className="grid-2">
-        <BranchCard
-          item={{
-            country: "Canada",
-            address: "Lafos ibadan expressway sulurele",
-            status: "DISPUTE",
-            plan: "Premium",
-            eqAge: "1 - 4 years",
-            expires: "20d",
-          }}
-          size="full"
-        />
+        {subscriptions?.map((sub) => (
+          <BranchCard
+            key={sub?.id}
+            item={sub}
+            size="full"
+            onOpenUpgrade={handleOpenModal}
+          />
+        ))}
       </div>
     </main>
   );

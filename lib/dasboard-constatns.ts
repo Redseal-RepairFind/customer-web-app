@@ -228,3 +228,22 @@ export const nextAct = [
   "We may reach out to the contractor for their perspective",
   "We'll work to find a fair solution for all parties",
 ];
+
+export const repairFilter = [
+  {
+    name: "Completed",
+    id: "COMPLETED",
+  },
+  {
+    name: "Ongoing",
+    id: "ONGOING",
+  },
+  {
+    name: "Pending",
+    id: "PENDING",
+  },
+  {
+    name: "Dispute",
+    id: "DISPUTED",
+  },
+];

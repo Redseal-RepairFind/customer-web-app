@@ -45,6 +45,8 @@ const PaymentModal = ({
   const user = curUser?.data;
   // console.log(curUser?.data?.subscription?.subscriptionType);
 
+  console.log(selectedPredictions.prediction.country);
+
   const onSubmit = async () => {
     const predictions = selectedPredictions?.prediction;
 
@@ -76,8 +78,6 @@ const PaymentModal = ({
 
     await handleCheckout(payload as SubscriptionType);
   };
-
-  // console.log(selectedPredictions);
 
   return (
     <div className="w-full flex-cols gap-4 z-[1000]">
