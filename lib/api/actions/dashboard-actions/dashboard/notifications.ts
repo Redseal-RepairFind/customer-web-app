@@ -99,4 +99,22 @@ export const notifications = {
       throw error;
     }
   },
+
+  getBadgeCounts: async () => {
+    try {
+      const response = await http.get(
+        `${url}/notifications/alerts`,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 };

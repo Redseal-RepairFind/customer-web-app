@@ -1,12 +1,16 @@
 import { notifications } from "@/lib/api/actions/dashboard-actions/dashboard/notifications";
 import { formatError } from "@/lib/helpers";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 export const useNotification = () => {
   const observerRef = useRef<HTMLDivElement | null>(null);
   const [sentinel, setSentinel] = useState<HTMLDivElement | null>(null);
+
+  const { data: notificationBagde, isLoading: isLoadingBagde } = useQuery({
+    queryKey: ["badge_counts"],
+    queryFn: notifications.getBadgeCounts,
+  });
 
   const fetchNotifications = async ({ pageParam = 1 }) => {
     const response = await notifications.getUserNotification({
@@ -60,8 +64,9 @@ export const useNotification = () => {
     };
   }, [sentinel, hasNextPage, fetchNextPage]);
 
-  const allNotifications =
-    data?.pages.flatMap((page) => page?.data?.data ?? []) ?? [];
+  const allNotifications = useMemo(() => {
+    return data?.pages.flatMap((page) => page?.data?.data ?? []) ?? [];
+  }, [data]);
 
   const unreadCount = useMemo(() => {
     return allNotifications.filter((not) => !not.readAt).length;
@@ -97,5 +102,7 @@ export const useNotification = () => {
     handleReadNotifs,
     handleAllReadNotifs,
     unreadCount,
+    notificationBagde,
+    isLoadingBagde,
   };
 };

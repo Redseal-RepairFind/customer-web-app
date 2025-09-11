@@ -109,7 +109,7 @@ const DashboardNav = ({
           {notificationsCount > 0 && (
             <span
               className="
-                absolute -top-1 -right-1
+                absolute top-1 right-1
                 translate-x-1 -translate-y-1
                 pointer-events-none
               "

@@ -8,7 +8,6 @@ import Image from "next/image";
 import { usePageNavigator } from "@/hook/navigator";
 import { icons, images } from "@/lib/constants";
 import Button from "../ui/custom-btn";
-import Badge from "../ui/badge";
 import { useAuthentication } from "@/hook/useAuthentication";
 
 const DashNav = () => {

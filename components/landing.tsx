@@ -14,15 +14,15 @@ import { useEffect, useRef, useState } from "react";
 import { usePageNavigator } from "@/hook/navigator";
 import { useAuthentication } from "@/hook/useAuthentication";
 
-useEffect(() => {
-  if (typeof window !== "undefined") {
-    gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger);
-  }
-}, []);
-
 const Home = () => {
   const [navOpen, setNavOpen] = useState(false);
   const { navigator } = usePageNavigator();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger);
+    }
+  }, []);
 
   // Intro hero animations
   useGSAP(() => {

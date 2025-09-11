@@ -1,5 +1,3 @@
-// DO NOT put "use client" here unless you need client-only hooks.
-// This file uses useState, so it **does** need "use client".
 "use client";
 
 import { useState, type ReactNode } from "react";
@@ -7,6 +5,7 @@ import DashboardNav from "./dashboard-nav";
 import DashNav from "./dash-nav";
 import { NavWindow } from "../landing";
 import { dashboardNav, otherNav } from "@/lib/dasboard-constatns";
+import { useNotification } from "@/hook/useNotification";
 
 export default function ClientDashboardLayout({
   children,
@@ -14,6 +13,9 @@ export default function ClientDashboardLayout({
   children: ReactNode;
 }) {
   const [navOpen, setNavOpen] = useState(false);
+  const { notificationBagde } = useNotification();
+
+  //  console.log();
 
   return (
     // No grid needed on lg since sidebar is fixed.
@@ -29,7 +31,10 @@ export default function ClientDashboardLayout({
           isDashboard
         />
 
-        <DashboardNav onOpen={() => setNavOpen(true)} />
+        <DashboardNav
+          onOpen={() => setNavOpen(true)}
+          notificationsCount={notificationBagde?.data?.totalCount}
+        />
 
         {/* Let the main content scroll; use calc to fill the rest of the viewport */}
         <div

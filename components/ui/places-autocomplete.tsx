@@ -17,6 +17,9 @@ export type PredictionsType = {
 const getPlaceDetails = (
   placeId: string
 ): Promise<google.maps.places.PlaceResult> => {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return Promise.reject("getPlaceDetails can only run in the browser");
+  }
   return new Promise((resolve, reject) => {
     const mapDiv = document.createElement("div");
     const service = new google.maps.places.PlacesService(mapDiv);
@@ -63,6 +66,8 @@ const PlacesAutocomplete = ({
 
   // Set current location prediction if none selected
   useEffect(() => {
+    if (typeof window === "undefined" || !navigator?.geolocation) return;
+
     if (!selectedPredictions.prediction && input === "") {
       navigator.geolocation.getCurrentPosition(
         async (position) => {

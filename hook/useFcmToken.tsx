@@ -1,6 +1,6 @@
+"use client";
+
 import { useEffect } from "react";
-import { onMessage } from "firebase/messaging";
-import { generateToken, messaging } from "@/lib/firebase/firebase";
 import { usePageNavigator } from "./navigator";
 import { useToast } from "@/contexts/toast-contexts";
 import Text from "@/components/ui/text";
@@ -12,34 +12,33 @@ export const useFCMNotifications = () => {
   const { warning } = useToast();
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     let isMounted = true;
 
     const setupMessaging = async () => {
       try {
+        // Dynamically import Firebase stuff only in the browser
+        const { generateToken, messaging } = await import(
+          "@/lib/firebase/firebase"
+        );
+        const { onMessage } = await import("firebase/messaging");
+
         const currentToken = await generateToken();
         if (!currentToken || !isMounted) return;
 
         const cookieToken = readStringCookie("fcm_device_token");
 
-        // console.log(currentToken, "current");
-
         if (cookieToken !== currentToken) {
-          // Submit the token
           await notifications.submitBrowserToken({
             deviceToken: currentToken,
             deviceType: "WEB",
           });
-
-          console.log("token submitted successfully");
-
-          // Save to cookie for future comparison
           setCookie("fcm_device_token", currentToken, 365);
         }
 
-        // Listen for foreground push messages
         onMessage(messaging, (payload) => {
           if (!isMounted) return;
-
           warning({
             render: () => (
               <div>

@@ -4,12 +4,8 @@ import { usePageNavigator } from "@/hook/navigator";
 import Footer from "./footer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ThemeRegistry from "@/contexts/theme-context";
-import { useEffect } from "react";
-import { generateToken, messaging } from "@/lib/firebase/firebase";
-import { onMessage } from "firebase/messaging";
+
 import { useToast } from "@/contexts/toast-contexts";
-import Text from "./text";
-import { dashboard } from "@/lib/api/actions/dashboard-actions/dashboard/dashboard";
 import { useFCMNotifications } from "@/hook/useFcmToken";
 
 export default function MainLayout({
@@ -18,7 +14,6 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const { curPathname } = usePageNavigator();
-  const { warning } = useToast();
   const isHome = curPathname === "/";
   const queryClient = new QueryClient();
 
