@@ -45,7 +45,7 @@ function ButtonBase({
       rest.border ? "border border-white" : ""
     }`,
     secondary:
-      "bg-white text-black border border-black hover:bg-black/5 hover:text-black transition-all duration-300 cursor-pointer",
+      "bg-white text-black border border-black hover:bg-white/5 hover:text-dark-500  transition-all duration-300 cursor-pointer",
     secondary_2:
       "bg-white text-green-main border border-green-main hover:bg-green-main hover:text-white transition-all duration-300 cursor-pointer",
     danger:

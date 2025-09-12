@@ -14,7 +14,6 @@ import Modal from "../ui/customModal";
 import PaymentModal from "./home/payment-modal";
 import Button from "../ui/custom-btn";
 import { usePageNavigator } from "@/hook/navigator";
-import { useAuthentication } from "@/hook/useAuthentication";
 import toast from "react-hot-toast";
 import { SUB_EXTRA_ID } from "@/utils/types";
 import { useSearchParams } from "next/navigation";
@@ -26,7 +25,6 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const { curUser, loadingCurUser } = useUser();
   const { navigator } = usePageNavigator();
   const user = curUser?.data;
-  const { handleLogout } = useAuthentication();
   const params = useSearchParams();
 
   const isNewParams = params?.get("new") || "";
@@ -104,14 +102,14 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
     setSelectedPlan(null);
   };
 
-  console.log(user);
+  // console.log(user);
 
-  console.log(isNew);
+  // console.log(isNew);
 
   useEffect(() => {
-    if (isUpgrade) return;
-    else if (isNew) return;
-    else if (user?.subscriptions[0] && !isNew) {
+    // if (isUpgrade) return;
+    if (isNew) return;
+    if (user?.subscriptions[0] && !isNew) {
       const initAgeCat = equipmentAge.find(
         (eq) => eq.id === user.subscriptions[0].equipmentAgeCategory
       );
@@ -144,7 +142,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
 
   // console.log(selectedPlan);
 
-  console.log(isUpgrade);
+  // console.log(isUpgrade);
 
   return (
     <main className="w-full my-12 xl:px-16 lg:px-8">
@@ -381,51 +379,55 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
       )}
       <div className="grid-3 w-full">
         {plansToRender.map((pla: any, i: number) => {
+          console.log(dropdown?.id);
           let ids: string[] = [];
           let curPlan;
           if (dropdown)
             if (dropdown?.id === "5-8") {
-              ids = [plansToRender[0]?._id];
-            } else if (dropdown?.id === "9+") {
               ids = [plansToRender[0]?._id, plansToRender[1]?._id];
+            } else if (dropdown?.id === "9+") {
+              ids = [
+                plansToRender[0]?._id,
+                plansToRender[1]?._id,
+                plansToRender[2]?._id,
+              ];
             } else if (dropdown?.id === "unknown") {
               ids = plansToRender.map((id: any) => id?._id);
             } else {
               ids = [];
             }
+          // if (isUpgrade) {
+          //   const index = plansToRender.findIndex(
+          //     (pl: any) =>
+          //       pl?.planType === singleSubPlans?.planType &&
+          //       pl?.billingFrequency === singleSubPlans?.billingFrequency
+          //   );
 
-          if (isUpgrade) {
-            const index = plansToRender.findIndex(
-              (pl: any) =>
-                pl?.planType === singleSubPlans?.planType &&
-                pl?.billingFrequency === singleSubPlans?.billingFrequency
-            );
+          //   let slicedPlans: any[] = [];
 
-            let slicedPlans: any[] = [];
+          //   if (index !== -1) {
+          //     slicedPlans = plansToRender.slice(0, index + 1);
 
-            if (index !== -1) {
-              slicedPlans = plansToRender.slice(0, index + 1);
+          //     // Stop at the first ANNUALLY plan (inclusive), if one exists in the slice
+          //     const annuallyIndex = slicedPlans.findIndex(
+          //       (pl: any) => pl?.billingFrequency === "ANNUALLY"
+          //     );
 
-              // Stop at the first ANNUALLY plan (inclusive), if one exists in the slice
-              const annuallyIndex = slicedPlans.findIndex(
-                (pl: any) => pl?.billingFrequency === "ANNUALLY"
-              );
+          //     if (annuallyIndex !== -1) {
+          //       slicedPlans = slicedPlans.slice(0, annuallyIndex + 1);
+          //     }
+          //   }
 
-              if (annuallyIndex !== -1) {
-                slicedPlans = slicedPlans.slice(0, annuallyIndex + 1);
-              }
-            }
-
-            // Apply equipmentAgeCategory filtering
-            if (singleSubPlans?.equipmentAgeCategory === "5-8") {
-              ids = [plansToRender[0]?._id];
-            } else if (singleSubPlans?.equipmentAgeCategory === "9+") {
-              ids = [plansToRender[0]?._id, plansToRender[1]?._id];
-            } else {
-              // Default fallback: use filtered sliced plans
-              ids = slicedPlans.map((pl: any) => pl?._id);
-            }
-          }
+          //   // Apply equipmentAgeCategory filtering
+          //   if (singleSubPlans?.equipmentAgeCategory === "5-8") {
+          //     ids = [plansToRender[0]?._id];
+          //   } else if (singleSubPlans?.equipmentAgeCategory === "9+") {
+          //     ids = [plansToRender[0]?._id, plansToRender[1]?._id];
+          //   } else {
+          //     // Default fallback: use filtered sliced plans
+          //     ids = slicedPlans.map((pl: any) => pl?._id);
+          //   }
+          // }
 
           // console.log(curPlan);
           return (

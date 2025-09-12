@@ -14,11 +14,16 @@ import { icons } from "@/lib/constants";
 import { useRepairs } from "@/hook/useRepairs";
 import MultiBranch from "./multi-branch";
 import { useSocket } from "@/contexts/socket-contexts";
+import { usePricing } from "@/hook/usePricing";
 
 const DashboardHome = () => {
   const { curUser, loadingCurUser } = useUser();
   const { trxSummary, isLoadingTrxSummary } = useDashboard();
   const { repairsData, loadingRepairs } = useRepairs();
+
+  const { subscriptions } = usePricing();
+
+  // console.log(subscriptions);
 
   const { isConnected, socket } = useSocket();
 
@@ -28,6 +33,11 @@ const DashboardHome = () => {
     return <LoadingTemplate />;
 
   const repairs = repairsData?.data?.data;
+  const totalCredits = subscriptions
+    ?.map((sub) => sub.remainingCredits)
+    ?.reduce((arr, cur) => Number(arr || 0) + Number(cur || 0), 0);
+
+  // console.log(totalCredits);
 
   const userData = curUser?.data;
   const trxData = trxSummary?.data;
@@ -60,7 +70,7 @@ const DashboardHome = () => {
       ) : null}
       <section className="flex-cols gap-5 mt-8">
         <PlanLog plans={planType} />
-        <Metrics stats={metrics} plans={planType} />
+        <Metrics stats={metrics} plans={planType} planBalance={totalCredits} />
         <MultiBranch />
         {repairs?.length > 0 ? (
           <RecentRequests requestData={repairs} />

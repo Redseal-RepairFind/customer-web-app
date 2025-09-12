@@ -169,7 +169,7 @@ export const BranchCard = ({
         <div>
           {" "}
           <Text.SmallText className="text-sm font-semibold">
-            {formatCurrency(item?.paymentAmount || 0)}
+            {formatCurrency(item?.remainingCredits || 0)}
           </Text.SmallText>
         </div>
         <div>

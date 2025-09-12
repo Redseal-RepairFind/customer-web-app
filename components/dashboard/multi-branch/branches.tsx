@@ -15,6 +15,7 @@ import Modal from "@/components/ui/customModal";
 import UpdatePlanModal from "./update-plan-modal";
 import { useUser } from "@/hook/useMe";
 import { ClipLoader } from "react-spinners";
+import { useRepairs } from "@/hook/useRepairs";
 
 const Branches = () => {
   const {
@@ -40,6 +41,7 @@ const Branches = () => {
     open: false,
     plan: null,
   });
+  const { paymentMethods: PMD, loadingPaymentMethods } = useRepairs();
 
   const handleOpenModal = (item: Subscriptions) => {
     setOpenUpgradeModal({
@@ -62,11 +64,14 @@ const Branches = () => {
 
   const subStats = subscriptionsStats?.[0]?.stats;
 
-  console.log(curUser4PaymentMethod?.data?.stripePaymentMethods);
+  // console.log(curUser4PaymentMethod?.data?.stripePaymentMethods);
 
-  const paymentMethods = curUser4PaymentMethod?.data?.stripePaymentMethods;
+  const paymentMethods = PMD?.data;
 
-  if (isFetching || loadingCurUser4PaymentMethod) return <LoadingTemplate />;
+  if (isFetching || loadingCurUser4PaymentMethod || loadingPaymentMethods)
+    return <LoadingTemplate />;
+
+  console.log(subscriptions);
   return (
     <main className="flex-cols gap-5">
       <Modal
@@ -132,9 +137,11 @@ const Branches = () => {
         </Button>
       </div>
 
-      {paymentMethods?.map((mtd: any) => (
-        <PaymentMethodItem method={mtd} key={mtd?._id} />
-      ))}
+      <div className="grid-3 gap-3">
+        {paymentMethods?.map((mtd: any) => (
+          <PaymentMethodItem method={mtd} key={mtd?._id} />
+        ))}
+      </div>
 
       <div className="grid-2">
         {subscriptions?.map((sub) => (
@@ -169,9 +176,9 @@ const PaymentMethodItem = ({
         </div>
       ) : (
         <div className="max-w-[200px]">
-          <Button variant="secondary">
+          {/* <Button variant="secondary">
             <Button.Text>Set as default</Button.Text>
-          </Button>
+          </Button> */}
         </div>
       )}
 
@@ -192,9 +199,9 @@ const PaymentMethodItem = ({
           </div>
         </div>
 
-        <button className="px-10 py-2 rounded-4xl border border-light-10 hover:bg-black hover:text-light-main transition-all duration-300 cursor-pointer">
+        {/* <button className="px-10 py-2 rounded-4xl border border-light-10 hover:bg-black hover:text-light-main transition-all duration-300 cursor-pointer">
           Edit
-        </button>
+        </button> */}
       </SpecialBox>
     </SpecialBox>
   );

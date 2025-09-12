@@ -307,7 +307,8 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                     </Dropdown.Trigger>
                     <Dropdown.Content className="w-[120px] bg-white absolute -left-5">
                       {rep?.contract?.isDraft ||
-                      rep.status === "EXPIRED" ? null : (
+                      rep.status === "EXPIRED" ||
+                      rep?.status === "PENDING" ? null : (
                         <Dropdown.Item
                           className="w-full"
                           onClick={(e) => {

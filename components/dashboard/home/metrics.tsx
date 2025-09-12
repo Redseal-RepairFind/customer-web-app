@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 const Metrics = ({
   stats,
   plans,
+  planBalance,
 }: {
   stats: {
     jobsCompleted: number;
@@ -24,6 +25,7 @@ const Metrics = ({
     planType: string;
   };
   plans: PLANSTYPE;
+  planBalance: number;
 }) => {
   const allRatings =
     stats &&
@@ -36,7 +38,9 @@ const Metrics = ({
   const date = dayjs(plans?.startDate || new Date()?.toDateString());
   const nextDate = date?.add(30, "day");
 
-  // console.log(stats);
+  console.log(stats);
+
+  console.log(plans);
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 lg:gap-2 xl:gap-4  ">
@@ -69,8 +73,8 @@ const Metrics = ({
                 ? avgRating || 0
                 : mtrc.name === "Completed Jobs"
                 ? stats.jobsCompleted
-                : mtrc.name === "Available Credits"
-                ? formatCurrency(Number(stats.creditBalance || 0))
+                : mtrc.name === "Total Available Credits"
+                ? formatCurrency(Number(planBalance || 0))
                 : mtrc?.name === "Next Maintenance Date"
                 ? nextDate?.format("YYYY/MM/DD")
                 : mtrc.metric}

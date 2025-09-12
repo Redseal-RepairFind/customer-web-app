@@ -81,7 +81,7 @@ export const quickActions = [
 
 export const dummyMetrics = [
   {
-    name: "Available Credits",
+    name: "Total Available Credits",
     icon: icons.dollarIcon,
     metric: "4850",
   },
