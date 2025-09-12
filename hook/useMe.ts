@@ -4,7 +4,9 @@ import { useEffect } from "react";
 import { usePageNavigator } from "./navigator";
 
 export const useUser = () => {
-  const { navigator } = usePageNavigator();
+  const { navigator, curPathname } = usePageNavigator();
+
+  // const {} = usePageNavigator()
   const {
     data: curUser,
     isLoading: loadingCurUser,
@@ -14,12 +16,27 @@ export const useUser = () => {
     queryKey: ["cur-user"],
     queryFn: pricingActions.getMe,
   });
+  const {
+    data: curUser4PaymentMethod,
+    isLoading: loadingCurUser4PaymentMethod,
+    refetch: refetchingCurUser4PaymentMethod,
+    isRefetching: isRefetchingCurUser4PaymentMethod,
+  } = useQuery<any>({
+    queryKey: ["cur-user-payment"],
+    queryFn: () =>
+      pricingActions.getMe$patmentMethod({
+        include: "stripePaymentMethods",
+      }),
+    enabled: curPathname === "/manage-subscription",
+  });
 
   // console.log(
   //   curUser?.data?.subscription?.equipmentAgeCategory
   //     ?.toLowerCase()
   //     ?.includes("unknown")
   // );
+
+  // console.log(curUser);
 
   useEffect(() => {
     if (!curUser?.data) return; // wait for user data
@@ -53,7 +70,7 @@ export const useUser = () => {
     if (pathname === target) return;
 
     // avoid double navigate in Strict Mode
-    let didNav = (window as any).__didInitialNav__;
+    const didNav = (window as any).__didInitialNav__;
     if (didNav && pathname !== target) {
       // already navigated once this render cycle
     } else {
@@ -67,5 +84,9 @@ export const useUser = () => {
     loadingCurUser,
     curUser,
     refetchingCurUser,
+    curUser4PaymentMethod,
+    loadingCurUser4PaymentMethod,
+    refetchingCurUser4PaymentMethod,
+    isRefetchingCurUser4PaymentMethod,
   };
 };

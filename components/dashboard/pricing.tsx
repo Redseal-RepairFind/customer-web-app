@@ -20,6 +20,7 @@ import { SUB_EXTRA_ID } from "@/utils/types";
 import { useSearchParams } from "next/navigation";
 import { StaticImageData } from "next/image";
 import { ClipLoader } from "react-spinners";
+import { InputContainer } from "../auth/signup-item";
 
 const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const { curUser, loadingCurUser } = useUser();
@@ -30,6 +31,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
 
   const isNewParams = params?.get("new") || "";
   const isNew = sessionStorage?.getItem(SUB_EXTRA_ID) || isNewParams;
+  const [unitNumber, setUnitNumber] = useState("");
 
   // console.log(isNew);
 
@@ -190,12 +192,12 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
             selectedPredictions={selectedPredictions}
             setDropdown={setDropdown}
             setSelectedPredictions={setSelectedPredictions}
+            unitNUmber={unitNumber}
           />
         </Modal>
       )}
       {isUpgrade ? (
         <>
-          {" "}
           <Text.Heading className="text-xl lg:text-3xl text-center">
             Change Your Subscription Plan
           </Text.Heading>
@@ -211,7 +213,6 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
 
             <Text.Paragraph className="text-green-500 text-sm lg:text-base">
               Bill annually
-              {"  "}
               <span className="font-semibold sm:ml-1">
                 (Save one month, sign up annually, pay up front)
               </span>
@@ -221,9 +222,6 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
       ) : (
         <>
           <div className="flex-col-center w-full mb-8 ">
-            {/* <button onClick={handleLogout} className="border py-2 px-3 rounded-lg">
-          Temp logout
-        </button> */}
             <Text.Heading className="text-xl lg:text-3xl text-center">
               RepairFind Subscription Plans
             </Text.Heading>
@@ -243,44 +241,45 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
 
               <Text.Paragraph className="text-green-500 text-sm lg:text-base">
                 Bill annually
-                {"  "}
                 <span className="font-semibold sm:ml-1">
                   (Save one month, sign up annually, pay up front)
                 </span>
               </Text.Paragraph>
             </div>
           </div>
-          <div className="flex-col gap-4 mb-4 ">
-            <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00 ">
-              Subscription Type
-            </Text.Paragraph>
-            <Dropdown className="w-full">
-              <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
-                <Text.Paragraph className="text-dark-500">
-                  {subType?.name || "Select Subscription type"}
-                </Text.Paragraph>
-              </Dropdown.Trigger>
-              <Dropdown.Content className="w-full bg-white">
-                <Dropdown.Label>
+          {isUpgrade && (
+            <div className="flex-col gap-4 mb-4 ">
+              <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00 ">
+                Subscription Type
+              </Text.Paragraph>
+              <Dropdown className="w-full">
+                <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
                   <Text.Paragraph className="text-dark-500">
-                    Select Subscription type
+                    {subType?.name || "Select Subscription type"}
                   </Text.Paragraph>
-                </Dropdown.Label>
-
-                {accountType?.map((item) => (
-                  <Dropdown.Item
-                    key={item.id}
-                    className="border-b border-b-dark-200"
-                    onClick={() => setSubType(item)}
-                  >
-                    <Text.Paragraph className="text-dark-200">
-                      {item?.name}
+                </Dropdown.Trigger>
+                <Dropdown.Content className="w-full bg-white">
+                  <Dropdown.Label>
+                    <Text.Paragraph className="text-dark-500">
+                      Select Subscription type
                     </Text.Paragraph>
-                  </Dropdown.Item>
-                ))}
-              </Dropdown.Content>
-            </Dropdown>
-          </div>
+                  </Dropdown.Label>
+
+                  {accountType?.map((item) => (
+                    <Dropdown.Item
+                      key={item.id}
+                      className="border-b border-b-dark-200"
+                      onClick={() => setSubType(item)}
+                    >
+                      <Text.Paragraph className="text-dark-200">
+                        {item?.name}
+                      </Text.Paragraph>
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Content>
+              </Dropdown>
+            </div>
+          )}
           <div className="flex-col gap-4 mb-4 ">
             <div className="flex-rows mb-2">
               <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
@@ -300,6 +299,21 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                 // modal
               />
             )}
+          </div>
+          <div className="flex-col gap-4 mb-4">
+            <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
+              Unit number
+              <span className="font-light text-xs sm:ml-1">(optional)</span>
+            </Text.Paragraph>
+            <div className="flex-rows mb-2">
+              <InputContainer>
+                <input
+                  placeholder="Unit number"
+                  className="text-input"
+                  onChange={(e) => setUnitNumber(e?.target?.value)}
+                />
+              </InputContainer>
+            </div>
           </div>
           <div className="flex-col gap-4 mb-4">
             <div className="flex-rows mb-2">

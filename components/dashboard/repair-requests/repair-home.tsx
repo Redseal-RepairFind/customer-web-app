@@ -16,7 +16,7 @@ const RepairRequestHome = () => {
 
   const repairs = repairsData?.data?.data;
   const meta = repairsData?.data;
-  console.log(meta);
+  // console.log(meta);
 
   const page = searchParams.get("page") || 1;
   const currentPage = Number(page);

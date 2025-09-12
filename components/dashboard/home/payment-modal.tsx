@@ -19,6 +19,7 @@ const PaymentModal = ({
   dropdown,
   selectedPredictions,
   setSelectedPredictions,
+  unitNUmber,
 }: {
   onClose: () => void;
   subPlan: any;
@@ -32,6 +33,7 @@ const PaymentModal = ({
     openModal: boolean;
   };
   setSelectedPredictions: (pr?: any) => void;
+  unitNUmber?: string;
 }) => {
   // const [selectedPredictions, setSelectedPredictions] = useState<any>({
   //   predictions: {},
@@ -45,7 +47,7 @@ const PaymentModal = ({
   const user = curUser?.data;
   // console.log(curUser?.data?.subscription?.subscriptionType);
 
-  console.log(selectedPredictions.prediction.country);
+  // console.log(selectedPredictions.prediction.country);
 
   const onSubmit = async () => {
     const predictions = selectedPredictions?.prediction;
@@ -66,6 +68,7 @@ const PaymentModal = ({
         city: predictions?.city || "",
         country: predictions?.country || "",
         state: predictions?.region || "",
+        ...(unitNUmber && { description: unitNUmber }),
       },
       planId: subPlan?._id,
       equipmentAgeCategory: dropdown?.id,

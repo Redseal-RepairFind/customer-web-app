@@ -137,7 +137,6 @@ export const getTimeAgo = (dateString: string): string => {
     return "Yesterday";
   }
 
-  // More than 2 days ago — use local time and locale
   const options: Intl.DateTimeFormatOptions = {
     month: "short",
     day: "numeric",
@@ -145,4 +144,59 @@ export const getTimeAgo = (dateString: string): string => {
   };
 
   return actionDate.toLocaleDateString(undefined, options); // Uses browser's locale
+};
+
+export const STATUS_PROGRESS: Record<string, string> = {
+  BOOKED: "Technician scheduled; awaiting arrival",
+  ONGOING: "Work in progress on site",
+  COMPLETED: "Repair completed; ready for review",
+  DISPUTED: "Customer dispute under investigation",
+  CANCELED: "Job canceled; no action needed",
+  EXPIRED: "Request expired; needs rebooking",
+  COMPLETED_SITE_VISIT: "Site visit finished; awaiting report",
+  PENDING: "Awaiting confirmation from customer",
+};
+
+export const getProgress = (status: string) =>
+  STATUS_PROGRESS[status] ?? "Status unknown";
+
+// lib/statusMeta.ts
+export interface StatusMeta {
+  header: string;
+  report: string;
+}
+
+export const STATUS_META: Record<string, StatusMeta> = {
+  BOOKED: {
+    header: "Job Scheduled",
+    report: "Technician scheduled; awaiting arrival",
+  },
+  ONGOING: {
+    header: "Work in Progress",
+    report: "Repair currently underway on site",
+  },
+  COMPLETED: {
+    header: "Repair Completed",
+    report: "Task finished; pending confirmation",
+  },
+  DISPUTED: {
+    header: "Dispute Raised",
+    report: "Issue under review and resolution",
+  },
+  CANCELED: {
+    header: "Job Canceled",
+    report: "Request canceled; no further action",
+  },
+  EXPIRED: {
+    header: "Request Expired",
+    report: "Job offer expired; rebooking needed",
+  },
+  COMPLETED_SITE_VISIT: {
+    header: "Site Visit Done",
+    report: "Inspection finished; awaiting report",
+  },
+  PENDING: {
+    header: "Awaiting Confirmation",
+    report: "Job request pending approval",
+  },
 };

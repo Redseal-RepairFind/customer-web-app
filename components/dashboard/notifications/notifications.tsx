@@ -12,13 +12,13 @@ import LoadingTemplate from "@/components/ui/spinner";
 import { ClipLoader } from "react-spinners";
 import { Notification } from "@/utils/types";
 import { getTimeAgo } from "@/lib/helpers";
+import { useSocket } from "@/contexts/socket-contexts";
 
 const Notifs = () => {
   const [switched, setSwitched] = useState("Notifications");
 
   const {
     // handleAllReadNotifs,
-    handleReadNotifs,
     allNotifications,
     isFetchingNextPage,
     // hasNextPage,
@@ -26,6 +26,8 @@ const Notifs = () => {
     sentinelRef,
     unreadCount,
   } = useNotification();
+
+  const { handleReadNotifs } = useSocket();
 
   // console.log(allNotifications);
 
@@ -79,6 +81,8 @@ const NotifItem = ({
   notif: Notification;
   onRead: (id: string) => void;
 }) => {
+  // console.log(notif);
+
   return (
     <SpecialBox
       className={`border border-dark-10 flex-row-between px-2 md:px-4 py-2`}
@@ -96,7 +100,7 @@ const NotifItem = ({
             {notif.type?.replaceAll("_", " ")?.toLowerCase()}
           </Text.SmallText>
 
-          <Text.SmallText className="text-xs md:text-sm text-dark-500 ">
+          <Text.SmallText className="text-xs md:text-sm text-dark-500 text-start">
             {notif.message}
           </Text.SmallText>
         </div>

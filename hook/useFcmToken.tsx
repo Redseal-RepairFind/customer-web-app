@@ -42,8 +42,10 @@ export const useFCMNotifications = () => {
           warning({
             render: () => (
               <div>
-                <Text.SubHeading>{payload.notification?.title}</Text.SubHeading>
-                <Text.SubParagraph>
+                <Text.SmallText className="text-base font-semibold ">
+                  {payload.notification?.title}
+                </Text.SmallText>
+                <Text.SubParagraph className="text-sm">
                   {payload.notification?.body}
                 </Text.SubParagraph>
               </div>

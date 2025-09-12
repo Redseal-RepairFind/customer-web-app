@@ -12,7 +12,9 @@ export const useRepairs = () => {
 
   const page = params.get("page") || "1";
   const limit = params.get("limit") || "10";
-  const status = params?.get("status") || "";
+  const status =
+    params?.get("status") ||
+    "BOOKED,ONGOING,COMPLETED,DISPUTED,CANCELED,EXPIRED,COMPLETED_SITE_VISIT,PENDING";
 
   const {
     data: repairsData,

@@ -6,6 +6,7 @@ import { useSubCalc } from "@/hook/useSubCalc";
 import Image from "next/image";
 import { icons, images } from "@/lib/constants";
 import { Subscription } from "@/utils/types";
+import { getProgress, STATUS_META } from "@/lib/helpers";
 
 const RequestSubmitToast = ({
   subscription,
@@ -47,24 +48,17 @@ const RequestSubmitToast = ({
 
 const RequestCompletedToast = ({ status }: { status: string }) => {
   const mStatus = status.toLowerCase();
-  const header =
-    mStatus === "pending"
-      ? "Request Received"
-      : mStatus === "ongoing"
-      ? "Awaiting estimate from contractor"
-      : "Repair Request Completed";
 
-  const message =
-    mStatus === "pending"
-      ? " Your request has been received and its currently being processed. A technician will be scheduled to arrive soon"
-      : mStatus === "ongoing"
-      ? " "
-      : "";
+  const meta = STATUS_META[status];
+  if (!meta) return null;
+  const header = meta.header;
+
+  const message = meta.report;
 
   const icontoRender =
     mStatus === "completed" ? icons.completeIcon : icons.noticeIcon;
   return (
-    <div className="flex-cols gap-2">
+    <div className="flex-cols gap-2 w-full">
       <div className="flex-rows items-center gap-2">
         <Image src={icontoRender} height={24} width={24} alt="Check icon" />
 

@@ -13,17 +13,21 @@ import Image from "next/image";
 import { icons } from "@/lib/constants";
 import { useRepairs } from "@/hook/useRepairs";
 import MultiBranch from "./multi-branch";
+import { useSocket } from "@/contexts/socket-contexts";
 
 const DashboardHome = () => {
   const { curUser, loadingCurUser } = useUser();
   const { trxSummary, isLoadingTrxSummary } = useDashboard();
   const { repairsData, loadingRepairs } = useRepairs();
 
+  const { isConnected, socket } = useSocket();
+
+  // console.log(socket);
+
   if (loadingCurUser || isLoadingTrxSummary || loadingRepairs)
     return <LoadingTemplate />;
 
   const repairs = repairsData?.data?.data;
-  // console.log(repairs);
 
   const userData = curUser?.data;
   const trxData = trxSummary?.data;

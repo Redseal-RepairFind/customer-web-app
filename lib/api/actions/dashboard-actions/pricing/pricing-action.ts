@@ -17,6 +17,27 @@ export const pricingActions = {
       throw error;
     }
   },
+  getMe$patmentMethod: async ({
+    include = "stripePaymentMethods",
+  }: {
+    include?: string;
+  }) => {
+    try {
+      const response = await http.get(
+        `${url}/me?include=${include}`,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 
   getSubscriptionPlan: async () => {
     try {
@@ -115,6 +136,23 @@ export const pricingActions = {
       const response = await http.post(
         `${url}/subscriptions/cancel`,
         payload,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+  createBillingPortal: async () => {
+    try {
+      const response = await http.get(
+        `${url}/subscriptions/create-customer-portal-session`,
         withAuth()
       );
 

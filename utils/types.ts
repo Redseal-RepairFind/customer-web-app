@@ -49,6 +49,7 @@ export type SubscriptionType = {
     city: string;
     state: string;
     country: string;
+    descrition?: string;
   };
   businessName?: string;
 };
@@ -228,6 +229,26 @@ export type Notification = {
   };
   __v: number;
 };
+
+export interface NotificationsPayload {
+  bookingAlerts: any[]; // replace `any` with the actual type if known
+  bookingConversationAlerts: any[];
+  disputeAlerts: any[];
+  jobAlerts: any[];
+  jobConversationAlerts: any[];
+  jobEstimateAlerts: any[];
+  jobScheduleAlerts: string[]; // seems to be array of IDs
+  quickActions: any[];
+  totalCount: number;
+  unReadNotifications: string[]; // array of notification IDs
+  unseenBookings: any[];
+}
+
+export interface NotificationsResponse {
+  payload: {
+    data: NotificationsPayload;
+  };
+}
 
 export const LANG_ID = "rpf_lng";
 

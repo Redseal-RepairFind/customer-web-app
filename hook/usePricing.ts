@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 type SubsPage = {
   data: any[]; // replace with your Subscription type
   meta?: { page: number; totalPages?: number; hasNextPage?: boolean };
+  stats?: any;
 };
 
 export const usePricing = (planId?: string) => {
@@ -81,9 +82,13 @@ export const usePricing = (planId?: string) => {
 
   // Flatten all loaded pages
   const subscriptions = useMemo(
-    () => data?.pages.flatMap((p) => p?.data ?? []) ?? [],
+    () => data?.pages.flatMap((p) => p?.data ?? { data }) ?? [],
     [data]
   );
+  // const subscriptionsStats = useMemo(
+  //   () => data?.pages.flatMap((p) => p?.stats ?? []) ?? {},
+  //   [data]
+  // );
 
   // Optional: derived total pages / page for UI
   const paginationMeta = data?.pages.at(-1)?.meta;
@@ -137,6 +142,29 @@ export const usePricing = (planId?: string) => {
       setIsCheckingOut(false);
     }
   };
+  const handleCheckoutSession = async () => {
+    setIsCheckingOut(true);
+    try {
+      const res = await pricingActions.createBillingPortal();
+      toast.success(
+        res?.message || res?.data?.message || "Session created successfully"
+      );
+
+      const url = res?.url || res?.data?.url;
+
+      if (url && typeof window !== "undefined") {
+        // ✅ open in new tab
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+    } catch (error) {
+      const errMsg = formatError(error);
+      console.error("CheckoutError", error);
+      toast.error(errMsg || "checkout failed");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
   const handleCheckoutUpgrade = async (payload: UpgradeType) => {
     setIsCheckingOut(true);
     try {
@@ -196,7 +224,8 @@ export const usePricing = (planId?: string) => {
     yearlylyPlans,
 
     // subscriptions (infinite)
-    subscriptions, // flattened list for rendering
+    subscriptions,
+    subscriptionsStats: data?.pages,
     status, // "pending" | "error" | "success"
     error,
     isFetching,
@@ -220,5 +249,7 @@ export const usePricing = (planId?: string) => {
 
     singleSubPlans,
     // loadingSingleSubsPlans,
+
+    handleCheckoutSession,
   };
 };

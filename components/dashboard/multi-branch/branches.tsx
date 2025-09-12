@@ -9,15 +9,17 @@ import { icons } from "@/lib/constants";
 import { BranchCard } from "../home/multi-branch";
 import { usePricing } from "@/hook/usePricing";
 import LoadingTemplate from "@/components/ui/spinner";
-import Pagination from "@/components/ui/pagination";
 import { Subscriptions } from "@/utils/types";
 import { useState } from "react";
 import Modal from "@/components/ui/customModal";
 import UpdatePlanModal from "./update-plan-modal";
+import { useUser } from "@/hook/useMe";
+import { ClipLoader } from "react-spinners";
 
 const Branches = () => {
   const {
     subscriptions,
+    subscriptionsStats,
     // status,
     // error,
     // fetchNextPage,
@@ -27,7 +29,10 @@ const Branches = () => {
     // refetch,
     handleCancelPlan,
     isCheckingout,
+    handleCheckoutSession,
   } = usePricing();
+
+  const { curUser4PaymentMethod, loadingCurUser4PaymentMethod } = useUser();
   const [openUpgradeModal, setOpenUpgradeModal] = useState<{
     open: boolean;
     plan: Subscriptions | null;
@@ -54,9 +59,14 @@ const Branches = () => {
       plan: item,
     }));
   };
-  // console.log(subscriptions);
 
-  if (isFetching) return <LoadingTemplate />;
+  const subStats = subscriptionsStats?.[0]?.stats;
+
+  console.log(curUser4PaymentMethod?.data?.stripePaymentMethods);
+
+  const paymentMethods = curUser4PaymentMethod?.data?.stripePaymentMethods;
+
+  if (isFetching || loadingCurUser4PaymentMethod) return <LoadingTemplate />;
   return (
     <main className="flex-cols gap-5">
       <Modal
@@ -80,30 +90,51 @@ const Branches = () => {
           <Text.Paragraph className="text-dark-500 text-base">
             Total Locations
           </Text.Paragraph>
-          <Text.Paragraph className="font-bold text-base">20</Text.Paragraph>
+          <Text.Paragraph className="font-bold text-base">
+            {subStats?.totalLocations}
+          </Text.Paragraph>
         </div>
         <div className="flex-cols items-center gap-2 ">
           <Text.Paragraph className="text-dark-500 text-base">
             Active
           </Text.Paragraph>
-          <Text.Paragraph className="font-bold text-base">12</Text.Paragraph>
+          <Text.Paragraph className="font-bold text-base">
+            {" "}
+            {subStats?.activeLocations}
+          </Text.Paragraph>
         </div>
         <div className="flex-cols items-center gap-2 ">
           <Text.Paragraph className="text-dark-500 text-base">
             Inactive
           </Text.Paragraph>
-          <Text.Paragraph className="font-bold text-base">8</Text.Paragraph>
+          <Text.Paragraph className="font-bold text-base">
+            {" "}
+            {subStats?.inactiveLocations}
+          </Text.Paragraph>
         </div>
       </SpecialBox>
 
       <div className="flex-row-between">
         <Text.SmallHeading>Payment Methods</Text.SmallHeading>
-        <Button variant="secondary">
-          <Button.Text>Add new Card</Button.Text>
+        <Button
+          variant="secondary"
+          disabled={isCheckingout}
+          onClick={handleCheckoutSession}
+        >
+          {isCheckingout ? (
+            <Button.Icon>
+              <ClipLoader size={24} color="#000000" />
+            </Button.Icon>
+          ) : null}
+          <Button.Text>
+            {isCheckingout ? "Creating session..." : "Add Payment Method"}
+          </Button.Text>
         </Button>
       </div>
 
-      <PaymentMethodItem isDefault />
+      {paymentMethods?.map((mtd: any) => (
+        <PaymentMethodItem method={mtd} key={mtd?._id} />
+      ))}
 
       <div className="grid-2">
         {subscriptions?.map((sub) => (
@@ -121,7 +152,13 @@ const Branches = () => {
 
 export default Branches;
 
-const PaymentMethodItem = ({ isDefault }: { isDefault: boolean }) => {
+const PaymentMethodItem = ({
+  isDefault,
+  method,
+}: {
+  isDefault?: boolean;
+  method: any;
+}) => {
   return (
     <SpecialBox className="flex-cols border border-light-10 p-4">
       {isDefault ? (
@@ -131,9 +168,11 @@ const PaymentMethodItem = ({ isDefault }: { isDefault: boolean }) => {
           </div>
         </div>
       ) : (
-        <Button variant="secondary">
-          <Button.Text>Set as default</Button.Text>
-        </Button>
+        <div className="max-w-[200px]">
+          <Button variant="secondary">
+            <Button.Text>Set as default</Button.Text>
+          </Button>
+        </div>
       )}
 
       <SpecialBox className="flex justify-between items-center border border-light-10 mt-4 p-3">
@@ -141,9 +180,13 @@ const PaymentMethodItem = ({ isDefault }: { isDefault: boolean }) => {
           <div className="flex items-start gap-2">
             <Image src={icons.card} height={20} width={20} alt="Card icon" />
             <div className="flex-col gap-2">
-              <Text.Paragraph>**** **** **** 4242</Text.Paragraph>
+              <Text.Paragraph>
+                **** **** **** {method?.card?.last4}
+              </Text.Paragraph>
               <Text.SmallText className="text-sm text-dark-500">
-                Expires 12/27
+                Expires {method?.card?.exp_month}/
+                {method?.card?.exp_year?.toString()?.split("")[2]}
+                {method?.card?.exp_year?.toString()?.split("")[3]}
               </Text.SmallText>
             </div>
           </div>

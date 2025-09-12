@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useContext, useState, type ReactNode } from "react";
 import DashboardNav from "./dashboard-nav";
 import DashNav from "./dash-nav";
 import { NavWindow } from "../landing";
 import { dashboardNav, otherNav } from "@/lib/dasboard-constatns";
 import { useNotification } from "@/hook/useNotification";
+import { useSocket } from "@/contexts/socket-contexts";
 
 export default function ClientDashboardLayout({
   children,
@@ -13,9 +14,9 @@ export default function ClientDashboardLayout({
   children: ReactNode;
 }) {
   const [navOpen, setNavOpen] = useState(false);
-  const { notificationBagde } = useNotification();
+  const { badgeCount, badge } = useSocket();
 
-  //  console.log();
+  // console.log(badgeCount);
 
   return (
     // No grid needed on lg since sidebar is fixed.
@@ -33,7 +34,7 @@ export default function ClientDashboardLayout({
 
         <DashboardNav
           onOpen={() => setNavOpen(true)}
-          notificationsCount={notificationBagde?.data?.totalCount}
+          notificationsCount={badgeCount?.totalCount || badge}
         />
 
         {/* Let the main content scroll; use calc to fill the rest of the viewport */}

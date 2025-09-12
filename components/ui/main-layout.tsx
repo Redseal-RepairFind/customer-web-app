@@ -7,6 +7,7 @@ import ThemeRegistry from "@/contexts/theme-context";
 
 import { useToast } from "@/contexts/toast-contexts";
 import { useFCMNotifications } from "@/hook/useFcmToken";
+import { SocketProvider } from "@/contexts/socket-contexts";
 
 export default function MainLayout({
   children,
@@ -40,7 +41,9 @@ export default function MainLayout({
               isHome || isAuth ? "lay-bg" : ""
             }`}
           >
-            <ThemeRegistry>{children}</ThemeRegistry>
+            <SocketProvider>
+              <ThemeRegistry>{children}</ThemeRegistry>
+            </SocketProvider>
           </div>
         </main>
 

@@ -10,7 +10,9 @@ const Badge = ({
   if (!isActive) return null;
   return (
     <span className="h-4 min-w-4 rounded-full bg-red-300 text-light-main flex items-center justify-center ">
-      <Text.SmallText className="text-[10px]">{count}</Text.SmallText>
+      <Text.SmallText className="text-[10px]">
+        {Number(count) > 99 ? "99+" : count}
+      </Text.SmallText>
     </span>
   );
 };

@@ -5,7 +5,7 @@ import StatusCard from "@/components/ui/ststus-card";
 import Text from "@/components/ui/text";
 import { icons, images } from "@/lib/constants";
 import { repTableH } from "@/lib/dasboard-constatns";
-import { formatDateProper } from "@/lib/helpers";
+import { formatDateProper, getProgress } from "@/lib/helpers";
 import Image from "next/image";
 import React, { useState } from "react";
 import { FcCheckmark } from "react-icons/fc";
@@ -17,23 +17,14 @@ import { useToast } from "@/contexts/toast-contexts";
 import { RequestCompletedToast } from "../home/request-submit-toast";
 import { RepairJob } from "@/utils/types";
 import { useSearchParams } from "next/navigation";
+import Modal from "@/components/ui/customModal";
+import Estimate from "./estimate-modal";
 
 interface IProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
 }
-
-type DataType = {
-  data: {
-    id: string;
-    service: string;
-    technician: string;
-    status: string;
-    progress: string;
-    contact: string;
-  }[];
-};
 
 const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const [check, setCheck] = useState(false);
@@ -42,6 +33,10 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const { warning } = useToast();
   const params = useSearchParams();
   const status = params.get("status");
+  const [openModal, setOpenModal] = useState({
+    estimate: null,
+    open: false,
+  });
 
   if (!data?.length)
     return (
@@ -60,8 +55,29 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
     });
   };
 
+  const handleViewEstimate = (estimate: RepairJob | null) => {
+    setOpenModal({
+      open: true,
+      estimate,
+    });
+  };
+
+  const handleUnViewEstimate = () => {
+    setOpenModal({
+      open: false,
+      estimate: null,
+    });
+  };
+
+  // lib/statusProgress.ts
+
+  // console.log(data);
+
   return (
     <>
+      <Modal onClose={handleUnViewEstimate} isOpen={openModal.open}>
+        <Estimate estimate={openModal.estimate || data[0]} />
+      </Modal>
       <TableOverflow>
         <TechModal
           open={open}
@@ -95,7 +111,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
 
           <Tbody>
             {data.map((rep) => (
-              <Tr key={rep.reference}>
+              <Tr key={rep.jobId} onClick={() => handleViewEstimate(rep)}>
                 {/* Job ID (visible on mobile) */}
                 <Td className="flex items-center gap-2">
                   <RadioCheck
@@ -104,7 +120,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                   />
                   <div>
                     <Text.SmallHeading className="text-sm font-semibold">
-                      {rep.id}
+                      {rep.jobId}
                     </Text.SmallHeading>
                     <Text.SmallText>
                       {formatDateProper(new Date())}
@@ -117,32 +133,29 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
 
                 {/* Technician (hide on mobile) */}
                 <Td className="hidden md:table-cell">
-                  <div className="flex items-center gap-2">
-                    {/* <Image
-                      src={images.technician}
-                      height={24}
-                      width={24}
-                      className="rounded-full "
-                      alt="Technician"
-                    /> */}
+                  {rep.contractors?.length ? (
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src={rep?.contractors[0]?.profilePhoto}
+                        height={24}
+                        width={24}
+                        className="rounded-full "
+                        alt="Technician"
+                      />
 
-                    <span>
-                      {rep?.status === "PENDING" ? "- -" : "TEchnicians name"}
-                    </span>
-                  </div>
+                      <Text.Paragraph className="text-xs">
+                        {rep?.contractors[0]?.firstName}{" "}
+                        {rep?.contractors[0]?.lastName}
+                      </Text.Paragraph>
+                    </div>
+                  ) : (
+                    <p>- -</p>
+                  )}
                 </Td>
 
                 {/* Progress (hide on mobile) */}
                 <Td className="hidden md:table-cell">
-                  <Text.SmallText>
-                    {rep?.status === "PENDING"
-                      ? "Scheduling in Progress"
-                      : rep?.status === "ONGOING"
-                      ? "Awaiting Technician’s Arrival"
-                      : rep?.status === "COMPLETED"
-                      ? "Completed"
-                      : "In dispute"}
-                  </Text.SmallText>
+                  <Text.SmallText>{getProgress(rep.status)}</Text.SmallText>
                 </Td>
 
                 {/* Status (visible on mobile) */}
@@ -198,7 +211,10 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                     <Dropdown.Content className="w-[120px] bg-white">
                       <Dropdown.Item
                         className="w-full"
-                        onClick={() => handleOpenModal(rep.status)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenModal(rep.status);
+                        }}
                       >
                         <div className="flex-rows items-center gap-2">
                           <BsEye />
@@ -207,7 +223,12 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                           </Text.Paragraph>
                         </div>
                       </Dropdown.Item>
-                      <Dropdown.Item className="w-full">
+                      <Dropdown.Item
+                        className="w-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
                         <div className="flex-rows items-center gap-2">
                           <CgCloseO />
                           <Text.Paragraph className="text-sm">
