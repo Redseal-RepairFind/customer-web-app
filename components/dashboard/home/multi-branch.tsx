@@ -132,7 +132,7 @@ export const BranchCard = ({
             item.status === "PENDING"
               ? "PENDING"
               : item.status === "CANCELED"
-              ? "DISPUTE"
+              ? "DISPUTED"
               : "COMPLETED"
           }
           name={

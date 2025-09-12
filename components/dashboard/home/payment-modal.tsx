@@ -79,7 +79,7 @@ const PaymentModal = ({
 
     // console.log(payload);
 
-    await handleCheckout(payload as SubscriptionType);
+    await handleCheckout(payload as any);
   };
 
   return (
