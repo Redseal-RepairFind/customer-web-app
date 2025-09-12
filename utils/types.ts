@@ -307,7 +307,6 @@ export type Contract = {
     gstRate: number;
     repairfindServiceFeeRate: number;
     subtotal: number;
-    isDraft: boolean;
   };
   estimates: {
     description: string;
@@ -316,6 +315,7 @@ export type Contract = {
     _id: string;
   }[];
   _id: string;
+  isDraft: boolean;
 };
 
 export const LANG_ID = "rpf_lng";
