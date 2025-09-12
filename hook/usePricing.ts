@@ -214,8 +214,6 @@ export const usePricing = (planId?: string) => {
     }
   }, [curPathname, planId, subscriptions]);
 
-  // console.log(subscriptions);
-
   return {
     // plans
     subPlans,
