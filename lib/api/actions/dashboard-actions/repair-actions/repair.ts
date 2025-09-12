@@ -61,4 +61,99 @@ export const repairActions = {
       throw error;
     }
   },
+  fetchPaymentMethods: async () => {
+    try {
+      const response = await http.get(
+        `${url}/stripe/payment-methods`,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+
+  acceptQuotes: async ({
+    jobId,
+    quotationsId,
+  }: {
+    jobId: string;
+    quotationsId: string;
+  }) => {
+    try {
+      const response = await http.post(
+        `${url}/jobs/${jobId}/quotations/${quotationsId}/accept`,
+        null,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+  rejectQuotes: async ({
+    jobId,
+    quotationsId,
+  }: {
+    jobId: string;
+    quotationsId: string;
+  }) => {
+    try {
+      const response = await http.post(
+        `${url}/jobs/${jobId}/quotations/${quotationsId}/decline`,
+        null,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+  payQuotes: async ({
+    jobId,
+    quotationId,
+    paymentMethodId,
+  }: {
+    quotationId: string;
+    paymentMethodId: string;
+    jobId: string;
+  }) => {
+    try {
+      const response = await http.post(
+        `${url}/jobs/${jobId}/pay`,
+        {
+          quotationId,
+          paymentMethodId,
+        },
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 };

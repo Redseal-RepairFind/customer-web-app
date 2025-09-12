@@ -1,11 +1,33 @@
 import Button from "@/components/ui/custom-btn";
 import Text from "@/components/ui/text";
+import { useRepairs } from "@/hook/useRepairs";
+import { icons } from "@/lib/constants";
 import { formatCurrency, getTimeAgo } from "@/lib/helpers";
 import { RepairJob } from "@/utils/types";
-import { ReactNode } from "react";
+import Image from "next/image";
+import React, { ReactNode } from "react";
+import { CgClose } from "react-icons/cg";
+import { ClipLoader } from "react-spinners";
 
 const estimateHeader = ["Description", "Qty", "Rate", "Amt"];
-const Estimate = ({ estimate }: { estimate: RepairJob }) => {
+const Estimate = ({
+  estimate,
+  closeModal,
+  openPayment,
+}: {
+  estimate: RepairJob;
+  closeModal: () => void;
+  openPayment: () => void;
+}) => {
+  const { charges, estimates } = estimate?.contract;
+
+  const { breakdown, breakdown_meta } = charges.customerSummary;
+
+  const { handleAcceptEstimate, handleDeclineEstimate, creatingRequest } =
+    useRepairs();
+
+  console.log(estimate);
+  // const
   return (
     <div className="flex-cols gap-2">
       <Text.SmallHeading>{estimate.category}</Text.SmallHeading>
@@ -26,10 +48,16 @@ const Estimate = ({ estimate }: { estimate: RepairJob }) => {
           </div>
         ))}
 
-        <EstimateItemText>Lorem, ipsum.</EstimateItemText>
-        <EstimateItemText>2000</EstimateItemText>
-        <EstimateItemText>{formatCurrency(200)}</EstimateItemText>
-        <EstimateItemText isEnd>{formatCurrency(200)}</EstimateItemText>
+        {estimates?.map((est) => (
+          <React.Fragment key={est._id}>
+            <EstimateItemText>{est.description}</EstimateItemText>
+            <EstimateItemText>{est.quantity}</EstimateItemText>
+            <EstimateItemText>{formatCurrency(est.rate)}</EstimateItemText>
+            <EstimateItemText isEnd>
+              {formatCurrency(est.rate * Number(est.quantity))}
+            </EstimateItemText>
+          </React.Fragment>
+        ))}
       </div>
 
       <div className="border-b border-light-0 py-2 grid grid-cols-2 gap-y-3">
@@ -38,33 +66,22 @@ const Estimate = ({ estimate }: { estimate: RepairJob }) => {
         </div>
         <div className="flex justify-end">
           <Text.SubHeading className="text-sm font-semibold">
-            {formatCurrency(10)}
+            {formatCurrency(charges.subtotal)}
           </Text.SubHeading>
         </div>
-        <div>
-          <EstimateItemText>Card processing fee 3%</EstimateItemText>
-        </div>
-        <div className="flex justify-end">
-          <Text.SubHeading className="text-sm font-semibold">
-            {formatCurrency(30)}
-          </Text.SubHeading>
-        </div>
-        <div>
-          <EstimateItemText>GST 5%</EstimateItemText>
-        </div>
-        <div className="flex justify-end">
-          <Text.SubHeading className="text-sm font-semibold">
-            {formatCurrency(10)}
-          </Text.SubHeading>
-        </div>
-        <div>
-          <EstimateItemText>Service Fee 10%</EstimateItemText>
-        </div>
-        <div className="flex justify-end">
-          <Text.SubHeading className="text-sm font-semibold">
-            {formatCurrency(16)}
-          </Text.SubHeading>
-        </div>
+
+        {breakdown_meta.map((mta) => (
+          <React.Fragment key={mta.label}>
+            <div>
+              <EstimateItemText>{mta.label}</EstimateItemText>
+            </div>
+            <div className="flex justify-end">
+              <Text.SubHeading className="text-sm font-semibold">
+                {formatCurrency(mta.value)}
+              </Text.SubHeading>
+            </div>
+          </React.Fragment>
+        ))}
       </div>
 
       <div className=" border-light-0 py-2 grid grid-cols-2 gap-y-3">
@@ -75,15 +92,43 @@ const Estimate = ({ estimate }: { estimate: RepairJob }) => {
         </div>
         <div className="flex justify-end">
           <Text.SubHeading className="text-sm font-semibold">
-            {formatCurrency(3000)}
+            {formatCurrency(charges.customerPayable)}
           </Text.SubHeading>
         </div>
       </div>
 
-      <Button>
-        {" "}
-        <Button.Text>Continue</Button.Text>
+      <Button
+        onClick={() => {
+          //   handleAcceptEstimate({
+          //     jobId: estimate._id,
+          //     quotesId: estimate.contract._id,
+          //     close: () => {
+          //       closeModal();
+          //       openPayment();
+          //     },
+          //   });
+
+          closeModal();
+          openPayment();
+        }}
+      >
+        <Button.Icon>
+          {creatingRequest ? (
+            <ClipLoader size={20} color="#fff" />
+          ) : (
+            <Image src={icons.card} alt="" height={20} width={20} />
+          )}
+        </Button.Icon>
+        <Button.Text>
+          {creatingRequest ? "Accepting..." : "Proceed"}
+        </Button.Text>
       </Button>
+      {/* <Button variant="secondary">
+        <Button.Icon>
+          <CgClose color="#000" size={20} />
+        </Button.Icon>
+        <Button.Text>Decline</Button.Text>
+      </Button> */}
     </div>
   );
 };

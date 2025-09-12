@@ -19,6 +19,10 @@ import { RepairJob } from "@/utils/types";
 import { useSearchParams } from "next/navigation";
 import Modal from "@/components/ui/customModal";
 import Estimate from "./estimate-modal";
+import { useRepairs } from "@/hook/useRepairs";
+import LoadingTemplate from "@/components/ui/spinner";
+import Button from "@/components/ui/custom-btn";
+import { ClipLoader } from "react-spinners";
 
 interface IProps {
   children: React.ReactNode;
@@ -36,7 +40,18 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const [openModal, setOpenModal] = useState({
     estimate: null,
     open: false,
+    openPayments: false,
   });
+  const [methodId, setMethodId] = useState<{
+    card: any;
+    id: string;
+  }>();
+  const {
+    paymentMethods,
+    loadingPaymentMethods,
+    creatingRequest,
+    handlePayEstimate,
+  } = useRepairs();
 
   if (!data?.length)
     return (
@@ -55,28 +70,110 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
     });
   };
 
+  console.log(openModal?.estimate);
+
   const handleViewEstimate = (estimate: RepairJob | null) => {
     setOpenModal({
       open: true,
       estimate,
+      openPayments: false,
     });
   };
 
   const handleUnViewEstimate = () => {
-    setOpenModal({
+    setOpenModal((est) => ({
+      ...est,
       open: false,
-      estimate: null,
-    });
+      openPayments: false,
+    }));
+  };
+  const handleViewMethods = () => {
+    setOpenModal((est) => ({
+      ...est,
+      open: false,
+      openPayments: true,
+    }));
   };
 
+  const handleCloseMethods = () => {
+    setOpenModal((est) => ({
+      ...est,
+      open: false,
+      openPayments: false,
+      estimate: null,
+    }));
+  };
   // lib/statusProgress.ts
 
   // console.log(data);
 
+  if (loadingPaymentMethods) return <LoadingTemplate />;
+
+  console.log(methodId);
+  const mthods = paymentMethods?.data;
+
   return (
     <>
       <Modal onClose={handleUnViewEstimate} isOpen={openModal.open}>
-        <Estimate estimate={openModal.estimate || data[0]} />
+        <Estimate
+          estimate={openModal.estimate || data[0]}
+          closeModal={handleUnViewEstimate}
+          openPayment={handleViewMethods}
+        />
+      </Modal>
+
+      <Modal onClose={handleCloseMethods} isOpen={openModal.openPayments}>
+        <div className="flex-cols gap-4 h-[200px]">
+          <Text.Paragraph className="font-semibold text-base">
+            Select payment method
+          </Text.Paragraph>
+          <Dropdown className="">
+            <Dropdown.Trigger className="flex-row-between">
+              <Text.Paragraph className="text-sm">
+                {methodId
+                  ? `${methodId?.card?.brand} **** **** **** ${methodId?.card?.last4}`
+                  : " Select Payment method"}
+              </Text.Paragraph>
+            </Dropdown.Trigger>
+            <Dropdown.Content className=" bg-white ">
+              {mthods?.map((mt: { card: any; id: string }) => (
+                <Dropdown.Item
+                  className="w-full border-b border-b-light-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMethodId(mt);
+                  }}
+                  key={mt?.id}
+                >
+                  <Text.SmallText>
+                    {mt?.card?.brand} **** **** **** {mt?.card?.last4}
+                  </Text.SmallText>
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Content>
+          </Dropdown>
+          <Button
+            onClick={() =>
+              handlePayEstimate({
+                jobId: openModal.estimate._id,
+                quotesId: openModal.estimate?.contract?._id,
+                paymentId: methodId?.id,
+                close: () => handleCloseMethods(),
+              })
+            }
+          >
+            <Button.Icon>
+              {creatingRequest ? (
+                <ClipLoader size={20} color="#fff" />
+              ) : (
+                <Image src={icons.card} alt="" height={20} width={20} />
+              )}
+            </Button.Icon>
+            <Button.Text>
+              {creatingRequest ? "Authorizing...." : "Proceed"}
+            </Button.Text>
+          </Button>
+        </div>
       </Modal>
       <TableOverflow>
         <TechModal
@@ -111,7 +208,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
 
           <Tbody>
             {data.map((rep) => (
-              <Tr key={rep.jobId} onClick={() => handleViewEstimate(rep)}>
+              <Tr key={rep.jobId}>
                 {/* Job ID (visible on mobile) */}
                 <Td className="flex items-center gap-2">
                   <RadioCheck
@@ -198,9 +295,9 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                 </Td>
 
                 {/* More (visible on mobile — part of actions) */}
-                <Td>
-                  <Dropdown className="">
-                    <Dropdown.Trigger className="w-10 cursor-pointer" isNormal>
+                <Td className="relative ">
+                  <Dropdown className="absolute -left-5 flex-cols items-end">
+                    <Dropdown.Trigger className="w-10 cursor-pointer " isNormal>
                       <Image
                         src={icons.moreIcon}
                         height={20}
@@ -208,7 +305,38 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                         alt="Menu icon"
                       />
                     </Dropdown.Trigger>
-                    <Dropdown.Content className="w-[120px] bg-white">
+                    <Dropdown.Content className="w-[120px] bg-white absolute -left-5">
+                      {rep?.isDraft || rep.status === "EXPIRED" ? null : (
+                        <Dropdown.Item
+                          className="w-full"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            // handleOpenModal(rep.status);
+                            handleViewEstimate(rep);
+                          }}
+                        >
+                          <div className="flex-rows items-center gap-2">
+                            <BsEye />
+                            <Text.Paragraph className="text-sm">
+                              View Estimate
+                            </Text.Paragraph>
+                          </div>
+                        </Dropdown.Item>
+                      )}
+                      <Dropdown.Item
+                        className="w-full"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        <div className="flex-rows items-center gap-2">
+                          <CgCloseO />
+                          <Text.Paragraph className="text-sm">
+                            Cancel
+                          </Text.Paragraph>
+                        </div>
+                      </Dropdown.Item>
+
                       <Dropdown.Item
                         className="w-full"
                         onClick={(e) => {
@@ -220,19 +348,6 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                           <BsEye />
                           <Text.Paragraph className="text-sm">
                             View Status
-                          </Text.Paragraph>
-                        </div>
-                      </Dropdown.Item>
-                      <Dropdown.Item
-                        className="w-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      >
-                        <div className="flex-rows items-center gap-2">
-                          <CgCloseO />
-                          <Text.Paragraph className="text-sm">
-                            Cancel
                           </Text.Paragraph>
                         </div>
                       </Dropdown.Item>

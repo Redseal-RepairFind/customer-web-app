@@ -21,6 +21,8 @@ import { useRepairs } from "@/hook/useRepairs";
 import LoadingTemplate from "@/components/ui/spinner";
 import { readCookie, readStringCookie } from "@/lib/helpers";
 import { ClipLoader } from "react-spinners";
+import Image from "next/image";
+import { icons } from "@/lib/constants";
 
 type SkilsTYpe = {
   name: string;
@@ -78,6 +80,7 @@ const RequestModal = ({
   //   //   }
   // };
 
+  // console.log(subs.status);
   return (
     <form className="w-full flex-cols gap-4 z-[1000]">
       <div className="flex-cols gap-2">
@@ -89,7 +92,6 @@ const RequestModal = ({
           you with qualified professionals in your area.
         </Text.SmallText>
       </div>
-
       <div className="flex-col gap-4 mb-4">
         <div className="flex-rows mb-2">
           <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
@@ -154,16 +156,16 @@ const RequestModal = ({
         </div>
         <Dropdown className="w-full">
           <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
-            <Text.Paragraph className="text-dark-500">
-              {subs?.subscriptionType && subs.planType && subs.billingFrequency
-                ? `${subs.subscriptionType} - ${subs.planType} (${subs.billingFrequency})`
-                : "Select Subscription Plan"}
+            <Text.Paragraph className="text-dark-500 text-sm">
+              {subs
+                ? `${subs.coverageAddress.address}  - ${subs.planType || ""}`
+                : "Select Subscription address"}
             </Text.Paragraph>
           </Dropdown.Trigger>
           <Dropdown.Content className="w-full bg-white">
             <Dropdown.Label className="flex-cols gap-2">
               <Text.Paragraph className="text-dark-500 ">
-                {"Select Subscription Plan"}
+                {"Select Subscription address"}
               </Text.Paragraph>
             </Dropdown.Label>
 
@@ -173,15 +175,31 @@ const RequestModal = ({
                 className={` border-b border-b-light-50`}
                 onClick={() => setSubs?.(eq)}
               >
-                <Text.Paragraph className="text-dark-500">
+                <Text.Paragraph className="text-dark-500 text-sm">
                   {`
-                  ${eq.subscriptionType} - ${eq.planType} (${eq.billingFrequency})
+                  ${eq.coverageAddress.address} - ${eq.planType || ""}
                  `}
                 </Text.Paragraph>
               </Dropdown.Item>
             ))}
           </Dropdown.Content>
         </Dropdown>
+
+        {subs && subs.status !== "ACTIVE" ? (
+          <div className="flex items-center gap-2 mt-4">
+            <Image
+              src={icons.disclaimer}
+              height={20}
+              width={20}
+              alt="Disclaimer icon"
+            />
+
+            <Text.Paragraph className="text-sm text-red-500">
+              Note: the selected subscription is not active at the moment, You
+              can not make repair requests to the selected location
+            </Text.Paragraph>
+          </div>
+        ) : null}
       </div>
       <div className="flex-rows gap-2">
         <Text.Paragraph className="font-semibold">Emergency</Text.Paragraph>
@@ -295,7 +313,7 @@ const RequestModal = ({
       </div>
       <div className="flex-rows gap-2">
         <Button
-          disabled={creatingRequest}
+          disabled={creatingRequest || subs?.status !== "ACTIVE"}
           onClick={async () => {
             const payload = {
               serviceType: dropdown?.name,

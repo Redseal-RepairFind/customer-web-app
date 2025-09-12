@@ -168,7 +168,7 @@ export interface RepairJob {
   location: Location;
 
   myQuotation: any | null;
-
+  contract: Contract | null;
   contractors: any[]; // could be typed if you know contractor structure
   conversations: any[];
   enquiries: any[];
@@ -249,6 +249,73 @@ export interface NotificationsResponse {
     data: NotificationsPayload;
   };
 }
+
+export type ContractorBreakdown = {
+  subtotal: number;
+  gst: number;
+  downPayment: number;
+  processingFee: number;
+  serviceFee: number;
+  [key: string]: number; // allow extra numeric keys if backend adds more
+};
+
+export type CustomerBreakdown = {
+  subtotal: number;
+  gst: number;
+  processingFee: number;
+  estimateDiscount: number;
+  couponDiscount: number;
+  [key: string]: number;
+};
+
+export type ContractorRates = {
+  serviceFeeRate: number;
+  gstRate: number;
+  processingFeeRate: number;
+};
+
+type ContractorSummary = {
+  discounts: any[]; // replace `any` with proper type if you know discount shape
+  breakdown: Record<string, number>;
+  deductions: Record<string, number>;
+  deductions_meta: any[];
+  customer_breakdown_meta: any[];
+  [key: string]: unknown; // safe for extra fields like totals, etc.
+};
+
+type CustomerSummary = {
+  discounts: any[];
+  breakdown: Record<string, number>;
+  breakdown_meta: any[];
+  description: string;
+  [key: string]: unknown;
+};
+
+export type Contract = {
+  charges: {
+    contractorBreakdown: ContractorBreakdown;
+    contractorPayable: number;
+    contractorProcessingFeeRate: number;
+    contractorRates: ContractorRates;
+    contractorSummary: ContractorSummary;
+    customerBreakdown: CustomerBreakdown;
+    customerPayable: number;
+    customerProcessingFeeRate: number;
+    customerSummary: CustomerSummary;
+    downPaymentAmount: number;
+    downPaymentExcessAmount: number;
+    gstRate: number;
+    repairfindServiceFeeRate: number;
+    subtotal: number;
+  };
+  estimates: {
+    description: string;
+    quantity: string | string;
+    rate: number;
+    _id: string;
+  }[];
+  _id: string;
+};
 
 export const LANG_ID = "rpf_lng";
 

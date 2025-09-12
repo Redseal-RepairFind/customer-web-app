@@ -31,6 +31,10 @@ export const useRepairs = () => {
       }),
     refetchOnWindowFocus: false,
   });
+  const { data: paymentMethods, isLoading: loadingPaymentMethods } = useQuery({
+    queryKey: ["fetch-payment-methods"],
+    queryFn: () => repairActions.fetchPaymentMethods(),
+  });
 
   const handleCreateRequest = async (data: RepairType, close: () => void) => {
     if (!data?.description) {
@@ -64,11 +68,105 @@ export const useRepairs = () => {
       setCreatingRequest(false);
     }
   };
+
+  const handleAcceptEstimate = async ({
+    jobId,
+    quotesId,
+    close,
+  }: {
+    jobId: string;
+    quotesId: string;
+    close: () => void;
+  }) => {
+    setCreatingRequest(true);
+    try {
+      const res = await repairActions.acceptQuotes({
+        jobId,
+        quotationsId: quotesId,
+      });
+      toast.success(res?.message || "Repair quotations accepted successfully");
+
+      close();
+      await refetchRepairs();
+      return res;
+    } catch (error: any) {
+      const err = formatError(error) || "An error occurred. Please try again.";
+      console.error("Create request error", error);
+      toast.error(err);
+    } finally {
+      setCreatingRequest(false);
+    }
+  };
+  const handleDeclineEstimate = async ({
+    jobId,
+    quotesId,
+    close,
+  }: {
+    jobId: string;
+    quotesId: string;
+    close: () => void;
+  }) => {
+    setCreatingRequest(true);
+    try {
+      const res = await repairActions.acceptQuotes({
+        jobId,
+        quotationsId: quotesId,
+      });
+      toast.success(res?.message || "Repair quotations accepted successfully");
+
+      close();
+      await refetchRepairs();
+      return res;
+    } catch (error: any) {
+      const err = formatError(error) || "An error occurred. Please try again.";
+      console.error("Create request error", error);
+      toast.error(err);
+    } finally {
+      setCreatingRequest(false);
+    }
+  };
+  const handlePayEstimate = async ({
+    jobId,
+    quotesId,
+    paymentId,
+    close,
+  }: {
+    jobId: string;
+    quotesId: string;
+    close: () => void;
+    paymentId: string;
+  }) => {
+    setCreatingRequest(true);
+    try {
+      const res = await repairActions.payQuotes({
+        jobId,
+        quotationId: quotesId,
+        paymentMethodId: paymentId,
+      });
+      toast.success(res?.message || "Repair quotations payment successful");
+
+      close();
+      await refetchRepairs();
+      return res;
+    } catch (error: any) {
+      const err = formatError(error) || "An error occurred. Please try again.";
+      console.error("Create request error", error);
+      toast.error(err);
+    } finally {
+      setCreatingRequest(false);
+    }
+  };
+
   return {
     creatingRequest,
     handleCreateRequest,
     repairsData,
     loadingRepairs,
     refetchRepairs,
+    handleAcceptEstimate,
+    handleDeclineEstimate,
+    paymentMethods,
+    loadingPaymentMethods,
+    handlePayEstimate,
   };
 };
