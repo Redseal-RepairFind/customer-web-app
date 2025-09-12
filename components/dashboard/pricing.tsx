@@ -104,12 +104,14 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
     setSelectedPlan(null);
   };
 
-  // console.log(user);
+  console.log(user);
+
+  console.log(isNew);
 
   useEffect(() => {
     if (isUpgrade) return;
-    if (isNew) return;
-    if (user?.subscriptions[0] && !isNew) {
+    else if (isNew) return;
+    else if (user?.subscriptions[0] && !isNew) {
       const initAgeCat = equipmentAge.find(
         (eq) => eq.id === user.subscriptions[0].equipmentAgeCategory
       );
@@ -125,10 +127,10 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const plansToRender = toggle ? yearlylyPlans : monthlyPlans;
   const handleCloseInfoModal = () => setPaymentInfo({ info: {}, open: false });
   const handleOpenInfoModal = (item: any) => {
-    if (!subType?.name) {
-      toast.error("Select a subscription type to proceed ");
-      return;
-    }
+    // if (!subType?.name) {
+    //   toast.error("Select a subscription type to proceed ");
+    //   return;
+    // }
     if (!selectedPredictions?.prediction || !dropdown?.id) {
       toast.error("Kindly enter address and equipment age range ");
       return;
@@ -141,6 +143,8 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   // console.log(singleSubPlans);
 
   // console.log(selectedPlan);
+
+  console.log(isUpgrade);
 
   return (
     <main className="w-full my-12 xl:px-16 lg:px-8">
@@ -193,6 +197,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
             setDropdown={setDropdown}
             setSelectedPredictions={setSelectedPredictions}
             unitNUmber={unitNumber}
+            isUpgrade={isUpgrade}
           />
         </Modal>
       )}

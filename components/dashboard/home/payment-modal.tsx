@@ -20,6 +20,7 @@ const PaymentModal = ({
   selectedPredictions,
   setSelectedPredictions,
   unitNUmber,
+  isUpgrade,
 }: {
   onClose: () => void;
   subPlan: any;
@@ -34,6 +35,7 @@ const PaymentModal = ({
   };
   setSelectedPredictions: (pr?: any) => void;
   unitNUmber?: string;
+  isUpgrade: boolean;
 }) => {
   // const [selectedPredictions, setSelectedPredictions] = useState<any>({
   //   predictions: {},
@@ -52,6 +54,7 @@ const PaymentModal = ({
   const onSubmit = async () => {
     const predictions = selectedPredictions?.prediction;
 
+    console.log(isUpgrade);
     if (!predictions?.latitude) {
       toast.error("Enter a valid address");
       return;

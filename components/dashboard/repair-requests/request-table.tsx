@@ -70,7 +70,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
     });
   };
 
-  console.log(openModal?.estimate);
+  console.log(data);
 
   const handleViewEstimate = (estimate: RepairJob | null) => {
     setOpenModal({
@@ -105,12 +105,12 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
   };
   // lib/statusProgress.ts
 
-  // console.log(data);
-
   if (loadingPaymentMethods) return <LoadingTemplate />;
 
   console.log(methodId);
   const mthods = paymentMethods?.data;
+
+  console.log(data);
 
   return (
     <>
@@ -306,7 +306,8 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                       />
                     </Dropdown.Trigger>
                     <Dropdown.Content className="w-[120px] bg-white absolute -left-5">
-                      {rep?.isDraft || rep.status === "EXPIRED" ? null : (
+                      {rep?.contract?.isDraft ||
+                      rep.status === "EXPIRED" ? null : (
                         <Dropdown.Item
                           className="w-full"
                           onClick={(e) => {

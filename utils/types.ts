@@ -307,6 +307,7 @@ export type Contract = {
     gstRate: number;
     repairfindServiceFeeRate: number;
     subtotal: number;
+    isDraft: boolean;
   };
   estimates: {
     description: string;
