@@ -457,13 +457,16 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                         className="w-full"
                         onClick={(e) => {
                           e.stopPropagation();
-                          rep.status === "COMPLETED"
-                            ? setOpenCompleted((cm) => ({
-                                ...cm,
-                                completed: true,
-                                jobInfo: rep,
-                              }))
-                            : handleOpenModal(rep.status);
+
+                          if (rep.status === "COMPLETED") {
+                            setOpenCompleted((cm) => ({
+                              ...cm,
+                              completed: true,
+                              jobInfo: rep,
+                            }));
+                          } else {
+                            handleOpenModal(rep.status);
+                          }
                         }}
                       >
                         <div className="flex-rows items-center gap-2">

@@ -207,10 +207,7 @@ export const dummyCommHistory = [
   },
 ];
 
-export const recommend = [
-  "Yes, I would recommend",
-  "No, I would not recommend",
-];
+export const recommend = ["Yes, I would love to", "No, i would not"];
 
 export const issueType = [
   "Work not completed as agreed",

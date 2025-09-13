@@ -70,10 +70,10 @@ export const useRepairs = () => {
     data: {
       jobId: string;
       reviews: {
-        review: string;
-        rattings: { item: string; rating: number };
+        review?: string;
+        ratings: { item: string; rating: number }[];
       };
-      favouriteContractor: boolean;
+      favoriteContractor?: boolean;
     },
     close: () => void
   ) => {

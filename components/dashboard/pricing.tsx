@@ -389,7 +389,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
               ids = [
                 plansToRender[0]?._id,
                 plansToRender[1]?._id,
-                plansToRender[2]?._id,
+                // plansToRender[2]?._id,
               ];
             } else if (dropdown?.id === "unknown") {
               ids = plansToRender.map((id: any) => id?._id);

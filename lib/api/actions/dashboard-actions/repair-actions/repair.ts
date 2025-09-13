@@ -163,10 +163,10 @@ export const repairActions = {
   }: {
     jobId: string;
     reviews: {
-      review: string;
-      rattings: { item: string; rating: number };
+      review?: string;
+      ratings: { item: string; rating: number }[];
     };
-    favouriteContractor?: boolean;
+    favoriteContractor?: boolean;
   }) => {
     try {
       const response = await http.post(

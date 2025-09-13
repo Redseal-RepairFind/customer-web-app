@@ -142,6 +142,31 @@ const JobCompletedModal = ({
   );
 };
 
+const otherKindsRate = [
+  {
+    name: "Cleanliness",
+    slug: "cleanliness",
+  },
+  {
+    name: "Skill",
+    slug: "skill",
+  },
+  {
+    name: "Communication",
+    slug: "communication",
+  },
+  {
+    name: "Timeliness",
+    slug: "timeliness",
+  },
+];
+type RatingKey =
+  | "cleanliness"
+  | "skill"
+  | "item"
+  | "communication"
+  | "timeliness";
+
 const JobRatingModal = ({
   onReview,
   jobInfo,
@@ -152,19 +177,28 @@ const JobRatingModal = ({
   jobInfo: any;
 }) => {
   const [rating, setRating] = useState(0);
-  const [selected, setSelected] = useState(recommend[0]);
-  // console.log(rating);
 
-  // console.log(jobInfo);
+  const [otherRatings, setOtherRatings] = useState({
+    cleanliness: 0,
+    skill: 0,
+    item: 0,
+    communication: 0,
+    timeliness: 0,
+  });
+  const [selected, setSelected] = useState(recommend[0]);
+  const [reviewMessage, setReviewMessage] = useState("");
+  const { handleRateJob, creatingRequest } = useRepairs();
 
   const contractor = jobInfo?.contractors?.find(
     (cnt: any) =>
       cnt?._id === jobInfo?.contractor || cnt?._id === jobInfo?.contractor?._id
   );
   return (
-    <div className="w-full flex-cols items-center gap-3">
-      <Text.SmallHeading>Rate Your Experience</Text.SmallHeading>
-      <Text.SubParagraph className="text-dark-500 text-sm">
+    <div className="w-full flex-cols items- gap-3">
+      <Text.SmallHeading className="text-center">
+        Rate Your Experience
+      </Text.SmallHeading>
+      <Text.SubParagraph className="text-dark-500 text-sm text-center">
         Help other customers by sharing your feedback about Mike Johnson{" "}
       </Text.SubParagraph>
       <SpecialBox className="flex-cols justify-center p-4">
@@ -180,8 +214,30 @@ const JobRatingModal = ({
           </Text.Paragraph>
         </div>
       </SpecialBox>
-      <Text.SmallHeading>Overall Rating</Text.SmallHeading>
-      <Rating defaultValue={0} onChange={(rt) => setRating(rt)} />
+      {/* <div className="flex-col items-center gap-2 w-full">
+        <Text.SmallHeading>Overall Rating</Text.SmallHeading>
+        <Rating defaultValue={0} onChange={(rt) => setRating(rt)} />
+      </div> */}
+      {otherKindsRate?.map((rt) => (
+        <div
+          key={rt.name}
+          className="flex-rows justify-start items-center gap-2"
+        >
+          <Text.Paragraph className="text-sm md:text-base font-semibold">
+            {rt.name}
+          </Text.Paragraph>
+          <Rating
+            defaultValue={0}
+            onChange={(ret) =>
+              setOtherRatings((r) => ({
+                ...r,
+                [rt.slug]: ret,
+              }))
+            }
+          />
+        </div>
+      ))}
+
       <div className="gap-2 w-full flex-cols">
         <Text.SmallText className="font-semibold text-sm">
           Tell us about your experience (optional)
@@ -191,12 +247,14 @@ const JobRatingModal = ({
           cols={4}
           className="text-input bg-purple-blue-50 w-full p-2"
           placeholder="Tell us about your experience (optional)"
+          value={reviewMessage}
+          onChange={(e) => setReviewMessage(e.target.value)}
         />
       </div>
 
       <div className="flex-cols items-start gap-2 justify-start w-full">
         <Text.SmallHeading className="text-base font-semibold text-start">
-          Would yoy recommend this contractor?
+          Do you wanna make {contractor?.firstName} your favorite contractor?
         </Text.SmallHeading>
         {recommend.map((rec, i) => (
           <div className="flex-rows items-center gap-2 justify-start" key={i}>
@@ -219,8 +277,41 @@ const JobRatingModal = ({
       </div>
 
       <div className="grid grid-cols-2 items-center gap-2 w-full">
-        <Button onClick={onReview}>
-          <Button.Text>Submit Review</Button.Text>
+        <Button
+          onClick={() => {
+            const payload = {
+              ...(reviewMessage && { review: reviewMessage }),
+              ratings:
+                otherKindsRate?.map((rt) => ({
+                  item: rt.name,
+                  rating: otherRatings?.[rt.slug as RatingKey] ?? 0,
+                })) ?? [],
+              favoriteContractor: selected?.toLowerCase()?.includes("yes"),
+            };
+
+            handleRateJob(
+              {
+                jobId: jobInfo?._id,
+                reviews: payload,
+              },
+              onClose
+            );
+          }}
+          disabled={
+            !otherRatings?.cleanliness ||
+            !otherRatings?.skill ||
+            !otherRatings?.communication ||
+            !otherRatings?.timeliness
+          }
+        >
+          {creatingRequest && (
+            <Button.Icon>
+              <ClipLoader size={24} color="#fff" />
+            </Button.Icon>
+          )}
+          <Button.Text>
+            Submit{creatingRequest ? "ing..." : "  Review"}
+          </Button.Text>
         </Button>
         <Button variant="secondary" onClick={onClose}>
           <Button.Text>Back</Button.Text>
