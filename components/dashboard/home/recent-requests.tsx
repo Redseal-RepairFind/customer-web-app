@@ -47,54 +47,6 @@ const RecentRequests = ({ requestData }: { requestData: RepairJob[] }) => {
 
   return (
     <>
-      <Modal
-        onClose={() => handleModal("close", "completed")}
-        isOpen={openModals.completed}
-        maxWidth="max-w-[539px]"
-      >
-        <JobCompletedModal
-          onReport={() => handleModal("open", "report")}
-          onReview={() => handleModal("open", "rating")}
-          onClose={() => handleModal("close", "completed")}
-          jobInfo={{
-            name: "Mike Johnson",
-            ratings: 4.9,
-            category: "Electrical",
-            jobsCompleted: 100,
-            date: new Date(),
-            summary: "Installed new electrical components",
-          }}
-        />
-      </Modal>
-      <Modal
-        onClose={() => handleModal("close", "rating")}
-        isOpen={openModals.rating}
-        maxWidth="max-w-[539px]"
-      >
-        <JobRatingModal
-          onReview={() => {}}
-          onClose={() => handleModal("close", "rating")}
-          jobInfo={{
-            name: "Mike Johnson",
-            ratings: 4.9,
-            category: "Electrical",
-            jobsCompleted: 100,
-            date: new Date(),
-            summary: "Installed new electrical components",
-          }}
-        />
-      </Modal>
-
-      <Modal
-        onClose={() => handleModal("close", "report")}
-        isOpen={openModals.report}
-        maxWidth="max-w-[539px]"
-      >
-        <JobDisputeModal
-          onClose={() => handleModal("close", "report")}
-          onReport={() => {}}
-        />
-      </Modal>
       <div className="flex-cols gap-4">
         <Text.SmallHeading>Recent Requests</Text.SmallHeading>
 
