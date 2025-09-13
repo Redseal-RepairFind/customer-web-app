@@ -23,6 +23,7 @@ import { readCookie, readStringCookie } from "@/lib/helpers";
 import { ClipLoader } from "react-spinners";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
+import toast from "react-hot-toast";
 
 type SkilsTYpe = {
   name: string;
@@ -315,6 +316,10 @@ const RequestModal = ({
         <Button
           disabled={creatingRequest || subs?.status !== "ACTIVE"}
           onClick={async () => {
+            if (!subs?.coverageAddress?.address) {
+              toast.error("Selected subscription have no coverage address");
+              return;
+            }
             const payload = {
               serviceType: dropdown?.name,
               date: dayjs(value).format("YYYY-MM-DD"),
@@ -339,7 +344,11 @@ const RequestModal = ({
             {creatingRequest ? "Submitting..." : "Submit Request"}
           </Button.Text>
         </Button>
-        <Button variant="secondary" disabled={creatingRequest}>
+        <Button
+          variant="secondary"
+          disabled={creatingRequest}
+          onClick={closeModal}
+        >
           <Button.Text>Cancel</Button.Text>
         </Button>
       </div>

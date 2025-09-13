@@ -34,7 +34,65 @@ export const useRepairs = () => {
   const { data: paymentMethods, isLoading: loadingPaymentMethods } = useQuery({
     queryKey: ["fetch-payment-methods"],
     queryFn: () => repairActions.fetchPaymentMethods(),
+    refetchOnWindowFocus: true,
   });
+
+  const handleDisputeJob = async (
+    {
+      jobId,
+      description,
+    }: {
+      jobId: string;
+      description: string;
+    },
+    close: () => void
+  ) => {
+    setCreatingRequest(true);
+    try {
+      const res = await repairActions.disputeRepairs({
+        jobId,
+        description,
+      });
+      toast.success(res?.message || "Repair request created successfully");
+
+      close();
+      await refetchRepairs();
+      return res;
+    } catch (error: any) {
+      const err = formatError(error) || "An error occurred. Please try again.";
+      console.error("Create request error", error);
+      toast.error(err);
+    } finally {
+      setCreatingRequest(false);
+    }
+  };
+  const handleRateJob = async (
+    data: {
+      jobId: string;
+      reviews: {
+        review: string;
+        rattings: { item: string; rating: number };
+      };
+      favouriteContractor: boolean;
+    },
+    close: () => void
+  ) => {
+    setCreatingRequest(true);
+    try {
+      const res = await repairActions.rateRepairs(data);
+      toast.success(res?.message || "Repair request created successfully");
+
+      close();
+      await refetchRepairs();
+      return res;
+    } catch (error: any) {
+      const err = formatError(error) || "An error occurred. Please try again.";
+      console.error("Create request error", error);
+      toast.error(err);
+    } finally {
+      setCreatingRequest(false);
+    }
+  };
 
   const handleCreateRequest = async (data: RepairType, close: () => void) => {
     if (!data?.description) {
@@ -43,6 +101,12 @@ export const useRepairs = () => {
     }
     if (!data?.serviceType) {
       toast.error("Please provide a service type.");
+      return;
+    }
+    if (!data?.subscriptionId) {
+      toast.error(
+        "Please select your subscription plan for issue locatiion identification."
+      );
       return;
     }
     if (!data?.subscriptionId) {
@@ -168,5 +232,7 @@ export const useRepairs = () => {
     paymentMethods,
     loadingPaymentMethods,
     handlePayEstimate,
+    handleDisputeJob,
+    handleRateJob,
   };
 };

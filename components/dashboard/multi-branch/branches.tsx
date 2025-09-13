@@ -139,7 +139,7 @@ const Branches = () => {
 
       <div className="grid-3 gap-3">
         {paymentMethods?.map((mtd: any) => (
-          <PaymentMethodItem method={mtd} key={mtd?._id} />
+          <PaymentMethodItem method={mtd} key={mtd?.id} />
         ))}
       </div>
 

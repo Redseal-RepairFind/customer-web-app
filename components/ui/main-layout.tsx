@@ -5,7 +5,6 @@ import Footer from "./footer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ThemeRegistry from "@/contexts/theme-context";
 
-import { useToast } from "@/contexts/toast-contexts";
 import { useFCMNotifications } from "@/hook/useFcmToken";
 import { SocketProvider } from "@/contexts/socket-contexts";
 

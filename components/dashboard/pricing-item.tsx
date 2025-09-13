@@ -2,7 +2,7 @@
 import { BiCheck } from "react-icons/bi";
 import Text from "../ui/text";
 import { useState } from "react";
-import { CgChevronUp } from "react-icons/cg";
+import { CgChevronDown, CgChevronUp } from "react-icons/cg";
 import { formatCurrency } from "@/lib/helpers";
 
 const PricingItem = ({
@@ -39,7 +39,7 @@ const PricingItem = ({
         </Text.Paragraph>
         {isRecommended ? (
           <span className=" px-3 py-2 rounded-full text-base text-white bg-black">
-            {currentPlan ? "Current Plan" : "Recommended"}
+            {"Recommended"}
           </span>
         ) : null}
       </div>
@@ -115,7 +115,7 @@ const PricingItem = ({
             {showall ? "See less Features" : "See more features"}
           </Text.SmallText>
 
-          <CgChevronUp />
+          {showall ? <CgChevronUp /> : <CgChevronDown />}
         </button>
       </div>
     </div>

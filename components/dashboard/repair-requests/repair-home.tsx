@@ -35,7 +35,6 @@ const RepairRequestHome = () => {
       <DashboardHeader />
       <section className="flex-cols gap-3 mt-5">
         <FilterRepair />
-
         <RepairTable data={repairs} />
       </section>
       <Pagination

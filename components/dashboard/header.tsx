@@ -18,6 +18,7 @@ import { usePricing } from "@/hook/usePricing";
 import { usePageNavigator } from "@/hook/navigator";
 import { BiPlus } from "react-icons/bi";
 import { SUB_EXTRA_ID } from "@/utils/types";
+import { useSocket } from "@/contexts/socket-contexts";
 
 const ROTATE_MS = 4000; // auto-advance every 4s
 
@@ -34,6 +35,7 @@ const DashboardHeader = () => {
 
   const { skills, loadingSkills } = useSkills();
   const { curPathname, navigator } = usePageNavigator();
+
   // console.log();
 
   const allSkils = skills?.data || [];

@@ -384,7 +384,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
           let curPlan;
           if (dropdown)
             if (dropdown?.id === "5-8") {
-              ids = [plansToRender[0]?._id, plansToRender[1]?._id];
+              ids = [plansToRender[0]?._id];
             } else if (dropdown?.id === "9+") {
               ids = [
                 plansToRender[0]?._id,
@@ -396,38 +396,42 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
             } else {
               ids = [];
             }
-          // if (isUpgrade) {
-          //   const index = plansToRender.findIndex(
-          //     (pl: any) =>
-          //       pl?.planType === singleSubPlans?.planType &&
-          //       pl?.billingFrequency === singleSubPlans?.billingFrequency
-          //   );
+          if (isUpgrade) {
+            const index = plansToRender.findIndex(
+              (pl: any) =>
+                pl?.planType === singleSubPlans?.planType &&
+                pl?.billingFrequency === singleSubPlans?.billingFrequency
+            );
 
-          //   let slicedPlans: any[] = [];
+            let slicedPlans: any[] = [];
 
-          //   if (index !== -1) {
-          //     slicedPlans = plansToRender.slice(0, index + 1);
+            if (index !== -1) {
+              slicedPlans = plansToRender.slice(0, index + 1);
 
-          //     // Stop at the first ANNUALLY plan (inclusive), if one exists in the slice
-          //     const annuallyIndex = slicedPlans.findIndex(
-          //       (pl: any) => pl?.billingFrequency === "ANNUALLY"
-          //     );
+              // Stop at the first ANNUALLY plan (inclusive), if one exists in the slice
+              // const annuallyIndex = slicedPlans.findIndex(
+              //   (pl: any) => pl?.billingFrequency === "ANNUALLY"
+              // );
 
-          //     if (annuallyIndex !== -1) {
-          //       slicedPlans = slicedPlans.slice(0, annuallyIndex + 1);
-          //     }
-          //   }
+              // if (annuallyIndex !== -1) {
+              //   slicedPlans = slicedPlans.slice(0, annuallyIndex + 1);
+              // }
+            }
 
-          //   // Apply equipmentAgeCategory filtering
-          //   if (singleSubPlans?.equipmentAgeCategory === "5-8") {
-          //     ids = [plansToRender[0]?._id];
-          //   } else if (singleSubPlans?.equipmentAgeCategory === "9+") {
-          //     ids = [plansToRender[0]?._id, plansToRender[1]?._id];
-          //   } else {
-          //     // Default fallback: use filtered sliced plans
-          //     ids = slicedPlans.map((pl: any) => pl?._id);
-          //   }
-          // }
+            // Apply equipmentAgeCategory filtering
+            if (singleSubPlans?.equipmentAgeCategory === "5-8") {
+              ids = [plansToRender[0]?._id, plansToRender[1]?._id];
+            } else if (singleSubPlans?.equipmentAgeCategory === "9+") {
+              ids = [
+                plansToRender[0]?._id,
+                plansToRender[1]?._id,
+                plansToRender[2]?._id,
+              ];
+            } else {
+              // Default fallback: use filtered sliced plans
+              ids = slicedPlans.map((pl: any) => pl?._id);
+            }
+          }
 
           // console.log(curPlan);
           return (

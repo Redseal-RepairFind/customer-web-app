@@ -1,11 +1,10 @@
 "use client";
 
-import { useContext, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import DashboardNav from "./dashboard-nav";
 import DashNav from "./dash-nav";
 import { NavWindow } from "../landing";
 import { dashboardNav, otherNav } from "@/lib/dasboard-constatns";
-import { useNotification } from "@/hook/useNotification";
 import { useSocket } from "@/contexts/socket-contexts";
 
 export default function ClientDashboardLayout({
@@ -22,7 +21,6 @@ export default function ClientDashboardLayout({
     // No grid needed on lg since sidebar is fixed.
     <div className="min-h-dvh">
       <DashNav />
-
       {/* Reserve space for the fixed 280px sidebar on lg+ */}
       <main className="lg:ml-[240px]">
         <NavWindow

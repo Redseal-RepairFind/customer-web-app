@@ -9,7 +9,7 @@ import { ToastProvider } from "@/contexts/toast-contexts";
 
 const jost = Jost({
   subsets: ["latin"],
-  variable: "--font-jost", // creates a CSS variable you can use
+  variable: "--font-jost", // creates a CSS variable
 });
 
 export const metadata: Metadata = {
@@ -26,10 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${jost.variable}  antialiased min-h-dvh flex-col flex justify-between`}
-      >
+    <html lang="en" className={jost.variable}>
+      <body className="antialiased min-h-dvh flex-col flex justify-between">
         <ToastProvider>
           <MainLayout>
             <GoogleMapsProvider>{children}</GoogleMapsProvider>
@@ -38,11 +36,7 @@ export default function RootLayout({
 
         <Toaster
           toastOptions={{
-            style: {
-              fontFamily: "'Jost', sans-serif",
-              fontSize: "12px",
-              fontWeight: "700",
-            },
+            className: "font-jost text-xs font-bold",
             success: {
               iconTheme: {
                 primary: "#000000",

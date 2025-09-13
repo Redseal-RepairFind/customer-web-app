@@ -156,4 +156,59 @@ export const repairActions = {
       throw error;
     }
   },
+
+  rateRepairs: async ({
+    jobId,
+    reviews,
+  }: {
+    jobId: string;
+    reviews: {
+      review: string;
+      rattings: { item: string; rating: number };
+    };
+    favouriteContractor?: boolean;
+  }) => {
+    try {
+      const response = await http.post(
+        `${url}/bookings/${jobId}/review`,
+        reviews,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+  disputeRepairs: async ({
+    jobId,
+    description,
+  }: {
+    jobId: string;
+    description: string;
+  }) => {
+    try {
+      const response = await http.post(
+        `${url}/bookings/${jobId}/dispute`,
+        {
+          description,
+        },
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 };

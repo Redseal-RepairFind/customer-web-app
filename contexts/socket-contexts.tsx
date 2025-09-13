@@ -11,6 +11,8 @@ type SocketContextType = {
   handleReadNotifs: (id: string) => void;
   badge: number;
   setBadge: (cnt: number) => void;
+  openComplete: boolean;
+  setOpenComplete: (cm: boolean) => void;
 };
 
 const SocketContext = createContext<SocketContextType>({
@@ -20,6 +22,8 @@ const SocketContext = createContext<SocketContextType>({
   handleReadNotifs() {},
   badge: 0,
   setBadge() {},
+  openComplete: false,
+  setOpenComplete() {},
 });
 
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
@@ -29,7 +33,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   );
   const { notificationBagde } = useNotification();
   const [badge, setBadge] = useState<number>(0);
-
+  const [openComplete, setOpenComplete] = useState(false);
   const handleReadNotifs = async (id: string): Promise<void> => {
     SocketsService.sendData("mark_single_notification_as_read", { id });
     setBadge((bg) => bg > 0 && bg - 1);
@@ -44,10 +48,15 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setBadgeCount(data?.payload?.data);
       console.log("RED_DOT_ALERT", data);
     };
+    const handleJobMarkComplete = (data: NotificationsResponse) => {
+      setOpenComplete(true);
+      console.log("JOB_MARKED_COMPLETE", data);
+    };
 
     SocketsService.socket.on("connect", handleConnect);
     SocketsService.socket.on("disconnect", handleDisconnect);
     SocketsService.subscribe("RED_DOT_ALERT", handleRedDotAlert);
+    SocketsService.subscribe("JOB_MARKED_COMPLETE", handleJobMarkComplete);
 
     if (notificationBagde) {
       setBadge(notificationBagde.data?.totalCount || 0);
@@ -70,6 +79,8 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
         handleReadNotifs,
         badge,
         setBadge,
+        openComplete,
+        setOpenComplete: (cm: boolean) => setOpenComplete(cm),
       }}
     >
       {children}

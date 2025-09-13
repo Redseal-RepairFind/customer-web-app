@@ -23,6 +23,12 @@ import { useRepairs } from "@/hook/useRepairs";
 import LoadingTemplate from "@/components/ui/spinner";
 import Button from "@/components/ui/custom-btn";
 import { ClipLoader } from "react-spinners";
+import { useSocket } from "@/contexts/socket-contexts";
+import {
+  JobCompletedModal,
+  JobDisputeModal,
+  JobRatingModal,
+} from "../home/job-toast-modal";
 
 interface IProps {
   children: React.ReactNode;
@@ -35,6 +41,14 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const [open, setOpen] = useState(false);
   const [tech, setTech] = useState<any>();
   const { warning } = useToast();
+
+  const [openCompleted, setOpenCompleted] = useState({
+    jobInfo: null,
+    completed: false,
+    review: false,
+    dispute: false,
+  });
+
   const params = useSearchParams();
   const status = params.get("status");
   const [openModal, setOpenModal] = useState({
@@ -46,6 +60,8 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
     card: any;
     id: string;
   }>();
+
+  const { openComplete, setOpenComplete } = useSocket();
   const {
     paymentMethods,
     loadingPaymentMethods,
@@ -107,10 +123,10 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
 
   if (loadingPaymentMethods) return <LoadingTemplate />;
 
-  console.log(methodId);
+  // console.log(methodId);
   const mthods = paymentMethods?.data;
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <>
@@ -174,6 +190,103 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
             </Button.Text>
           </Button>
         </div>
+      </Modal>
+
+      <Modal
+        isOpen={openCompleted.completed}
+        onClose={() =>
+          setOpenCompleted((cm) => ({
+            ...cm,
+            completed: false,
+          }))
+        }
+      >
+        <JobCompletedModal
+          jobInfo={openCompleted.jobInfo}
+          onReport={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              dispute: true,
+              completed: false,
+            }))
+          }
+          onReview={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              review: true,
+              completed: false,
+            }))
+          }
+          onClose={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              completed: false,
+            }))
+          }
+        />
+      </Modal>
+      <Modal
+        isOpen={openCompleted.review}
+        onClose={() =>
+          setOpenCompleted((cm) => ({
+            ...cm,
+            review: false,
+          }))
+        }
+      >
+        <JobRatingModal
+          jobInfo={openCompleted.jobInfo}
+          // onReport={() =>
+          //   setOpenCompleted((cm) => ({
+          //     ...cm,
+          //     dispute: false,
+          //   }))
+          // }
+          onReview={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              review: false,
+            }))
+          }
+          onClose={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              review: false,
+            }))
+          }
+        />
+      </Modal>
+      <Modal
+        isOpen={openCompleted.dispute}
+        onClose={() =>
+          setOpenCompleted((cm) => ({
+            ...cm,
+            dispute: false,
+          }))
+        }
+      >
+        <JobDisputeModal
+          // jobInfo={openCompleted.dispute}
+          onReport={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              dispute: false,
+            }))
+          }
+          // onReview={() =>
+          //   setOpenCompleted((cm) => ({
+          //     ...cm,
+          //     review: false,
+          //   }))
+          // }
+          onClose={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              dispute: false,
+            }))
+          }
+          disputeInfo={openCompleted.jobInfo}
+        />
       </Modal>
       <TableOverflow>
         <TechModal
@@ -308,7 +421,8 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                     <Dropdown.Content className="w-[120px] bg-white absolute -left-5">
                       {rep?.contract?.isDraft ||
                       rep.status === "EXPIRED" ||
-                      rep?.status === "PENDING" ? null : (
+                      rep?.status === "PENDING" ||
+                      rep?.status === "CANCELED" ? null : (
                         <Dropdown.Item
                           className="w-full"
                           onClick={(e) => {
@@ -318,7 +432,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                           }}
                         >
                           <div className="flex-rows items-center gap-2">
-                            <BsEye />
+                            {/* <BsEye /> */}
                             <Text.Paragraph className="text-sm">
                               View Estimate
                             </Text.Paragraph>
@@ -332,7 +446,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                         }}
                       >
                         <div className="flex-rows items-center gap-2">
-                          <CgCloseO />
+                          {/* <CgCloseO /> */}
                           <Text.Paragraph className="text-sm">
                             Cancel
                           </Text.Paragraph>
@@ -343,16 +457,57 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                         className="w-full"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleOpenModal(rep.status);
+                          rep.status === "COMPLETED"
+                            ? setOpenCompleted((cm) => ({
+                                ...cm,
+                                completed: true,
+                                jobInfo: rep,
+                              }))
+                            : handleOpenModal(rep.status);
                         }}
                       >
                         <div className="flex-rows items-center gap-2">
-                          <BsEye />
+                          {/* <BsEye /> */}
                           <Text.Paragraph className="text-sm">
                             View Status
                           </Text.Paragraph>
                         </div>
                       </Dropdown.Item>
+                      {/* {rep.status === "COMPLETED" && (
+                        <>
+                          <Dropdown.Item
+                            className="w-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+
+                              setOpenCompleted((cm) => ({
+                                ...cm,
+                                completed: true,
+                                jobInfo: rep,
+                              }));
+                            }}
+                          >
+                            <div className="flex-rows items-center gap-2">
+                              <Text.Paragraph className="text-sm">
+                                Rate Job
+                              </Text.Paragraph>
+                            </div>
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            className="w-full"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenModal(rep.status);
+                            }}
+                          >
+                            <div className="flex-rows items-center gap-2">
+                              <Text.Paragraph className="text-sm">
+                                View Status
+                              </Text.Paragraph>
+                            </div>
+                          </Dropdown.Item>
+                        </>
+                      )} */}
                     </Dropdown.Content>
                   </Dropdown>
                 </Td>

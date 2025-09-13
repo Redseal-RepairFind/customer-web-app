@@ -97,32 +97,36 @@ const Estimate = ({
         </div>
       </div>
 
-      <Button
-        onClick={() => {
-          //   handleAcceptEstimate({
-          //     jobId: estimate._id,
-          //     quotesId: estimate.contract._id,
-          //     close: () => {
-          //       closeModal();
-          //       openPayment();
-          //     },
-          //   });
+      {estimate?.status === "CANCELED" ||
+      estimate?.status === "DISPUTED" ||
+      estimate?.status === "PENDING" ? null : (
+        <Button
+          onClick={() => {
+            //   handleAcceptEstimate({
+            //     jobId: estimate._id,
+            //     quotesId: estimate.contract._id,
+            //     close: () => {
+            //       closeModal();
+            //       openPayment();
+            //     },
+            //   });
 
-          closeModal();
-          openPayment();
-        }}
-      >
-        <Button.Icon>
-          {creatingRequest ? (
-            <ClipLoader size={20} color="#fff" />
-          ) : (
-            <Image src={icons.card} alt="" height={20} width={20} />
-          )}
-        </Button.Icon>
-        <Button.Text>
-          {creatingRequest ? "Accepting..." : "Proceed"}
-        </Button.Text>
-      </Button>
+            closeModal();
+            openPayment();
+          }}
+        >
+          <Button.Icon>
+            {creatingRequest ? (
+              <ClipLoader size={20} color="#fff" />
+            ) : (
+              <Image src={icons.card} alt="" height={20} width={20} />
+            )}
+          </Button.Icon>
+          <Button.Text>
+            {creatingRequest ? "Accepting..." : "Proceed"}
+          </Button.Text>
+        </Button>
+      )}
       {/* <Button variant="secondary">
         <Button.Icon>
           <CgClose color="#000" size={20} />
