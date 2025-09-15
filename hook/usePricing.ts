@@ -11,7 +11,9 @@ import { useSearchParams } from "next/navigation";
 
 type SubsPage = {
   data: any[]; // replace with your Subscription type
-  meta?: { page: number; totalPages?: number; hasNextPage?: boolean };
+  page: number;
+  totalPages?: number;
+  hasNextPage?: boolean;
   stats?: any;
 };
 
@@ -20,7 +22,7 @@ export const usePricing = (planId?: string) => {
   const { navigator, curPathname } = usePageNavigator();
   const searchParams = useSearchParams();
   const [singleSubPlans, setSubPlans] = useState<any>();
-  const limit = searchParams.get("limit") || "20";
+  const limit = searchParams.get("limit") || "10";
   const page = searchParams.get("page") || "1";
   const planType = searchParams.get("planType");
   const search = searchParams.get("search") || "";
@@ -59,7 +61,7 @@ export const usePricing = (planId?: string) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    isFetching,
+    isLoading: isFetching,
     refetch,
   } = useInfiniteQuery<SubsPage>({
     queryKey: ["subscriptions", { planType, search, limit }],
@@ -67,14 +69,19 @@ export const usePricing = (planId?: string) => {
     queryFn: ({ pageParam }) =>
       pricingActions.getUserSubscriptions({
         page: Number(pageParam) || 1,
-        limit: Number(limit) || 20,
+        limit: Number(limit) || 10,
         planType: planType as "RESIDENTIAL",
         search,
       }),
+
     getNextPageParam: (lastPage) => {
-      const { page, hasNextPage } = lastPage?.meta ?? {};
-      return hasNextPage ? (page ?? 1) + 1 : undefined;
+      const meta = lastPage;
+      const currentPage = Number(meta?.page);
+      const totalPages = meta.totalPages;
+      // console.log(currentPage, totalPages);
+      return currentPage < totalPages ? currentPage + 1 : undefined;
     },
+
     staleTime: 60_000,
     gcTime: 5 * 60_000,
     // enabled: curPathname?.includes("/manage-subscription"),
@@ -91,7 +98,9 @@ export const usePricing = (planId?: string) => {
   // );
 
   // Optional: derived total pages / page for UI
-  const paginationMeta = data?.pages.at(-1)?.meta;
+  const paginationMeta = data?.pages;
+
+  console.log(paginationMeta);
 
   // ---- IntersectionObserver sentinel ----
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -101,6 +110,8 @@ export const usePricing = (planId?: string) => {
 
     const onIntersect: IntersectionObserverCallback = (entries) => {
       const [entry] = entries;
+      console.log("Intersecting?", entry.isIntersecting);
+
       if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
         fetchNextPage();
       }

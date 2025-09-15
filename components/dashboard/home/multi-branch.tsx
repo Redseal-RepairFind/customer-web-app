@@ -7,18 +7,12 @@ import { icons } from "@/lib/constants";
 import Link from "next/link";
 import Button from "@/components/ui/custom-btn";
 import { BiEdit } from "react-icons/bi";
-import { FaLocationPin } from "react-icons/fa6";
 import { HiOutlineLocationMarker } from "react-icons/hi";
-import { PLANSTYPE } from "./plan-log";
-import { formatCurrency, formatDate } from "@/lib/helpers";
-import dayjs from "dayjs";
+import { formatCurrency } from "@/lib/helpers";
 import { Subscriptions } from "@/utils/types";
 import { useSubCalc } from "@/hook/useSubCalc";
 import { usePricing } from "@/hook/usePricing";
 import LoadingTemplate from "@/components/ui/spinner";
-import Modal from "@/components/ui/customModal";
-import UpdatePlanModal from "../multi-branch/update-plan-modal";
-import { useState } from "react";
 
 const MultiBranch = () => {
   const {
@@ -37,7 +31,7 @@ const MultiBranch = () => {
 
   const first4 = subscriptions?.slice(0, 4);
 
-  console.log();
+  // console.log();
 
   return (
     <>
@@ -214,13 +208,14 @@ export const BranchCard = ({
               </Text.SmallText>
             </div>
           </div>
-
-          <Button variant="secondary" onClick={() => onOpenUpgrade?.(item)}>
-            <Button.Icon>
-              <BiEdit size={24} />
-            </Button.Icon>
-            <Button.Text>Manage</Button.Text>
-          </Button>
+          {item?.status === "ACTIVE" && (
+            <Button variant="secondary" onClick={() => onOpenUpgrade?.(item)}>
+              <Button.Icon>
+                <BiEdit size={24} />
+              </Button.Icon>
+              <Button.Text>Manage</Button.Text>
+            </Button>
+          )}
         </>
       ) : null}
     </Box>

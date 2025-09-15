@@ -28,7 +28,7 @@ export const generateToken = async () => {
     const token = await getToken(messaging, {
       vapidKey: process.env.NEXT_PUBLIC_VAPID_KEY,
     });
-    console.log(token);
+    // console.log(token);
     return token;
   }
   // console.log(permission);

@@ -38,7 +38,7 @@ export default function ClientDashboardLayout({
         {/* Let the main content scroll; use calc to fill the rest of the viewport */}
         <div
           className="p-4"
-          style={{ height: "calc(100dvh - 56px)", overflowY: "auto" }}
+          // style={{ height: "calc(100dvh - 56px)", overflowY: "auto" }}
         >
           {children}
         </div>

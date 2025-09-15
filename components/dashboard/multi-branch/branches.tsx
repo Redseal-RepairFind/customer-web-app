@@ -23,15 +23,18 @@ const Branches = () => {
     subscriptionsStats,
     // status,
     // error,
-    // fetchNextPage,
-    // hasNextPage,
-    // isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     isFetching,
     // refetch,
     handleCancelPlan,
     isCheckingout,
     handleCheckoutSession,
+    sentinelRef,
   } = usePricing();
+
+  // console.log(hasNextPage);
 
   const { curUser4PaymentMethod, loadingCurUser4PaymentMethod } = useUser();
   const [openUpgradeModal, setOpenUpgradeModal] = useState<{
@@ -152,6 +155,11 @@ const Branches = () => {
             onOpenUpgrade={handleOpenModal}
           />
         ))}
+      </div>
+      <div ref={sentinelRef} className="h-12" />
+
+      <div className="flex-row-center w-full">
+        {isFetchingNextPage && <ClipLoader size={24} color="#000" />}
       </div>
     </main>
   );

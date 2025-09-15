@@ -16,9 +16,12 @@ import { useSubCalc } from "@/hook/useSubCalc";
 import { useSkills } from "@/hook/useSkills";
 import { usePricing } from "@/hook/usePricing";
 import { usePageNavigator } from "@/hook/navigator";
-import { BiPlus } from "react-icons/bi";
+import { BiCheck, BiPlus } from "react-icons/bi";
 import { SUB_EXTRA_ID } from "@/utils/types";
 import { useSocket } from "@/contexts/socket-contexts";
+import { useCopyToClipboard } from "@/hook/useCopy";
+import { BsCopy } from "react-icons/bs";
+import { CgCheck } from "react-icons/cg";
 
 const ROTATE_MS = 4000; // auto-advance every 4s
 
@@ -35,6 +38,8 @@ const DashboardHeader = () => {
 
   const { skills, loadingSkills } = useSkills();
   const { curPathname, navigator } = usePageNavigator();
+
+  const { isCopied, copy } = useCopyToClipboard();
 
   // console.log();
 
@@ -118,11 +123,33 @@ const DashboardHeader = () => {
         />
       </Modal>
       <div className="flex flex-col gap-5 w-full">
-        <Text.SubHeading className="font-semibold capitalize">
-          Welcome back,{" "}
-          {user?.businessName?.toLowerCase() || user?.firstName?.toLowerCase()}
-        </Text.SubHeading>
+        <div className="flex-cols  gap-2">
+          <Text.SubHeading className="font-semibold capitalize">
+            Welcome back,{" "}
+            {user?.businessName?.toLowerCase() ||
+              user?.firstName?.toLowerCase()}
+          </Text.SubHeading>
+          <div className="flex-rows items-center gap-3">
+            <Text.Paragraph className="font-semibold capitalize">
+              Account ID:{" "}
+              <span className="uppercase font-normal">{user?.accountId}</span>
+            </Text.Paragraph>
 
+            <button
+              className="cursor-pointer "
+              onClick={() => copy(user?.accountId)}
+            >
+              {isCopied ? (
+                <div className="border border-light-0 p-[2px] rounded-sm flex items-center">
+                  <BiCheck />
+                  <p>copied</p>
+                </div>
+              ) : (
+                <BsCopy />
+              )}
+            </button>
+          </div>
+        </div>
         <section
           className="relative w-full rounded-lg overflow-hidden shadow-sm"
           aria-roledescription="carousel"

@@ -15,7 +15,7 @@ export const useNotification = () => {
   const fetchNotifications = async ({ pageParam = 1 }) => {
     const response = await notifications.getUserNotification({
       page: pageParam,
-      limit: 20,
+      limit: 10,
     });
 
     return response;
@@ -33,11 +33,13 @@ export const useNotification = () => {
     queryKey: ["user_notifications"],
     queryFn: fetchNotifications,
     getNextPageParam: (lastPage) => {
-      const currentPage = lastPage.page;
-      const totalPages = lastPage.totalPages;
+      const meta = lastPage?.data;
+      const currentPage = Number(meta.currentPage);
+      const totalPages = meta.lastPage;
+      // console.log(currentPage);
       return currentPage < totalPages ? currentPage + 1 : undefined;
     },
-    initialPageParam: 1, // ✅ Add this line to fix the TS error
+    initialPageParam: 1,
   });
 
   useEffect(() => {

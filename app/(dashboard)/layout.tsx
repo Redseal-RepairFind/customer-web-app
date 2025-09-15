@@ -8,7 +8,7 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
 
   if (!token?.value) redirect("/home");
   // console.log(token);
-  console.log("🔑 cookie in layout:", token?.value);
+  // console.log("🔑 cookie in layout:", token?.value);
 
   return <ClientDashboardLayout>{children}</ClientDashboardLayout>;
 };

@@ -25,7 +25,7 @@ const DashboardHome = () => {
 
   // console.log(subscriptions);
 
-  const { isConnected, socket } = useSocket();
+  // const { isConnected, socket } = useSocket();
 
   // console.log(socket);
 
@@ -54,7 +54,7 @@ const DashboardHome = () => {
     planType,
   };
 
-  // console.log(repairsData);
+  // console.log(curUser);
 
   return (
     <main className="w-full">

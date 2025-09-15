@@ -13,6 +13,7 @@ import { ClipLoader } from "react-spinners";
 import { Notification } from "@/utils/types";
 import { getTimeAgo } from "@/lib/helpers";
 import { useSocket } from "@/contexts/socket-contexts";
+import Image from "next/image";
 
 const Notifs = () => {
   const [switched, setSwitched] = useState("Notifications");
@@ -21,7 +22,7 @@ const Notifs = () => {
     // handleAllReadNotifs,
     allNotifications,
     isFetchingNextPage,
-    // hasNextPage,
+    hasNextPage,
     isLoading,
     sentinelRef,
     unreadCount,
@@ -30,6 +31,8 @@ const Notifs = () => {
   const { handleReadNotifs } = useSocket();
 
   // console.log(allNotifications);
+
+  // console.log(hasNextPage);
 
   if (isLoading) return <LoadingTemplate />;
   return (
@@ -81,7 +84,7 @@ const NotifItem = ({
   notif: Notification;
   onRead: (id: string) => void;
 }) => {
-  // console.log(notif);
+  // console.log(notif?.heading);
 
   return (
     <SpecialBox
@@ -91,8 +94,17 @@ const NotifItem = ({
       isRead={Boolean(notif.readAt)}
     >
       <div className="flex-rows gap-2 w-[80%]">
-        <div className="h-8 min-w-8 rounded-full flex-row-center bg-red-100">
-          <HiUser />
+        <div className="h-8 min-w-8 relative rounded-full flex-row-center bg-red-100">
+          {notif?.heading?.image ? (
+            <Image
+              src={notif?.heading?.image}
+              fill
+              alt="Notification image"
+              className="rounded-full"
+            />
+          ) : (
+            <HiUser />
+          )}
         </div>
 
         <div className="">

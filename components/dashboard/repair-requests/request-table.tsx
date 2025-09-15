@@ -29,6 +29,7 @@ import {
   JobDisputeModal,
   JobRatingModal,
 } from "../home/job-toast-modal";
+import RepairDropdown from "./table-menu";
 
 interface IProps {
   children: React.ReactNode;
@@ -61,7 +62,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
     id: string;
   }>();
 
-  const { openComplete, setOpenComplete } = useSocket();
+  // const { openComplete, setOpenComplete } = useSocket();
   const {
     paymentMethods,
     loadingPaymentMethods,
@@ -86,7 +87,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
     });
   };
 
-  console.log(data);
+  // console.log(data);
 
   const handleViewEstimate = (estimate: RepairJob | null) => {
     setOpenModal({
@@ -409,110 +410,12 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
 
                 {/* More (visible on mobile — part of actions) */}
                 <Td className="relative ">
-                  <Dropdown className="absolute -left-5 flex-cols items-end">
-                    <Dropdown.Trigger className="w-10 cursor-pointer " isNormal>
-                      <Image
-                        src={icons.moreIcon}
-                        height={20}
-                        width={24}
-                        alt="Menu icon"
-                      />
-                    </Dropdown.Trigger>
-                    <Dropdown.Content className="w-[120px] bg-white absolute -left-5">
-                      {rep?.contract?.isDraft ||
-                      rep.status === "EXPIRED" ||
-                      rep?.status === "PENDING" ||
-                      rep?.status === "CANCELED" ? null : (
-                        <Dropdown.Item
-                          className="w-full"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // handleOpenModal(rep.status);
-                            handleViewEstimate(rep);
-                          }}
-                        >
-                          <div className="flex-rows items-center gap-2">
-                            {/* <BsEye /> */}
-                            <Text.Paragraph className="text-sm">
-                              View Estimate
-                            </Text.Paragraph>
-                          </div>
-                        </Dropdown.Item>
-                      )}
-                      <Dropdown.Item
-                        className="w-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      >
-                        <div className="flex-rows items-center gap-2">
-                          {/* <CgCloseO /> */}
-                          <Text.Paragraph className="text-sm">
-                            Cancel
-                          </Text.Paragraph>
-                        </div>
-                      </Dropdown.Item>
-
-                      <Dropdown.Item
-                        className="w-full"
-                        onClick={(e) => {
-                          e.stopPropagation();
-
-                          if (rep.status === "COMPLETED") {
-                            setOpenCompleted((cm) => ({
-                              ...cm,
-                              completed: true,
-                              jobInfo: rep,
-                            }));
-                          } else {
-                            handleOpenModal(rep.status);
-                          }
-                        }}
-                      >
-                        <div className="flex-rows items-center gap-2">
-                          {/* <BsEye /> */}
-                          <Text.Paragraph className="text-sm">
-                            View Status
-                          </Text.Paragraph>
-                        </div>
-                      </Dropdown.Item>
-                      {/* {rep.status === "COMPLETED" && (
-                        <>
-                          <Dropdown.Item
-                            className="w-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-
-                              setOpenCompleted((cm) => ({
-                                ...cm,
-                                completed: true,
-                                jobInfo: rep,
-                              }));
-                            }}
-                          >
-                            <div className="flex-rows items-center gap-2">
-                              <Text.Paragraph className="text-sm">
-                                Rate Job
-                              </Text.Paragraph>
-                            </div>
-                          </Dropdown.Item>
-                          <Dropdown.Item
-                            className="w-full"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenModal(rep.status);
-                            }}
-                          >
-                            <div className="flex-rows items-center gap-2">
-                              <Text.Paragraph className="text-sm">
-                                View Status
-                              </Text.Paragraph>
-                            </div>
-                          </Dropdown.Item>
-                        </>
-                      )} */}
-                    </Dropdown.Content>
-                  </Dropdown>
+                  <RepairDropdown
+                    rep={rep}
+                    handleViewEstimate={handleViewEstimate}
+                    handleOpenModal={handleOpenModal}
+                    setOpenCompleted={setOpenCompleted}
+                  />
                 </Td>
               </Tr>
             ))}
