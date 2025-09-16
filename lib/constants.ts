@@ -282,14 +282,14 @@ export const equipmentAge = [
     variant: "green",
     icon: greenPeople,
   },
-  {
-    name: "I don't know",
-    id: "unknown",
+  // {
+  //   name: "I don't know",
+  //   id: "unknown",
 
-    tag: "Tailored plans for businesses managing multiple properties and equipment.",
-    variant: "green",
-    icon: greenPeople,
-  },
+  //   tag: "Tailored plans for businesses managing multiple properties and equipment.",
+  //   variant: "green",
+  //   icon: greenPeople,
+  // },
 ];
 
 export const residentialAcctType: {

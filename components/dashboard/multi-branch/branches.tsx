@@ -33,6 +33,7 @@ const Branches = () => {
     handleCheckoutSession,
     sentinelRef,
     isRefetchingSubs,
+    handleReactivatePlan,
   } = usePricing();
 
   // console.log(hasNextPage);
@@ -95,6 +96,7 @@ const Branches = () => {
           onUpdatePlanList={handleChoosePlan}
           handleCancelPlan={handleCancelPlan}
           isCheckingout={isCheckingout}
+          onReactivate={handleReactivatePlan}
         />
       </Modal>
       <DashboardHeader />

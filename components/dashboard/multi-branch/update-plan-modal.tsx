@@ -16,6 +16,7 @@ const UpdatePlanModal = ({
   onUpdatePlanList,
   handleCancelPlan,
   isCheckingout,
+  onReactivate,
 }: {
   plan: Subscription;
   close: () => void;
@@ -23,6 +24,7 @@ const UpdatePlanModal = ({
   onUpdatePlanList: (item: Subscription) => void;
   handleCancelPlan: any;
   isCheckingout: boolean;
+  onReactivate: any;
 }) => {
   const router = useRouter();
 
@@ -31,14 +33,17 @@ const UpdatePlanModal = ({
     router.push(`/upgrade_subscription?planId=${encodedPlanId}`);
   };
 
+  console.log(plan);
+
   return (
     <div className=" flex-cols gap-4">
       <div className="flex-cols mb-2">
         <Text.Heading className="font-semibold mr-2 text-lg lg:text-xl text-dark-00">
-          Edit Plan
+          {plan?.status === "ACTIVE" ? "Edit" : "Activate"} Plan
         </Text.Heading>
         <Text.Paragraph className="text-start text-sm text-dark-500">
-          Update the branch information and settings.
+          {plan?.status === "ACTIVE" ? "Update" : "Activate"} the branch
+          information and settings.
         </Text.Paragraph>
       </div>
       <div className="flex-cols mb-2 w-full">
@@ -139,7 +144,28 @@ const UpdatePlanModal = ({
             </Button.Text>
           </Button>
         </div>
-      ) : null}
+      ) : (
+        <Button
+          className="w-full"
+          onClick={async () => {
+            await onReactivate({
+              subscriptionId: plan?.id,
+            });
+
+            close();
+          }}
+          disabled={isCheckingout}
+        >
+          {isCheckingout ? (
+            <Button.Icon>
+              <ClipLoader size={20} color="#fff" />
+            </Button.Icon>
+          ) : null}
+          <Button.Text>
+            {isCheckingout ? "Creating session..." : "Activate plan"}
+          </Button.Text>
+        </Button>
+      )}
     </div>
   );
 };

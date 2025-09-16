@@ -101,7 +101,7 @@ export const usePricing = (planId?: string) => {
   // Optional: derived total pages / page for UI
   const paginationMeta = data?.pages;
 
-  console.log(paginationMeta);
+  // console.log(paginationMeta);
 
   // ---- IntersectionObserver sentinel ----
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -218,6 +218,26 @@ export const usePricing = (planId?: string) => {
       setIsCheckingOut(false);
     }
   };
+  const handleReactivatePlan = async (payload: UpgradeType) => {
+    setIsCheckingOut(true);
+    try {
+      const res = await pricingActions.reactivateSubscriptionPlan(payload);
+      toast.success(
+        res?.message || res?.data?.message || "Plan cancelled successfully"
+      );
+    
+      
+
+      console.log(res);
+      await refetch();
+    } catch (error) {
+      const errMsg = formatError(error);
+      console.error("CheckoutError", error);
+      toast.error(errMsg || "checkout failed");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   useEffect(() => {
     if (curPathname === "/upgrade_subscription" && Boolean(planId)) {
@@ -263,5 +283,6 @@ export const usePricing = (planId?: string) => {
 
     handleCheckoutSession,
     isRefetchingSubs,
+    handleReactivatePlan,
   };
 };

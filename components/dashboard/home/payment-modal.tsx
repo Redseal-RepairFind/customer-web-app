@@ -5,25 +5,27 @@ import Button from "@/components/ui/custom-btn";
 import PlacesAutocomplete from "@/components/ui/places-autocomplete";
 import LoadingTemplate from "@/components/ui/spinner";
 import Text from "@/components/ui/text";
+import ToggleBtn from "@/components/ui/toggle-btn";
 import { useUser } from "@/hook/useMe";
 import { usePricing } from "@/hook/usePricing";
 import { formatCurrency } from "@/lib/helpers";
 import { SubscriptionType } from "@/utils/types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { CgCheck, CgChevronDown } from "react-icons/cg";
 
 const PaymentModal = ({
   onClose,
-  subPlan,
+  plan,
   dropdown,
   selectedPredictions,
   setSelectedPredictions,
   unitNUmber,
   isUpgrade,
+  equivalentYearlyPlan,
 }: {
   onClose: () => void;
-  subPlan: any;
+  plan: any;
   dropdown?: {
     name: string;
     id: string;
@@ -36,6 +38,7 @@ const PaymentModal = ({
   setSelectedPredictions: (pr?: any) => void;
   unitNUmber?: string;
   isUpgrade: boolean;
+  equivalentYearlyPlan: any;
 }) => {
   // const [selectedPredictions, setSelectedPredictions] = useState<any>({
   //   predictions: {},
@@ -43,13 +46,39 @@ const PaymentModal = ({
   // });
   const [acceptTerms, setAcceptTerms] = useState(false);
   const { handleCheckout, isCheckingout } = usePricing();
-
+  const [toggle, setToggle] = useState(
+    plan?.billingFrequency === "ANNUALLY" ? true : false
+  );
   const { curUser } = useUser();
 
   const user = curUser?.data;
+
+  const [subPlan, setSubPlan] = useState(plan);
   // console.log(curUser?.data?.subscription?.subscriptionType);
 
   // console.log(selectedPredictions.prediction.country);
+
+  console.log(equivalentYearlyPlan);
+
+  useEffect(() => {
+    const { yearlylyPlans, monthlyPlans } = equivalentYearlyPlan;
+
+    // const monthlyPlan = plan?.billingFrequency === "ANNUALLY";
+
+    if (toggle) {
+      const curPlan = yearlylyPlans?.find(
+        (pl: any) => pl?.planType === plan?.planType
+      );
+
+      setSubPlan(curPlan);
+    } else {
+      const curPlan = monthlyPlans?.find(
+        (pl: any) => pl?.planType === plan?.planType
+      );
+
+      setSubPlan(curPlan);
+    }
+  }, [plan, toggle, equivalentYearlyPlan]);
 
   const onSubmit = async () => {
     const predictions = selectedPredictions?.prediction;
@@ -87,6 +116,20 @@ const PaymentModal = ({
 
   return (
     <div className="w-full flex-cols gap-4 z-[1000]">
+      <div className="flex items-center justify-center gap-2 text-dark-400 ">
+        <Text.Paragraph className="text-dark-400 text-sm lg:text-base text-nowrap">
+          Billed monthly
+        </Text.Paragraph>
+
+        <ToggleBtn toggle={toggle} onClick={() => setToggle((tg) => !tg)} />
+
+        <Text.Paragraph className="text-green-500 text-sm lg:text-base">
+          Bill annually
+          <span className="font-semibold sm:ml-1">
+            (Save one month, sign up annually, pay up front)
+          </span>
+        </Text.Paragraph>
+      </div>
       <Text.SubHeading className="text-lg font-semibold">
         Confirm payment information for your subscription
       </Text.SubHeading>

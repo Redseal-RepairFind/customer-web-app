@@ -149,6 +149,24 @@ export const pricingActions = {
       throw error;
     }
   },
+  reactivateSubscriptionPlan: async (payload: { subscriptionId: string }) => {
+    try {
+      const response = await http.post(
+        `${url}/subscriptions/reactivate`,
+        payload,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
   createBillingPortal: async () => {
     try {
       const response = await http.get(

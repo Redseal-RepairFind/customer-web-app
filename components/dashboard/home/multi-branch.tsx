@@ -216,7 +216,7 @@ export const BranchCard = ({
               <Button.Text>Manage</Button.Text>
             </Button>
           ) : item?.status === "PENDING" ? null : (
-            <Button variant="secondary" onClick={() => {}}>
+            <Button variant="secondary" onClick={() => onOpenUpgrade?.(item)}>
               {/* <Button.Icon>
                 <BiEdit size={24} />
               </Button.Icon> */}

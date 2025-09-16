@@ -93,6 +93,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPlanAlt, setSelectedPlanAlt] = useState(null);
   const handleOPENMODAL = (plan: any) => {
     setOpenModal(true);
     setSelectedPlan(plan);
@@ -100,6 +101,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const handleCLOSEMODAL = () => {
     setOpenModal(false);
     setSelectedPlan(null);
+    setSelectedPlanAlt(null);
   };
 
   // console.log(user);
@@ -113,7 +115,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
       const initAgeCat = equipmentAge.find(
         (eq) => eq.id === user.subscriptions[0].equipmentAgeCategory
       );
-
+      console.log("new shite");
       setDropdown(initAgeCat || null);
       setSelectedPredictions({
         prediction: user.subscriptions[0].coverageAddress || "",
@@ -134,6 +136,10 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
       return;
     }
     setPaymentInfo({ info: item, open: true });
+    setSelectedPlanAlt({
+      yearlylyPlans,
+      monthlyPlans,
+    });
   };
 
   // console.log(selectedPredictions?.prediction?.country);
@@ -189,13 +195,14 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
         <Modal isOpen={paymentInfo.open} onClose={handleCloseInfoModal}>
           <PaymentModal
             onClose={handleCloseInfoModal}
-            subPlan={paymentInfo?.info}
+            plan={paymentInfo?.info}
             dropdown={dropdown}
             selectedPredictions={selectedPredictions}
             setDropdown={setDropdown}
             setSelectedPredictions={setSelectedPredictions}
             unitNUmber={unitNumber}
             isUpgrade={isUpgrade}
+            equivalentYearlyPlan={selectedPlanAlt}
           />
         </Modal>
       )}
@@ -379,7 +386,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
       )}
       <div className="grid-3 w-full">
         {plansToRender.map((pla: any, i: number) => {
-          console.log(dropdown?.id);
+          // console.log(dropdown?.id);
           let ids: string[] = [];
           let curPlan;
           if (dropdown)

@@ -41,17 +41,29 @@ export const useUser = () => {
   useEffect(() => {
     if (!curUser?.data) return; // wait for user data
 
-    const location = typeof window !== "undefined" ? window.location : null;
-    const pathname = location?.pathname || "/";
+    const w = typeof window !== "undefined" ? window : null;
+    if (!w) return;
+
+    const pathname = w.location.pathname;
+
+    // allow pages that should NOT be auto-redirected away from
     const allowList = [
       "/pricing",
       "/subscriptions",
-      "/subscriptions/new",
-      "/plans",
+      "/inbox",
+      "/maintenance-log", // 👈 add this
+      "/notifications", // (optionally add subpaths you use)
+      "/manage-subscription",
+      "/referal",
+      "/repair-request",
+      // add others you actually want to stay on:
+      // '/account', '/settings', etc.
     ];
 
-    // allow subscription-related pages at will
-    const onAllowedPage = allowList.some((base) => pathname.startsWith(base));
+    // treat as allowed if pathname starts with any base prefix
+    const onAllowedPage = allowList.some(
+      (base) => pathname === base || pathname.startsWith(base + "/")
+    );
     if (onAllowedPage) return;
 
     const plans = curUser?.data?.subscriptions ?? [];
@@ -66,19 +78,17 @@ export const useUser = () => {
 
     const target = isUnknown || isActive ? "/dashboard" : "/pricing";
 
-    // avoid pointless navigate if we're already there
+    // idempotent guard
     if (pathname === target) return;
 
-    // avoid double navigate in Strict Mode
-    const didNav = (window as any).__didInitialNav__;
-    if (didNav && pathname !== target) {
-      // already navigated once this render cycle
-    } else {
-      (window as any).__didInitialNav__ = true;
-      navigator.navigate(target, "replace");
-    }
-  }, [curUser?.data]);
+    // avoid StrictMode double-run: component-level ref
+    const ranRef =
+      (w as any).__nav_ran_ref || ((w as any).__nav_ran_ref = { ran: false });
+    if (ranRef.ran) return;
+    ranRef.ran = true;
 
+    navigator.navigate(target, "replace");
+  }, [curUser?.data, navigator]);
   return {
     isRefetchingCurUser,
     loadingCurUser,
