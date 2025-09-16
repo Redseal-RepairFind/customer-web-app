@@ -32,6 +32,7 @@ const Branches = () => {
     isCheckingout,
     handleCheckoutSession,
     sentinelRef,
+    isRefetchingSubs,
   } = usePricing();
 
   // console.log(hasNextPage);
@@ -71,10 +72,15 @@ const Branches = () => {
 
   const paymentMethods = PMD?.data;
 
-  if (isFetching || loadingCurUser4PaymentMethod || loadingPaymentMethods)
+  if (
+    isFetching ||
+    loadingCurUser4PaymentMethod ||
+    loadingPaymentMethods ||
+    isRefetchingSubs
+  )
     return <LoadingTemplate />;
 
-  console.log(subscriptions);
+  // console.log(subscriptions);
   return (
     <main className="flex-cols gap-5">
       <Modal

@@ -63,6 +63,7 @@ export const usePricing = (planId?: string) => {
     isFetchingNextPage,
     isLoading: isFetching,
     refetch,
+    isRefetching: isRefetchingSubs,
   } = useInfiniteQuery<SubsPage>({
     queryKey: ["subscriptions", { planType, search, limit }],
     initialPageParam: 1,
@@ -186,6 +187,7 @@ export const usePricing = (planId?: string) => {
 
       // console.log(res);
 
+      await refetch();
       navigator.navigate("/manage-subscription", "replace");
       // const url = res?.url || res?.data?.url;
       // window.location.href = url;
@@ -260,5 +262,6 @@ export const usePricing = (planId?: string) => {
     // loadingSingleSubsPlans,
 
     handleCheckoutSession,
+    isRefetchingSubs,
   };
 };

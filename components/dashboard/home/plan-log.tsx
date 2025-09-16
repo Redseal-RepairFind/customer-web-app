@@ -1,3 +1,4 @@
+"use client";
 import Text from "@/components/ui/text";
 import Box from "./box";
 import { ProgressBar } from "./progress-bar";
@@ -42,8 +43,8 @@ const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
   // console.log(plans);
 
   return (
-    <div className="md:grid-cols-2 grid lg:gap-2 xl:gap-4 gap-4">
-      <Box className="h-[142px] ">
+    <div className="">
+      {/* <Box className="h-[142px] ">
         <div className="flex justify-between  h-full">
           <div className="flex flex-col gap-8 h-full">
             <Text.Paragraph>Plan Status</Text.Paragraph>
@@ -62,14 +63,14 @@ const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
             />
           </div>
         </div>
-      </Box>
+      </Box> */}
 
       <Box className="h-[142px]  flex-cols gap-8">
         <Text.Paragraph>Quick Actions</Text.Paragraph>
 
         <div className="w-full flex items-center lg:gap-2 xl:gap-4 gap-2">
           {quickActions.map((action, i) => (
-            <Link href={action.route} key={action.route}>
+            <Link href={action.route} key={action.route} className="w-full">
               <Box
                 // className=""
                 className={`${
@@ -86,7 +87,7 @@ const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
                 <Text.SmallText
                   className={`${
                     i === 0 ? "text-light-main" : " text-dark-main"
-                  } text-xs xl:text-sm md:hidden xl:flex`}
+                  } text-xs xl:text-sm  xl:flex`}
                 >
                   {action.name}
                 </Text.SmallText>

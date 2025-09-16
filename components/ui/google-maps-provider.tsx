@@ -1,22 +1,33 @@
-// components/GoogleMapsProvider.tsx
 "use client";
 
 import { useLoadScript } from "@react-google-maps/api";
 import LoadingTemplate from "./spinner";
+import { useEffect, useState } from "react";
 
 export const GoogleMapsProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
-  // const { mapAipKey } = envConfig;
-
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_MAP_API_KEY!,
     libraries: ["places"],
   });
 
-  if (!isLoaded) return <LoadingTemplate />;
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Before hydration, just render nothing (or a stable div)
+  if (!mounted) {
+    return <div />;
+  }
+
+  if (!isLoaded) {
+    return <LoadingTemplate />;
+  }
 
   return <>{children}</>;
 };

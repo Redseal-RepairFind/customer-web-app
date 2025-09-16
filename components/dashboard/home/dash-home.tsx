@@ -69,9 +69,10 @@ const DashboardHome = () => {
         </div>
       ) : null}
       <section className="flex-cols gap-5 mt-8">
-        <PlanLog plans={planType} />
-        <Metrics stats={metrics} plans={planType} planBalance={totalCredits} />
         <MultiBranch />
+        <Metrics stats={metrics} plans={planType} planBalance={totalCredits} />
+        <PlanLog plans={planType} />
+
         {repairs?.length > 0 ? (
           <RecentRequests requestData={repairs} />
         ) : (

@@ -29,7 +29,7 @@ const MultiBranch = () => {
 
   if (isFetching) return <LoadingTemplate />;
 
-  const first4 = subscriptions?.slice(0, 4);
+  const first4 = subscriptions?.slice(0, 3);
 
   // console.log();
 
@@ -47,11 +47,11 @@ const MultiBranch = () => {
 
             <Text.SmallHeading>Multi-Branch Overview</Text.SmallHeading>
           </div>
-          <TableOverflow className="grid-3">
+          <div className="grid-3">
             {first4?.map((sub) => (
               <BranchCard key={sub?.id} item={sub} />
             ))}
-          </TableOverflow>
+          </div>
 
           <SeemoreBtn
             icon={icons.subIconActive}
@@ -208,12 +208,19 @@ export const BranchCard = ({
               </Text.SmallText>
             </div>
           </div>
-          {item?.status === "ACTIVE" && (
+          {item?.status === "ACTIVE" ? (
             <Button variant="secondary" onClick={() => onOpenUpgrade?.(item)}>
               <Button.Icon>
                 <BiEdit size={24} />
               </Button.Icon>
               <Button.Text>Manage</Button.Text>
+            </Button>
+          ) : item?.status === "PENDING" ? null : (
+            <Button variant="secondary" onClick={() => {}}>
+              {/* <Button.Icon>
+                <BiEdit size={24} />
+              </Button.Icon> */}
+              <Button.Text>Activate</Button.Text>
             </Button>
           )}
         </>

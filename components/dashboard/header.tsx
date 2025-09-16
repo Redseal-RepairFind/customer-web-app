@@ -129,25 +129,31 @@ const DashboardHeader = () => {
             {user?.businessName?.toLowerCase() ||
               user?.firstName?.toLowerCase()}
           </Text.SubHeading>
-          <div className="flex-rows items-center gap-3">
-            <Text.Paragraph className="font-semibold capitalize">
-              Account ID:{" "}
-              <span className="uppercase font-normal">{user?.accountId}</span>
+          <div className=" gap-3">
+            <Text.Paragraph className=" capitalize text-sm">
+              Account ID:
             </Text.Paragraph>
 
-            <button
-              className="cursor-pointer "
-              onClick={() => copy(user?.accountId)}
-            >
-              {isCopied ? (
-                <div className="border border-light-0 p-[2px] rounded-sm flex items-center">
-                  <BiCheck />
-                  <p>copied</p>
-                </div>
-              ) : (
-                <BsCopy />
-              )}
-            </button>
+            {user?.accountId && (
+              <div className="flex-rows items-center gap-2">
+                <span className="uppercase text-sm font-semibold">
+                  {user?.accountId}
+                </span>
+                <button
+                  className="cursor-pointer "
+                  onClick={() => copy(user?.accountId)}
+                >
+                  {isCopied ? (
+                    <div className="border border-light-0 p-[2px] rounded-sm flex items-center">
+                      <BiCheck />
+                      <p>copied</p>
+                    </div>
+                  ) : (
+                    <BsCopy />
+                  )}
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <section
