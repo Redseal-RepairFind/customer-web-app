@@ -16,11 +16,13 @@ import Button from "../ui/custom-btn";
 import { usePageNavigator } from "@/hook/navigator";
 import toast from "react-hot-toast";
 import { SUB_EXTRA_ID } from "@/utils/types";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image, { StaticImageData } from "next/image";
 import { ClipLoader } from "react-spinners";
 import { InputContainer } from "../auth/signup-item";
 import { useAuthentication } from "@/hook/useAuthentication";
+import { BsChevronBarLeft } from "react-icons/bs";
+import { CgChevronLeft } from "react-icons/cg";
 
 const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const { curUser, loadingCurUser } = useUser();
@@ -31,7 +33,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const isNewParams = params?.get("new") || "";
   const isNew = sessionStorage?.getItem(SUB_EXTRA_ID) || isNewParams;
   const [unitNumber, setUnitNumber] = useState("");
-
+  const router = useRouter();
   // console.log(isNew);
 
   const initAgeCat = equipmentAge.find(
@@ -214,6 +216,12 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
 
       {isUpgrade ? (
         <>
+          <Button onClick={() => router.back()} variant="secondary">
+            <Button.Icon>
+              <CgChevronLeft size={24} color="#000" />
+            </Button.Icon>
+            <Button.Text>Back</Button.Text>
+          </Button>
           <Text.Heading className="text-xl lg:text-3xl text-center">
             Change Your Subscription Plan
           </Text.Heading>
@@ -237,7 +245,18 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
         </>
       ) : (
         <>
-          {isNew ? null : (
+          {isNew ? (
+            <Button
+              onClick={() => router.back()}
+              variant="secondary"
+              className="mb-4"
+            >
+              <Button.Icon>
+                <CgChevronLeft size={24} color="#000" />
+              </Button.Icon>
+              <Button.Text>Back</Button.Text>
+            </Button>
+          ) : (
             <div className="w-full flex justify-end">
               <Button onClick={handleLogout}>
                 <Button.Icon>
