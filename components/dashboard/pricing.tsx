@@ -346,7 +346,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
               </InputContainer>
             </div>
           </div>
-          <div className="flex-col gap-4 mb-4">
+          {/* <div className="flex-col gap-4 mb-4">
             <div className="flex-rows mb-2">
               <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
                 Age of Equipment
@@ -356,7 +356,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                 </span>
               </Text.Paragraph>
             </div>
-            {/* <Dropdown className="w-full">
+            <Dropdown className="w-full">
               <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
                 <Text.Paragraph className="text-dark-500">
                   {dropdown?.name || "Select Equipment Age"}
@@ -385,8 +385,8 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                   </Dropdown.Item>
                 ))}
               </Dropdown.Content>
-            </Dropdown> */}
-          </div>
+            </Dropdown>
+          </div> */}
           {dropdown?.id === "unknown" ? (
             <div className="flex-cols gap-2 my-4">
               <Text.Paragraph>
