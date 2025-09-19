@@ -11,7 +11,6 @@ const PricingItem = ({
   cycle,
   blurItems,
   onSelectPlan,
-  currentPlan,
 }: {
   item: any;
   isRecommended: boolean;
@@ -37,11 +36,11 @@ const PricingItem = ({
         <Text.Paragraph className="font-bold">
           {item?.name.split(" - ")[0]}
         </Text.Paragraph>
-        {isRecommended ? (
+        {/* {isRecommended ? (
           <span className=" px-3 py-2 rounded-full text-base text-white bg-black">
             {"Recommended"}
           </span>
-        ) : null}
+        ) : null} */}
       </div>
 
       <span className="flex-rows gap-2 mb-1">

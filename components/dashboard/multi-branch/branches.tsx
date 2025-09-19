@@ -130,7 +130,7 @@ const Branches = () => {
         </div>
       </SpecialBox>
 
-      <div className="flex-row-between">
+      {/* <div className="flex-row-between">
         <Text.SmallHeading>Payment Methods</Text.SmallHeading>
         <Button
           variant="secondary"
@@ -152,7 +152,7 @@ const Branches = () => {
         {paymentMethods?.map((mtd: any) => (
           <PaymentMethodItem method={mtd} key={mtd?.id} />
         ))}
-      </div>
+      </div> */}
 
       <div className="grid-2">
         {subscriptions?.map((sub) => (
