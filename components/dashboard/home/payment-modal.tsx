@@ -10,6 +10,7 @@ import { useUser } from "@/hook/useMe";
 import { usePricing } from "@/hook/usePricing";
 import { formatCurrency } from "@/lib/helpers";
 import { SubscriptionType } from "@/utils/types";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { CgCheck, CgChevronDown } from "react-icons/cg";
@@ -58,7 +59,7 @@ const PaymentModal = ({
 
   // console.log(selectedPredictions.prediction.country);
 
-  console.log(equivalentYearlyPlan);
+  // console.log(equivalentYearlyPlan);
 
   useEffect(() => {
     const { yearlylyPlans, monthlyPlans } = equivalentYearlyPlan;
@@ -88,10 +89,10 @@ const PaymentModal = ({
       toast.error("Enter a valid address");
       return;
     }
-    if (!dropdown?.id) {
-      toast.error("Select equipment age");
-      return;
-    }
+    // if (!dropdown?.id) {
+    //   toast.error("Select equipment age");
+    //   return;
+    // }
     const payload = {
       coverageAddress: {
         latitude: predictions?.latitude || "",
@@ -103,7 +104,7 @@ const PaymentModal = ({
         ...(unitNUmber && { description: unitNUmber }),
       },
       planId: subPlan?._id,
-      equipmentAgeCategory: dropdown?.id,
+      // equipmentAgeCategory: dropdown?.id,
       subscriptionType:
         curUser?.data?.subscriptions[0]?.subscriptionType || "RESIDENTIAL",
       ...(user?.businessName ? { businessName: user?.businessName } : null),
@@ -260,7 +261,16 @@ const PaymentModal = ({
         </button>
 
         <Text.Paragraph className="text-sm lg:text-base">
-          I agree to the Terms of Service*{" "}
+          I agree to the{" "}
+          <Link
+            href="/subscription_agreement"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold underline"
+          >
+            Terms of Service
+          </Link>
+          *
         </Text.Paragraph>
       </div>
 

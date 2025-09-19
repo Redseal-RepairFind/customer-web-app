@@ -13,7 +13,6 @@ import Image from "next/image";
 import { icons } from "@/lib/constants";
 import { useRepairs } from "@/hook/useRepairs";
 import MultiBranch from "./multi-branch";
-import { useSocket } from "@/contexts/socket-contexts";
 import { usePricing } from "@/hook/usePricing";
 
 const DashboardHome = () => {

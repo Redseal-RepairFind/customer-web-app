@@ -24,6 +24,7 @@ import { countriesPhoneCodes } from "@/lib/countries";
 
 import { SignupValues } from "@/lib/signup-schema";
 import LoadingTemplate from "../ui/spinner";
+import Link from "next/link";
 
 const UserInformation = () => {
   const params = useSearchParams();
@@ -369,8 +370,24 @@ const UserInformation = () => {
         </button>
 
         <Text.Paragraph className="text-sm lg:text-base">
-          By creating an account, you agree to our Terms of Service and Privacy
-          Policy
+          By creating an account, you agree to our{" "}
+          <Link
+            href={"/terms"}
+            className="underline font-semibold cursor-pointer"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link
+            href={"/policy"}
+            className="underline font-semibold cursor-pointer"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Privacy Policy
+          </Link>
         </Text.Paragraph>
       </div>
 

@@ -25,6 +25,8 @@ const AUTH_ROUTES = [
   "/otp",
   "/auth", // treat everything under /auth/* as auth screens
   "/home",
+  "/policy",
+  "/terms",
 ];
 
 function isAuthRoute(pathname: string) {

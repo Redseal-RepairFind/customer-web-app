@@ -17,9 +17,10 @@ import { usePageNavigator } from "@/hook/navigator";
 import toast from "react-hot-toast";
 import { SUB_EXTRA_ID } from "@/utils/types";
 import { useSearchParams } from "next/navigation";
-import { StaticImageData } from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { ClipLoader } from "react-spinners";
 import { InputContainer } from "../auth/signup-item";
+import { useAuthentication } from "@/hook/useAuthentication";
 
 const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const { curUser, loadingCurUser } = useUser();
@@ -68,6 +69,8 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
     isUpgrade && singleSubPlans?.billingFrequency === "ANNUALLY" ? true : false
   );
 
+  // console.log(monthlyPlans);
+
   useEffect(() => {
     if (isUpgrade && singleSubPlans?.billingFrequency === "ANNUALLY") {
       setToggle(true);
@@ -90,6 +93,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
     icon: StaticImageData;
     id: string;
   }>(isNew ? null : stp);
+  const { handleLogout } = useAuthentication();
 
   const [openModal, setOpenModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -124,6 +128,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
     }
   }, [user, isNew, isUpgrade]);
   if (loadingCurUser || loadingSubsPlans) return <LoadingTemplate />;
+
   const plansToRender = toggle ? yearlylyPlans : monthlyPlans;
   const handleCloseInfoModal = () => setPaymentInfo({ info: {}, open: false });
   const handleOpenInfoModal = (item: any) => {
@@ -131,8 +136,8 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
     //   toast.error("Select a subscription type to proceed ");
     //   return;
     // }
-    if (!selectedPredictions?.prediction || !dropdown?.id) {
-      toast.error("Kindly enter address and equipment age range ");
+    if (!selectedPredictions?.prediction) {
+      toast.error("Kindly enter an address");
       return;
     }
     setPaymentInfo({ info: item, open: true });
@@ -206,6 +211,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
           />
         </Modal>
       )}
+
       {isUpgrade ? (
         <>
           <Text.Heading className="text-xl lg:text-3xl text-center">
@@ -231,6 +237,21 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
         </>
       ) : (
         <>
+          {isNew ? null : (
+            <div className="w-full flex justify-end">
+              <Button onClick={handleLogout}>
+                <Button.Icon>
+                  <Image
+                    src={icons.logoutIcon}
+                    height={24}
+                    width={24}
+                    alt="Logout icon"
+                  />
+                </Button.Icon>
+                <Button.Text>logout</Button.Text>
+              </Button>
+            </div>
+          )}
           <div className="flex-col-center w-full mb-8 ">
             <Text.Heading className="text-xl lg:text-3xl text-center">
               RepairFind Subscription Plans
@@ -335,7 +356,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                 </span>
               </Text.Paragraph>
             </div>
-            <Dropdown className="w-full">
+            {/* <Dropdown className="w-full">
               <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
                 <Text.Paragraph className="text-dark-500">
                   {dropdown?.name || "Select Equipment Age"}
@@ -364,7 +385,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                   </Dropdown.Item>
                 ))}
               </Dropdown.Content>
-            </Dropdown>
+            </Dropdown> */}
           </div>
           {dropdown?.id === "unknown" ? (
             <div className="flex-cols gap-2 my-4">
@@ -388,21 +409,21 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
         {plansToRender.map((pla: any, i: number) => {
           // console.log(dropdown?.id);
           let ids: string[] = [];
-          let curPlan;
-          if (dropdown)
-            if (dropdown?.id === "5-8") {
-              ids = [plansToRender[0]?._id];
-            } else if (dropdown?.id === "9+") {
-              ids = [
-                plansToRender[0]?._id,
-                plansToRender[1]?._id,
-                // plansToRender[2]?._id,
-              ];
-            } else if (dropdown?.id === "unknown") {
-              ids = plansToRender.map((id: any) => id?._id);
-            } else {
-              ids = [];
-            }
+          // let curPlan;
+          // if (dropdown)
+          //   if (dropdown?.id === "5-8") {
+          //     ids = [plansToRender[0]?._id];
+          //   } else if (dropdown?.id === "9+") {
+          //     ids = [
+          //       plansToRender[0]?._id,
+          //       plansToRender[1]?._id,
+          //       // plansToRender[2]?._id,
+          //     ];
+          //   } else if (dropdown?.id === "unknown") {
+          //     ids = plansToRender.map((id: any) => id?._id);
+          //   } else {
+          //     ids = [];
+          //   }
           if (isUpgrade) {
             const index = plansToRender.findIndex(
               (pl: any) =>

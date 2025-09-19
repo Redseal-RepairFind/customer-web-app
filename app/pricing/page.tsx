@@ -1,5 +1,4 @@
 import Pricingg from "@/components/dashboard/pricing";
-import { isToken } from "@/utils/isAuth";
 // import { redirect } from "next/navigation";
 
 // app/dashboard/page.tsx

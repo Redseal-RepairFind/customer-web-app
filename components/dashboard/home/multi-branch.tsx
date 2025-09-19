@@ -47,7 +47,7 @@ const MultiBranch = () => {
 
             <Text.SmallHeading>Multi-Branch Overview</Text.SmallHeading>
           </div>
-          <div className="grid-3">
+          <div className="grid md:grid-cols-2 gap-3 xl:grid-cols-3">
             {first4?.map((sub) => (
               <BranchCard key={sub?.id} item={sub} />
             ))}
@@ -100,7 +100,9 @@ export const BranchCard = ({
   size?: "full" | "";
   onOpenUpgrade?: (item: Subscriptions) => void;
 }) => {
-  const { daysLeft } = useSubCalc(item);
+  const { daysLeft } = useSubCalc(item, item?.billingFrequency);
+
+  console.log(item);
 
   const jobSummary = item?.jobCounts;
 
@@ -108,7 +110,7 @@ export const BranchCard = ({
 
   return (
     <Box className="flex-cols gap-3">
-      <div className="flex-row-between items-start gap-2">
+      <div className="flex-row-between items-start gap-2 w-full">
         {/* <FaLocatio /> */}
         <div className="flex gap-2 items-start">
           <HiOutlineLocationMarker size={20} className="mt-1" />
@@ -121,24 +123,26 @@ export const BranchCard = ({
             </Text.SmallText>
           </div>
         </div>
-        <StatusCard
-          status={
-            item.status === "PENDING"
-              ? "PENDING"
-              : item.status === "CANCELED"
-              ? "DISPUTED"
-              : "COMPLETED"
-          }
-          name={
-            item.status === "ACTIVE"
-              ? "Active"
-              : item?.status === "ONGOING"
-              ? "Ongoing"
-              : item?.status === "PENDING"
-              ? "Pending"
-              : "Inactive"
-          }
-        />
+        <div className="">
+          <StatusCard
+            status={
+              item.status === "PENDING"
+                ? "PENDING"
+                : item.status === "CANCELED"
+                ? "DISPUTED"
+                : "COMPLETED"
+            }
+            name={
+              item.status === "ACTIVE"
+                ? "Active"
+                : item?.status === "ONGOING"
+                ? "Ongoing"
+                : item?.status === "PENDING"
+                ? "Pending"
+                : "Inactive"
+            }
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
@@ -193,10 +197,10 @@ export const BranchCard = ({
             </div>
             <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-1">
               <Text.Paragraph className="text-sm text-dark-500">
-                Age of equipments:
+                Frequency:
               </Text.Paragraph>
               <Text.SmallText className="text-sm text-dark-500 font-bold">
-                {item?.equipmentAgeCategory}yrs
+                {item?.billingFrequency}
               </Text.SmallText>
             </div>
             <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-1">

@@ -65,7 +65,7 @@ const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
         </div>
       </Box> */}
 
-      <Box className="h-[142px]  flex-cols gap-8">
+      {/* <Box className="h-[142px]  flex-cols gap-8">
         <Text.Paragraph>Quick Actions</Text.Paragraph>
 
         <div className="w-full flex items-center lg:gap-2 xl:gap-4 gap-2">
@@ -95,7 +95,7 @@ const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
             </Link>
           ))}
         </div>
-      </Box>
+      </Box> */}
     </div>
   );
 };

@@ -5,10 +5,15 @@ import { Subscription } from "@/utils/types";
 import dayjs from "dayjs";
 import { useState } from "react";
 
-export const useSubCalc = (subscription: Subscription) => {
+export const useSubCalc = (
+  subscription: Subscription,
+  duration = "MONTHLY"
+) => {
   const [st, setSt] = useState();
   const startDate = dayjs(subscription?.startDate ?? Date.now());
-  const endDate = startDate.add(30, "day");
+
+  const days = duration === "MONTHLY" ? 30 : 365;
+  const endDate = startDate.add(days, "day");
 
   // progress right now
   const now = dayjs();

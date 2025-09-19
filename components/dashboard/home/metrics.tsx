@@ -73,7 +73,7 @@ const Metrics = ({
                 ? avgRating || 0
                 : mtrc.name === "Completed Jobs"
                 ? stats.jobsCompleted
-                : mtrc.name === "Total Available Credits"
+                : mtrc.name === "Accrued Credit"
                 ? formatCurrency(Number(planBalance || 0))
                 : mtrc?.name === "Next Maintenance Date"
                 ? nextDate?.format("YYYY/MM/DD")

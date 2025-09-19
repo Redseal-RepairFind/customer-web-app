@@ -19,34 +19,34 @@ export const dashboardNav = [
     icon: icons.subIcon,
     activeIcon: icons.subIconActive,
   },
-  {
-    name: "Inbox",
-    route: "/inbox",
-    icon: icons.chatIcon,
-    activeIcon: icons.chatIconActive,
-  },
-  {
-    name: "Maintenance Log",
-    route: "/maintenance-log",
-    icon: icons.maintenanceIcon,
-    activeIcon: icons.maintenanceIconActive,
-  },
-  {
-    name: "Refer & Earn",
-    route: "/referral",
-    icon: icons.referIcon,
-    activeIcon: icons.referIconActive,
-  },
+  // {
+  //   name: "Inbox",
+  //   route: "/inbox",
+  //   icon: icons.chatIcon,
+  //   activeIcon: icons.chatIconActive,
+  // },
+  // {
+  //   name: "Maintenance Log",
+  //   route: "/maintenance-log",
+  //   icon: icons.maintenanceIcon,
+  //   activeIcon: icons.maintenanceIconActive,
+  // },
+  // {
+  //   name: "Refer & Earn",
+  //   route: "/referral",
+  //   icon: icons.referIcon,
+  //   activeIcon: icons.referIconActive,
+  // },
 ];
 
 export const otherNav = [
-  {
-    name: "Account",
-    route: "/settings",
-    icon: icons.accountIcon,
-    activeIcon: icons.accountIconActive,
-    isLogout: false,
-  },
+  // {
+  //   name: "Account",
+  //   route: "/settings",
+  //   icon: icons.accountIcon,
+  //   activeIcon: icons.accountIconActive,
+  //   isLogout: false,
+  // },
   {
     name: "Logout",
     route: "",
@@ -81,7 +81,7 @@ export const quickActions = [
 
 export const dummyMetrics = [
   {
-    name: "Total Available Credits",
+    name: "Accrued Credit",
     icon: icons.dollarIcon,
     metric: "4850",
   },

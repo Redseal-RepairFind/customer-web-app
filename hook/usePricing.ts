@@ -128,12 +128,13 @@ export const usePricing = (planId?: string) => {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  // console.log(subPlans);
   // ---- Plans helpers ----
   const monthlyPlans = subPlans?.data?.filter((p: any) =>
-    p?.name?.toLowerCase().includes("monthly")
+    p?.billingFrequency?.toLowerCase().includes("monthly")
   );
   const yearlylyPlans = subPlans?.data?.filter((p: any) =>
-    p?.name?.toLowerCase().includes("annually")
+    p?.billingFrequency?.toLowerCase().includes("annually")
   );
 
   // ---- Checkout ----
@@ -225,8 +226,13 @@ export const usePricing = (planId?: string) => {
       toast.success(
         res?.message || res?.data?.message || "Plan cancelled successfully"
       );
-    
-      
+
+      const url = res?.url || res?.data?.url;
+
+      if (url && typeof window !== "undefined") {
+        // ✅ open in new tab
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
 
       console.log(res);
       await refetch();
