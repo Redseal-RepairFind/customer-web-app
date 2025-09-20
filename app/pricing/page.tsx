@@ -4,7 +4,7 @@ import Pricingg from "@/components/dashboard/pricing";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Payment plans", // will render as "Repairfind Premium Customer | Dashboard"
+  title: "Payment plans",
   description: "Select your Payment plans",
 };
 
