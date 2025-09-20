@@ -1,4 +1,5 @@
-// app/subscription_agreement/page.tsx
+"use client";
+
 import React from "react";
 import Text from "../ui/text";
 import { formatDateProper } from "@/lib/helpers";
