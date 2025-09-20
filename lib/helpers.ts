@@ -83,13 +83,19 @@ export function formatDate(date: string | Date, formatStr = "DD/MM/YYYY") {
   return dayjs(date).format(formatStr);
 }
 
-export function formatDateProper(date: Date): string {
-  const userLocale = navigator.language || "en-US"; // Default to 'en-US' if locale is unavailable
+export function formatDateProper(date: Date, locale?: string): string {
+  // On the server, fall back to a safe default
+  const userLocale =
+    typeof navigator !== "undefined" && navigator.language
+      ? navigator.language
+      : locale || "en-CA";
+
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "short",
     day: "numeric",
   };
+
   return new Intl.DateTimeFormat(userLocale, options).format(date);
 }
 
