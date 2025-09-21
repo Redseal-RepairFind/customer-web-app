@@ -8,6 +8,8 @@ import Text from "./text";
 import { useState } from "react";
 import RepairfindLogo from "./logo";
 import { usePageNavigator } from "@/hook/navigator";
+import { readCookie, removeCookie, setCookie } from "@/lib/helpers";
+import { LANG_ID } from "@/utils/types";
 
 const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
   const { height } = useViewportHeight();
@@ -17,6 +19,10 @@ const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
     flag: initCnt.flag,
     lang: initCnt.lang,
   });
+
+  // const LANG_ID = "rpf_lng";
+
+  // const curLang = readCookie(LANG_ID) || "en";
   // console.log(curPathname);
 
   // const derivedHeight = Number(height) - 326;
@@ -39,7 +45,7 @@ const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="lg:hidden flex">
             <RepairfindLogo />
           </div>
-          {curPathname.includes("login") ? (
+          {curPathname.includes("login") || curPathname.includes("signup") ? (
             <Dropdown className="w-[221px]">
               <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
                 <span className="flex-rows">
@@ -66,7 +72,18 @@ const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
                         ? ""
                         : "border-b border-b-light-100"
                     } `}
-                    onClick={() => setLanguage(cnt)}
+                    onClick={() => {
+                      setLanguage(cnt); // Set current language context/state
+
+                      removeCookie(LANG_ID); // Remove old language cookie
+
+                      const langCode =
+                        cnt.code === "CA"
+                          ? "en"
+                          : cnt.code?.toLowerCase() || "en";
+
+                      setCookie(LANG_ID, langCode, 365); // Set new cookie for 1 year
+                    }}
                   >
                     <span className="rounded-full h-6 w-6 relative mr-2">
                       <Image

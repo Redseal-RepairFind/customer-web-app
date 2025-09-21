@@ -7,10 +7,12 @@ import Text from "@/components/ui/text";
 import { formatCurrency, formatDate } from "@/lib/helpers";
 import { PLANSTYPE } from "./plan-log";
 import dayjs from "dayjs";
+import { useToast } from "@/contexts/toast-contexts";
 
 const Metrics = ({
   stats,
   plans,
+  planBalance,
 }: {
   stats: {
     jobsCompleted: number;
@@ -24,7 +26,10 @@ const Metrics = ({
     planType: string;
   };
   plans: PLANSTYPE;
+  planBalance: number;
 }) => {
+  const { warning } = useToast();
+
   const allRatings =
     stats &&
     stats?.reviewSummary
@@ -36,12 +41,37 @@ const Metrics = ({
   const date = dayjs(plans?.startDate || new Date()?.toDateString());
   const nextDate = date?.add(30, "day");
 
-  // console.log(stats);
+  console.log(stats);
+
+  console.log(plans);
+
+  const handleFeatureMessage = () => {
+    warning({
+      vars: { bg: "#fbbd00", fg: "#000" }, // still can theme even with custom render
+
+      render: (api) => (
+        <div className="w-full">
+          <Text.Paragraph>
+            Feature unlocks after waiting period & inspection.
+          </Text.Paragraph>
+        </div>
+      ),
+    });
+  };
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 lg:gap-2 xl:gap-4  ">
       {dummyMetrics.map((mtrc, i) => (
-        <Box className="flex gap-4 items-center md:h-[142px]" key={i}>
+        <Box
+          className="flex gap-4 items-center md:h-[142px]"
+          key={i}
+          clickable={mtrc?.name === "Next Maintenance Date" ? true : false}
+          onClick={() => {
+            if (mtrc?.name === "Next Maintenance Date") {
+              handleFeatureMessage();
+            }
+          }}
+        >
           <div
             className="
             relative h-10 w-10 lg:h-7 lg:w-7 xl:h-10 xl:w-10 rounded-full
@@ -69,10 +99,10 @@ const Metrics = ({
                 ? avgRating || 0
                 : mtrc.name === "Completed Jobs"
                 ? stats.jobsCompleted
-                : mtrc.name === "Available Credits"
-                ? formatCurrency(Number(stats.creditBalance || 0))
+                : mtrc.name === "Accrued Credit"
+                ? formatCurrency(Number(planBalance || 0))
                 : mtrc?.name === "Next Maintenance Date"
-                ? nextDate?.format("YYYY/MM/DD")
+                ? `N/A`
                 : mtrc.metric}
             </Text.SmallHeading>
           </div>

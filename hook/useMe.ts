@@ -4,7 +4,9 @@ import { useEffect } from "react";
 import { usePageNavigator } from "./navigator";
 
 export const useUser = () => {
-  const { navigator } = usePageNavigator();
+  const { navigator, curPathname } = usePageNavigator();
+
+  // const {} = usePageNavigator()
   const {
     data: curUser,
     isLoading: loadingCurUser,
@@ -14,6 +16,19 @@ export const useUser = () => {
     queryKey: ["cur-user"],
     queryFn: pricingActions.getMe,
   });
+  const {
+    data: curUser4PaymentMethod,
+    isLoading: loadingCurUser4PaymentMethod,
+    refetch: refetchingCurUser4PaymentMethod,
+    isRefetching: isRefetchingCurUser4PaymentMethod,
+  } = useQuery<any>({
+    queryKey: ["cur-user-payment"],
+    queryFn: () =>
+      pricingActions.getMe$patmentMethod({
+        include: "stripePaymentMethods",
+      }),
+    enabled: curPathname === "/manage-subscription",
+  });
 
   // console.log(
   //   curUser?.data?.subscription?.equipmentAgeCategory
@@ -21,51 +36,67 @@ export const useUser = () => {
   //     ?.includes("unknown")
   // );
 
-  useEffect(() => {
-    if (!curUser?.data) return; // wait for user data
+  // console.log(curUser);
 
-    const location = typeof window !== "undefined" ? window.location : null;
-    const pathname = location?.pathname || "/";
-    const allowList = [
-      "/pricing",
-      "/subscriptions",
-      "/subscriptions/new",
-      "/plans",
-    ];
+  // useEffect(() => {
+  //   if (!curUser?.data) return; // wait for user data
 
-    // allow subscription-related pages at will
-    const onAllowedPage = allowList.some((base) => pathname.startsWith(base));
-    if (onAllowedPage) return;
+  //   const w = typeof window !== "undefined" ? window : null;
+  //   if (!w) return;
 
-    const plans = curUser?.data?.subscriptions ?? [];
-    const isUnknown =
-      plans.length > 0 &&
-      plans.some((p: any) =>
-        p?.equipmentAgeCategory?.toLowerCase?.().includes("unknown")
-      );
-    const isActive =
-      plans.length > 0 &&
-      plans.some((p: any) => p?.status?.toLowerCase?.().includes("active"));
+  //   const pathname = w.location.pathname;
 
-    const target = isUnknown || isActive ? "/dashboard" : "/pricing";
+  //   // allow pages that should NOT be auto-redirected away from
+  //   const allowList = [
+  //     "/pricing",
+  //     "/subscriptions",
+  //     "/inbox",
+  //     "/maintenance-log", // 👈 add this
+  //     "/notifications", // (optionally add subpaths you use)
+  //     "/manage-subscription",
+  //     "/referal",
+  //     "/repair-request",
+  //     // add others you actually want to stay on:
+  //     // '/account', '/settings', etc.
+  //   ];
 
-    // avoid pointless navigate if we're already there
-    if (pathname === target) return;
+  //   // treat as allowed if pathname starts with any base prefix
+  //   const onAllowedPage = allowList.some(
+  //     (base) => pathname === base || pathname.startsWith(base + "/")
+  //   );
+  //   if (onAllowedPage) return;
 
-    // avoid double navigate in Strict Mode
-    let didNav = (window as any).__didInitialNav__;
-    if (didNav && pathname !== target) {
-      // already navigated once this render cycle
-    } else {
-      (window as any).__didInitialNav__ = true;
-      navigator.navigate(target, "replace");
-    }
-  }, [curUser?.data]);
+  //   const plans = curUser?.data?.subscriptions ?? [];
+  //   const isUnknown =
+  //     plans.length > 0 &&
+  //     plans.some((p: any) =>
+  //       p?.equipmentAgeCategory?.toLowerCase?.().includes("unknown")
+  //     );
+  //   const isActive =
+  //     plans.length > 0 &&
+  //     plans.some((p: any) => p?.status?.toLowerCase?.().includes("active"));
 
+  //   const target = isUnknown || isActive ? "/dashboard" : "/pricing";
+
+  //   // idempotent guard
+  //   if (pathname === target) return;
+
+  //   // avoid StrictMode double-run: component-level ref
+  //   const ranRef =
+  //     (w as any).__nav_ran_ref || ((w as any).__nav_ran_ref = { ran: false });
+  //   if (ranRef.ran) return;
+  //   ranRef.ran = true;
+
+  //   navigator.navigate(target, "replace");
+  // }, [curUser?.data, navigator]);
   return {
     isRefetchingCurUser,
     loadingCurUser,
     curUser,
     refetchingCurUser,
+    curUser4PaymentMethod,
+    loadingCurUser4PaymentMethod,
+    refetchingCurUser4PaymentMethod,
+    isRefetchingCurUser4PaymentMethod,
   };
 };

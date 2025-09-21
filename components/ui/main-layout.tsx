@@ -4,11 +4,9 @@ import { usePageNavigator } from "@/hook/navigator";
 import Footer from "./footer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ThemeRegistry from "@/contexts/theme-context";
-import { useEffect } from "react";
-import { generateToken, messaging } from "@/lib/firebase/firebase";
-import { onMessage } from "firebase/messaging";
-import { useToast } from "@/contexts/toast-contexts";
-import Text from "./text";
+
+import { useFCMNotifications } from "@/hook/useFcmToken";
+import { SocketProvider } from "@/contexts/socket-contexts";
 
 export default function MainLayout({
   children,
@@ -16,27 +14,8 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   const { curPathname } = usePageNavigator();
-  const { warning } = useToast();
   const isHome = curPathname === "/";
   const queryClient = new QueryClient();
-
-  useEffect(() => {
-    const token = generateToken();
-    onMessage(messaging, (payload) => {
-      warning({
-        render: (api) => (
-          <div>
-            <Text.SubHeading> {payload.notification.title}</Text.SubHeading>
-            <Text.SubParagraph>{payload.notification.body}</Text.SubParagraph>
-          </div>
-        ),
-        vars: { bg: "#ffffff", fg: "#05e405" }, // still can theme even with custom render
-        // title: payload.notification.title,
-        // description: payload.notification.body,
-      });
-    });
-    // console.log(token);
-  }, []);
 
   const isAuth =
     curPathname === "/login" ||
@@ -45,7 +24,11 @@ export default function MainLayout({
     curPathname === "/signup/info" ||
     curPathname === "/forgotPassword" ||
     curPathname === "/pricing" ||
-    curPathname === "/resetPassword";
+    curPathname === "/resetPassword" ||
+    curPathname === "/upgrade_subscription";
+
+  useFCMNotifications();
+
   return (
     <QueryClientProvider client={queryClient}>
       <div
@@ -57,7 +40,9 @@ export default function MainLayout({
               isHome || isAuth ? "lay-bg" : ""
             }`}
           >
-            <ThemeRegistry>{children}</ThemeRegistry>
+            <SocketProvider>
+              <ThemeRegistry>{children}</ThemeRegistry>
+            </SocketProvider>
           </div>
         </main>
 

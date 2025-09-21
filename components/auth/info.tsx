@@ -24,6 +24,7 @@ import { countriesPhoneCodes } from "@/lib/countries";
 
 import { SignupValues } from "@/lib/signup-schema";
 import LoadingTemplate from "../ui/spinner";
+import Link from "next/link";
 
 const UserInformation = () => {
   const params = useSearchParams();
@@ -84,9 +85,10 @@ const UserInformation = () => {
 
   // console.log(extraI);
 
-  const fieldsInput = field?.toUpperCase()?.includes("RESIDENTIAL")
-    ? residentialAcctType
-    : businessAcctType;
+  const fieldsInput = businessAcctType;
+  // const fieldsInput = field?.toUpperCase()?.includes("RESIDENTIAL")
+  //   ? residentialAcctType
+  //   : businessAcctType;
 
   const setQueryParam = useCallback(
     (key: string, value?: string | null) => {
@@ -251,6 +253,7 @@ const UserInformation = () => {
                 ) : null}
               </InputContainer>
             </div>
+
             {errors?.[inps.id as keyof SignupValues]?.message && (
               <Text.SmallText className="text-red-500">
                 {String(errors[inps.id as keyof SignupValues]?.message)}
@@ -368,14 +371,31 @@ const UserInformation = () => {
         </button>
 
         <Text.Paragraph className="text-sm lg:text-base">
-          By creating an account, you agree to our Terms of Service and Privacy
-          Policy
+          By creating an account, you agree to our{" "}
+          <Link
+            href={"/terms"}
+            className="underline font-semibold cursor-pointer"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Terms of Service
+          </Link>{" "}
+          and{" "}
+          <Link
+            href={"/policy"}
+            className="underline font-semibold cursor-pointer"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Privacy Policy
+          </Link>
         </Text.Paragraph>
       </div>
 
       <Button
         className="cursor-pointer w-full mb-4 mt-8 min-h-12 relative"
         disabled={isLoading}
+        type="submit"
       >
         {isLoading ? (
           <LoadingTemplate isMessage={false} variant="small" />

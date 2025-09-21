@@ -11,6 +11,7 @@ import { useUser } from "@/hook/useMe";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
 import { usePageNavigator } from "@/hook/navigator";
+import { useSocket } from "@/contexts/socket-contexts";
 
 type DashboardNavProps = {
   onBellClick?: () => void;
@@ -27,6 +28,8 @@ const DashboardNav = ({
   const bellRef = useRef<HTMLButtonElement | null>(null);
   const burgerRef = useRef<HTMLButtonElement | null>(null);
   const { curUser, loadingCurUser } = useUser();
+  const { badgeCount } = useSocket();
+  console.log(badgeCount);
 
   const userData = curUser?.data;
   const unknown =
@@ -100,8 +103,8 @@ const DashboardNav = ({
             focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-light-500 focus-visible:ring-offset-light-main
           "
           aria-label={
-            notificationsCount > 0
-              ? `${notificationsCount} new notifications`
+            Number(badgeCount) > 0
+              ? `${badgeCount} new notifications`
               : "Notifications"
           }
         >
@@ -109,7 +112,7 @@ const DashboardNav = ({
           {notificationsCount > 0 && (
             <span
               className="
-                absolute -top-1 -right-1
+                absolute top-1 right-1
                 translate-x-1 -translate-y-1
                 pointer-events-none
               "

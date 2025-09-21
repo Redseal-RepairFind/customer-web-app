@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   description: "Select your Payment plans",
 };
 
-const PricingPage = () => {
-  return <Pricingg />;
+const PricingPage = async () => {
+  return <Pricingg isUpgrade={false} />;
 };
 
 export default PricingPage;

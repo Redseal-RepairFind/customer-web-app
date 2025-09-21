@@ -1,6 +1,7 @@
-import SignupPage from "@/components/auth/signup-item";
+// import SignupPage from "@/components/auth/signup-item";
 
 // app/dashboard/page.tsx
+import UserInformation from "@/components/auth/info";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const Signup = () => {
-  return <SignupPage />;
+  return <UserInformation />;
 };
 
 export default Signup;

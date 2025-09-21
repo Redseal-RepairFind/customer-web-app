@@ -19,34 +19,34 @@ export const dashboardNav = [
     icon: icons.subIcon,
     activeIcon: icons.subIconActive,
   },
-  {
-    name: "Inbox",
-    route: "/inbox",
-    icon: icons.chatIcon,
-    activeIcon: icons.chatIconActive,
-  },
-  {
-    name: "Maintenance Log",
-    route: "/maintenance-log",
-    icon: icons.maintenanceIcon,
-    activeIcon: icons.maintenanceIconActive,
-  },
-  {
-    name: "Refer & Earn",
-    route: "/referral",
-    icon: icons.referIcon,
-    activeIcon: icons.referIconActive,
-  },
+  // {
+  //   name: "Inbox",
+  //   route: "/inbox",
+  //   icon: icons.chatIcon,
+  //   activeIcon: icons.chatIconActive,
+  // },
+  // {
+  //   name: "Maintenance Log",
+  //   route: "/maintenance-log",
+  //   icon: icons.maintenanceIcon,
+  //   activeIcon: icons.maintenanceIconActive,
+  // },
+  // {
+  //   name: "Refer & Earn",
+  //   route: "/referral",
+  //   icon: icons.referIcon,
+  //   activeIcon: icons.referIconActive,
+  // },
 ];
 
 export const otherNav = [
-  {
-    name: "Account",
-    route: "/settings",
-    icon: icons.accountIcon,
-    activeIcon: icons.accountIconActive,
-    isLogout: false,
-  },
+  // {
+  //   name: "Account",
+  //   route: "/settings",
+  //   icon: icons.accountIcon,
+  //   activeIcon: icons.accountIconActive,
+  //   isLogout: false,
+  // },
   {
     name: "Logout",
     route: "",
@@ -81,7 +81,7 @@ export const quickActions = [
 
 export const dummyMetrics = [
   {
-    name: "Available Credits",
+    name: "Accrued Credit",
     icon: icons.dollarIcon,
     metric: "4850",
   },
@@ -207,10 +207,7 @@ export const dummyCommHistory = [
   },
 ];
 
-export const recommend = [
-  "Yes, I would recommend",
-  "No, I would not recommend",
-];
+export const recommend = ["Yes, I would love to", "No, i would not"];
 
 export const issueType = [
   "Work not completed as agreed",
@@ -227,4 +224,23 @@ export const nextAct = [
   "Our team will contact you to discuss resolution options",
   "We may reach out to the contractor for their perspective",
   "We'll work to find a fair solution for all parties",
+];
+
+export const repairFilter = [
+  {
+    name: "Completed",
+    id: "COMPLETED",
+  },
+  {
+    name: "Ongoing",
+    id: "ONGOING",
+  },
+  {
+    name: "Pending",
+    id: "PENDING",
+  },
+  {
+    name: "Dispute",
+    id: "DISPUTED",
+  },
 ];

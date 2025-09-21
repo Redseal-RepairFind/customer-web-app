@@ -5,22 +5,38 @@ import DashboardHeader from "../header";
 import Metrics from "./metrics";
 import PlanLog from "./plan-log";
 import RecentRequests from "./recent-requests";
-import { useState } from "react";
 import { useUser } from "@/hook/useMe";
 import LoadingTemplate from "@/components/ui/spinner";
 import { useDashboard } from "@/hook/useDashboard";
 import Text from "@/components/ui/text";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
+import { useRepairs } from "@/hook/useRepairs";
 import MultiBranch from "./multi-branch";
+import { usePricing } from "@/hook/usePricing";
 
 const DashboardHome = () => {
-  const [isRec, setIsRec] = useState(false);
-
   const { curUser, loadingCurUser } = useUser();
   const { trxSummary, isLoadingTrxSummary } = useDashboard();
+  const { repairsData, loadingRepairs } = useRepairs();
 
-  if (loadingCurUser || isLoadingTrxSummary) return <LoadingTemplate />;
+  const { subscriptions } = usePricing();
+
+  // console.log(subscriptions);
+
+  // const { isConnected, socket } = useSocket();
+
+  // console.log(socket);
+
+  if (loadingCurUser || isLoadingTrxSummary || loadingRepairs)
+    return <LoadingTemplate />;
+
+  const repairs = repairsData?.data?.data;
+  const totalCredits = subscriptions
+    ?.map((sub) => sub.remainingCredits)
+    ?.reduce((arr, cur) => Number(arr || 0) + Number(cur || 0), 0);
+
+  // console.log(totalCredits);
 
   const userData = curUser?.data;
   const trxData = trxSummary?.data;
@@ -37,6 +53,8 @@ const DashboardHome = () => {
     planType,
   };
 
+  // console.log(curUser);
+
   return (
     <main className="w-full">
       <DashboardHeader />
@@ -50,11 +68,12 @@ const DashboardHome = () => {
         </div>
       ) : null}
       <section className="flex-cols gap-5 mt-8">
-        <PlanLog plans={planType} />
-        <Metrics stats={metrics} plans={planType} />
         <MultiBranch />
-        {isRec ? (
-          <RecentRequests />
+        <Metrics stats={metrics} plans={planType} planBalance={totalCredits} />
+        <PlanLog plans={planType} />
+
+        {repairs?.length > 0 ? (
+          <RecentRequests requestData={repairs} />
         ) : (
           <EmptyPage
             tytle="No Recent Request"

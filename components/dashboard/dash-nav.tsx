@@ -8,7 +8,6 @@ import Image from "next/image";
 import { usePageNavigator } from "@/hook/navigator";
 import { icons, images } from "@/lib/constants";
 import Button from "../ui/custom-btn";
-import Badge from "../ui/badge";
 import { useAuthentication } from "@/hook/useAuthentication";
 
 const DashNav = () => {
@@ -78,7 +77,7 @@ const DashNav = () => {
                         curPathname === dash.route
                           ? "bg-white"
                           : "bg-transparent"
-                      } flex-rows py-2 px-3 rounded-lg gap-2 hover:bg-dark-600  transition-all duration-300`}
+                      }  cursor-pointer flex-rows py-2 px-3 rounded-lg gap-2 hover:bg-dark-600  transition-all duration-300`}
                       onClick={dash.isLogout ? () => handleLogout() : () => {}}
                       key={dash.route}
                     >

@@ -282,14 +282,14 @@ export const equipmentAge = [
     variant: "green",
     icon: greenPeople,
   },
-  {
-    name: "I don't know",
-    id: "unknown",
+  // {
+  //   name: "I don't know",
+  //   id: "unknown",
 
-    tag: "Tailored plans for businesses managing multiple properties and equipment.",
-    variant: "green",
-    icon: greenPeople,
-  },
+  //   tag: "Tailored plans for businesses managing multiple properties and equipment.",
+  //   variant: "green",
+  //   icon: greenPeople,
+  // },
 ];
 
 export const residentialAcctType: {
@@ -363,16 +363,16 @@ export const residentialAcctType: {
     inputType: "",
     list: [],
   },
-  {
-    title: "Age of Equipment",
-    type: "drop_down",
-    placeHolder: "Select age",
-    id: "",
-    icon: icons.downIcon,
-    notice: "notice text",
-    inputType: "",
-    list: equipmentAge,
-  },
+  // {
+  //   title: "Age of Equipment",
+  //   type: "drop_down",
+  //   placeHolder: "Select age",
+  //   id: "",
+  //   icon: icons.downIcon,
+  //   notice: "notice text",
+  //   inputType: "",
+  //   list: equipmentAge,
+  // },
   {
     title: "Password",
     type: "input",
@@ -404,16 +404,16 @@ export const businessAcctType: {
   inputType: string;
   id: string;
 }[] = [
-  {
-    title: "Account Type",
-    type: "drop_down",
-    placeHolder: "Residential Subscription",
-    id: "acctType",
-    icon: icons.downIcon,
-    notice: "",
-    inputType: "",
-    list: accountType,
-  },
+  // {
+  //   title: "Account Type",
+  //   type: "drop_down",
+  //   placeHolder: "Residential Subscription",
+  //   id: "acctType",
+  //   icon: icons.downIcon,
+  //   notice: "",
+  //   inputType: "",
+  //   list: accountType,
+  // },
   {
     title: "Business Name",
     type: "input",
@@ -475,16 +475,16 @@ export const businessAcctType: {
     inputType: "",
     list: [],
   },
-  {
-    title: "Age of Equipment",
-    type: "drop_down",
-    placeHolder: "Select age",
-    id: "eqAge",
-    icon: icons.downIcon,
-    notice: "notice text",
-    inputType: "",
-    list: equipmentAge,
-  },
+  // {
+  //   title: "Age of Equipment",
+  //   type: "drop_down",
+  //   placeHolder: "Select age",
+  //   id: "eqAge",
+  //   icon: icons.downIcon,
+  //   notice: "notice text",
+  //   inputType: "",
+  //   list: equipmentAge,
+  // },
   {
     title: "Password",
     type: "input",

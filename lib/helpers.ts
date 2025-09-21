@@ -38,9 +38,9 @@ export const formatError = (error: any) => {
   return error?.response?.data?.message;
 };
 
-export const setCookie = async (name: string, item: any) => {
+export const setCookie = async (name: string, item: any, dur?: number) => {
   Cookies.set(name, item, {
-    expires: 7,
+    expires: dur || 7,
     path: "/",
     sameSite: "lax",
     // secure: process.env.NODE_ENV === "production",
@@ -51,6 +51,10 @@ export const readCookie = (name: string) => {
   const token = Cookies.get(name); // string | undefined
 
   return token && JSON?.parse(token as string);
+};
+export const readStringCookie = (name: string) => {
+  const token = Cookies.get(name); // string | undefined
+  return token;
 };
 
 export const removeCookie = (name: string) => {
@@ -79,13 +83,19 @@ export function formatDate(date: string | Date, formatStr = "DD/MM/YYYY") {
   return dayjs(date).format(formatStr);
 }
 
-export function formatDateProper(date: Date): string {
-  const userLocale = navigator.language || "en-US"; // Default to 'en-US' if locale is unavailable
+export function formatDateProper(date: Date, locale?: string): string {
+  // On the server, fall back to a safe default
+  const userLocale =
+    typeof navigator !== "undefined" && navigator.language
+      ? navigator.language
+      : locale || "en-CA";
+
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "short",
     day: "numeric",
   };
+
   return new Intl.DateTimeFormat(userLocale, options).format(date);
 }
 
@@ -105,3 +115,94 @@ export function formatTo12Hour(date: Date) {
 
   return `${hours}:${minutesStr} ${ampm}`;
 }
+
+export const getTimeAgo = (dateString: string): string => {
+  const actionDate = new Date(dateString);
+  const now = new Date();
+
+  const diffInSeconds = Math.floor(
+    (now.getTime() - actionDate.getTime()) / 1000
+  );
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  const diffInDays = Math.floor(diffInHours / 24);
+
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} sec${diffInSeconds === 1 ? "" : "s"} ago`;
+  }
+
+  if (diffInMinutes < 60) {
+    return `${diffInMinutes} min${diffInMinutes === 1 ? "" : "s"} ago`;
+  }
+
+  if (diffInHours < 24) {
+    return `${diffInHours} hr${diffInHours === 1 ? "" : "s"} ago`;
+  }
+
+  if (diffInDays === 1) {
+    return "Yesterday";
+  }
+
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+    year: "2-digit",
+  };
+
+  return actionDate.toLocaleDateString(undefined, options); // Uses browser's locale
+};
+
+export const STATUS_PROGRESS: Record<string, string> = {
+  BOOKED: "Technician scheduled; awaiting arrival",
+  ONGOING: "Work in progress on site",
+  COMPLETED: "Repair completed; ready for review",
+  DISPUTED: "Customer dispute under investigation",
+  CANCELED: "Job canceled; no action needed",
+  EXPIRED: "Request expired; needs rebooking",
+  COMPLETED_SITE_VISIT: "Site visit finished; awaiting report",
+  PENDING: "Awaiting confirmation from customer",
+};
+
+export const getProgress = (status: string) =>
+  STATUS_PROGRESS[status] ?? "Status unknown";
+
+// lib/statusMeta.ts
+export interface StatusMeta {
+  header: string;
+  report: string;
+}
+
+export const STATUS_META: Record<string, StatusMeta> = {
+  BOOKED: {
+    header: "Job Scheduled",
+    report: "Technician scheduled; awaiting arrival",
+  },
+  ONGOING: {
+    header: "Work in Progress",
+    report: "Repair currently underway on site",
+  },
+  COMPLETED: {
+    header: "Repair Completed",
+    report: "Task finished; pending confirmation",
+  },
+  DISPUTED: {
+    header: "Dispute Raised",
+    report: "Issue under review and resolution",
+  },
+  CANCELED: {
+    header: "Job Canceled",
+    report: "Request canceled; no further action",
+  },
+  EXPIRED: {
+    header: "Request Expired",
+    report: "Job offer expired; rebooking needed",
+  },
+  COMPLETED_SITE_VISIT: {
+    header: "Site Visit Done",
+    report: "Inspection finished; awaiting report",
+  },
+  PENDING: {
+    header: "Awaiting Confirmation",
+    report: "Job request pending approval",
+  },
+};

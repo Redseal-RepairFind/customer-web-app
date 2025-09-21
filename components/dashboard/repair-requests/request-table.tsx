@@ -5,7 +5,7 @@ import StatusCard from "@/components/ui/ststus-card";
 import Text from "@/components/ui/text";
 import { icons, images } from "@/lib/constants";
 import { repTableH } from "@/lib/dasboard-constatns";
-import { formatDateProper } from "@/lib/helpers";
+import { formatDateProper, getProgress } from "@/lib/helpers";
 import Image from "next/image";
 import React, { useState } from "react";
 import { FcCheckmark } from "react-icons/fc";
@@ -15,6 +15,21 @@ import { BsEye } from "react-icons/bs";
 import { CgCloseO } from "react-icons/cg";
 import { useToast } from "@/contexts/toast-contexts";
 import { RequestCompletedToast } from "../home/request-submit-toast";
+import { RepairJob } from "@/utils/types";
+import { useSearchParams } from "next/navigation";
+import Modal from "@/components/ui/customModal";
+import Estimate from "./estimate-modal";
+import { useRepairs } from "@/hook/useRepairs";
+import LoadingTemplate from "@/components/ui/spinner";
+import Button from "@/components/ui/custom-btn";
+import { ClipLoader } from "react-spinners";
+import { useSocket } from "@/contexts/socket-contexts";
+import {
+  JobCompletedModal,
+  JobDisputeModal,
+  JobRatingModal,
+} from "../home/job-toast-modal";
+import RepairDropdown from "./table-menu";
 
 interface IProps {
   children: React.ReactNode;
@@ -22,28 +37,44 @@ interface IProps {
   onClick?: () => void;
 }
 
-type DataType = {
-  data: {
-    id: string;
-    service: string;
-    technician: string;
-    status: string;
-    progress: string;
-    contact: string;
-  }[];
-};
-
-const RepairTable = ({ data }: DataType) => {
+const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const [check, setCheck] = useState(false);
   const [open, setOpen] = useState(false);
   const [tech, setTech] = useState<any>();
   const { warning } = useToast();
 
+  const [openCompleted, setOpenCompleted] = useState({
+    jobInfo: null,
+    completed: false,
+    review: false,
+    dispute: false,
+  });
+
+  const params = useSearchParams();
+  const status = params.get("status");
+  const [openModal, setOpenModal] = useState({
+    estimate: null,
+    open: false,
+    openPayments: false,
+  });
+  const [methodId, setMethodId] = useState<{
+    card: any;
+    id: string;
+  }>();
+
+  // const { openComplete, setOpenComplete } = useSocket();
+  const {
+    paymentMethods,
+    loadingPaymentMethods,
+    creatingRequest,
+    handlePayEstimate,
+  } = useRepairs();
+
   if (!data?.length)
     return (
       <EmptyPage
-        tytle="No Recent Request"
-        message="Your recent activity appears here."
+        tytle={`No ${status ? status : ""} Repair Requests`}
+        message="Your repair activities appears here."
         className="min-h-[350px]"
       />
     );
@@ -56,8 +87,208 @@ const RepairTable = ({ data }: DataType) => {
     });
   };
 
+  // console.log(data);
+
+  const handleViewEstimate = (estimate: RepairJob | null) => {
+    setOpenModal({
+      open: true,
+      estimate,
+      openPayments: false,
+    });
+  };
+
+  const handleUnViewEstimate = () => {
+    setOpenModal((est) => ({
+      ...est,
+      open: false,
+      openPayments: false,
+    }));
+  };
+  const handleViewMethods = () => {
+    setOpenModal((est) => ({
+      ...est,
+      open: false,
+      openPayments: true,
+    }));
+  };
+
+  const handleCloseMethods = () => {
+    setOpenModal((est) => ({
+      ...est,
+      open: false,
+      openPayments: false,
+      estimate: null,
+    }));
+  };
+  // lib/statusProgress.ts
+
+  if (loadingPaymentMethods) return <LoadingTemplate />;
+
+  // console.log(methodId);
+  const mthods = paymentMethods?.data;
+
+  // console.log(data);
+
   return (
     <>
+      <Modal onClose={handleUnViewEstimate} isOpen={openModal.open}>
+        <Estimate
+          estimate={openModal.estimate || data[0]}
+          closeModal={handleUnViewEstimate}
+          openPayment={handleViewMethods}
+        />
+      </Modal>
+
+      <Modal onClose={handleCloseMethods} isOpen={openModal.openPayments}>
+        <div className="flex-cols gap-4 h-[200px]">
+          <Text.Paragraph className="font-semibold text-base">
+            Select payment method
+          </Text.Paragraph>
+          <Dropdown className="">
+            <Dropdown.Trigger className="flex-row-between">
+              <Text.Paragraph className="text-sm">
+                {methodId
+                  ? `${methodId?.card?.brand} **** **** **** ${methodId?.card?.last4}`
+                  : " Select Payment method"}
+              </Text.Paragraph>
+            </Dropdown.Trigger>
+            <Dropdown.Content className=" bg-white ">
+              {mthods?.map((mt: { card: any; id: string }) => (
+                <Dropdown.Item
+                  className="w-full border-b border-b-light-0"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setMethodId(mt);
+                  }}
+                  key={mt?.id}
+                >
+                  <Text.SmallText>
+                    {mt?.card?.brand} **** **** **** {mt?.card?.last4}
+                  </Text.SmallText>
+                </Dropdown.Item>
+              ))}
+            </Dropdown.Content>
+          </Dropdown>
+          <Button
+            onClick={() =>
+              handlePayEstimate({
+                jobId: openModal.estimate._id,
+                quotesId: openModal.estimate?.contract?._id,
+                paymentId: methodId?.id,
+                close: () => handleCloseMethods(),
+              })
+            }
+          >
+            <Button.Icon>
+              {creatingRequest ? (
+                <ClipLoader size={20} color="#fff" />
+              ) : (
+                <Image src={icons.card} alt="" height={20} width={20} />
+              )}
+            </Button.Icon>
+            <Button.Text>
+              {creatingRequest ? "Authorizing...." : "Proceed"}
+            </Button.Text>
+          </Button>
+        </div>
+      </Modal>
+
+      <Modal
+        isOpen={openCompleted.completed}
+        onClose={() =>
+          setOpenCompleted((cm) => ({
+            ...cm,
+            completed: false,
+          }))
+        }
+      >
+        <JobCompletedModal
+          jobInfo={openCompleted.jobInfo}
+          onReport={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              dispute: true,
+              completed: false,
+            }))
+          }
+          onReview={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              review: true,
+              completed: false,
+            }))
+          }
+          onClose={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              completed: false,
+            }))
+          }
+        />
+      </Modal>
+      <Modal
+        isOpen={openCompleted.review}
+        onClose={() =>
+          setOpenCompleted((cm) => ({
+            ...cm,
+            review: false,
+          }))
+        }
+      >
+        <JobRatingModal
+          jobInfo={openCompleted.jobInfo}
+          // onReport={() =>
+          //   setOpenCompleted((cm) => ({
+          //     ...cm,
+          //     dispute: false,
+          //   }))
+          // }
+          onReview={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              review: false,
+            }))
+          }
+          onClose={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              review: false,
+            }))
+          }
+        />
+      </Modal>
+      <Modal
+        isOpen={openCompleted.dispute}
+        onClose={() =>
+          setOpenCompleted((cm) => ({
+            ...cm,
+            dispute: false,
+          }))
+        }
+      >
+        <JobDisputeModal
+          // jobInfo={openCompleted.dispute}
+          onReport={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              dispute: false,
+            }))
+          }
+          // onReview={() =>
+          //   setOpenCompleted((cm) => ({
+          //     ...cm,
+          //     review: false,
+          //   }))
+          // }
+          onClose={() =>
+            setOpenCompleted((cm) => ({
+              ...cm,
+              dispute: false,
+            }))
+          }
+          disputeInfo={openCompleted.jobInfo}
+        />
+      </Modal>
       <TableOverflow>
         <TechModal
           open={open}
@@ -91,7 +322,7 @@ const RepairTable = ({ data }: DataType) => {
 
           <Tbody>
             {data.map((rep) => (
-              <Tr key={rep.id}>
+              <Tr key={rep.jobId}>
                 {/* Job ID (visible on mobile) */}
                 <Td className="flex items-center gap-2">
                   <RadioCheck
@@ -100,7 +331,7 @@ const RepairTable = ({ data }: DataType) => {
                   />
                   <div>
                     <Text.SmallHeading className="text-sm font-semibold">
-                      {rep.id}
+                      {rep.jobId}
                     </Text.SmallHeading>
                     <Text.SmallText>
                       {formatDateProper(new Date())}
@@ -109,25 +340,34 @@ const RepairTable = ({ data }: DataType) => {
                 </Td>
 
                 {/* Service (visible on mobile) */}
-                <Td>{rep.service}</Td>
+                <Td>{rep.category}</Td>
 
                 {/* Technician (hide on mobile) */}
                 <Td className="hidden md:table-cell">
-                  <div className="flex items-center gap-2">
-                    <Image
-                      src={images.technician}
-                      height={24}
-                      width={24}
-                      className="rounded-full "
-                      alt="Technician"
-                    />
+                  {rep.contractors?.length ? (
+                    <div className="flex items-center gap-2">
+                      <Image
+                        src={rep?.contractors[0]?.profilePhoto}
+                        height={24}
+                        width={24}
+                        className="rounded-full "
+                        alt="Technician"
+                      />
 
-                    <span>{rep.technician}</span>
-                  </div>
+                      <Text.Paragraph className="text-xs">
+                        {rep?.contractors[0]?.firstName}{" "}
+                        {rep?.contractors[0]?.lastName}
+                      </Text.Paragraph>
+                    </div>
+                  ) : (
+                    <p>- -</p>
+                  )}
                 </Td>
 
                 {/* Progress (hide on mobile) */}
-                <Td className="hidden md:table-cell">{rep.progress}</Td>
+                <Td className="hidden md:table-cell">
+                  <Text.SmallText>{getProgress(rep.status)}</Text.SmallText>
+                </Td>
 
                 {/* Status (visible on mobile) */}
                 <Td className="hidden md:table-cell">
@@ -169,38 +409,13 @@ const RepairTable = ({ data }: DataType) => {
                 </Td>
 
                 {/* More (visible on mobile — part of actions) */}
-                <Td>
-                  <Dropdown className="">
-                    <Dropdown.Trigger className="w-10 cursor-pointer" isNormal>
-                      <Image
-                        src={icons.moreIcon}
-                        height={20}
-                        width={24}
-                        alt="Menu icon"
-                      />
-                    </Dropdown.Trigger>
-                    <Dropdown.Content className="w-[120px] bg-white">
-                      <Dropdown.Item
-                        className="w-full"
-                        onClick={() => handleOpenModal(rep.status)}
-                      >
-                        <div className="flex-rows items-center gap-2">
-                          <BsEye />
-                          <Text.Paragraph className="text-sm">
-                            View Status
-                          </Text.Paragraph>
-                        </div>
-                      </Dropdown.Item>
-                      <Dropdown.Item className="w-full">
-                        <div className="flex-rows items-center gap-2">
-                          <CgCloseO />
-                          <Text.Paragraph className="text-sm">
-                            Cancel
-                          </Text.Paragraph>
-                        </div>
-                      </Dropdown.Item>
-                    </Dropdown.Content>
-                  </Dropdown>
+                <Td className="relative ">
+                  <RepairDropdown
+                    rep={rep}
+                    handleViewEstimate={handleViewEstimate}
+                    handleOpenModal={handleOpenModal}
+                    setOpenCompleted={setOpenCompleted}
+                  />
                 </Td>
               </Tr>
             ))}
@@ -213,7 +428,7 @@ const RepairTable = ({ data }: DataType) => {
 
 export const TableOverflow: React.FC<IProps> = ({ children, className }) => {
   return (
-    <div className={`w-full overflow-x-auto h-full pb-20 ${className}`}>
+    <div className={`w-full overflow-x-auto h-full md:pb-20 ${className}`}>
       {children}
     </div>
   );

@@ -1,5 +1,5 @@
 import { http, withAuth } from "@/lib/api/axios/http";
-import { SubscriptionType } from "@/utils/types";
+import { SubGetParams, SubscriptionType, UpgradeType } from "@/utils/types";
 
 const url = "/customer";
 export const pricingActions = {
@@ -17,12 +17,50 @@ export const pricingActions = {
       throw error;
     }
   },
+  getMe$patmentMethod: async ({
+    include = "stripePaymentMethods",
+  }: {
+    include?: string;
+  }) => {
+    try {
+      const response = await http.get(
+        `${url}/me?include=${include}`,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 
   getSubscriptionPlan: async () => {
     try {
       const response = await http.get(`${url}/subscription-plans`, withAuth());
 
-      return response.data;
+      return response?.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+  getSingleSubscriptionPlan: async (planId: string) => {
+    try {
+      const response = await http.get(
+        `${url}/subscription-plans/${planId}`,
+        withAuth()
+      );
+
+      return response?.data;
     } catch (error: any) {
       console.error(
         "Axios error:",
@@ -38,12 +76,7 @@ export const pricingActions = {
     limit,
     planType,
     search,
-  }: {
-    page: number;
-    limit: number;
-    planType?: string;
-    search?: string;
-  }) => {
+  }: SubGetParams) => {
     try {
       const response = await http.get(
         `${url}/subscriptions?page=${page}&limit=${limit}${
@@ -52,7 +85,7 @@ export const pricingActions = {
         withAuth()
       );
 
-      return response.data;
+      return response.data?.data;
     } catch (error: any) {
       console.error(
         "Axios error:",
@@ -67,6 +100,77 @@ export const pricingActions = {
       const response = await http.post(
         `${url}/subscriptions/stripe-checkout`,
         payload,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+  upgradeSubscriptionPlan: async (payload: UpgradeType) => {
+    try {
+      const response = await http.post(
+        `${url}/subscriptions/upgrade`,
+        payload,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+  cancelSubscriptionPlan: async (payload: { subscriptionId: string }) => {
+    try {
+      const response = await http.post(
+        `${url}/subscriptions/cancel`,
+        payload,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+  reactivateSubscriptionPlan: async (payload: { subscriptionId: string }) => {
+    try {
+      const response = await http.post(
+        `${url}/subscriptions/reactivate`,
+        payload,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
+  createBillingPortal: async () => {
+    try {
+      const response = await http.get(
+        `${url}/subscriptions/create-customer-portal-session`,
         withAuth()
       );
 

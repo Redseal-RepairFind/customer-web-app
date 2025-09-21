@@ -2,7 +2,7 @@
 import { BiCheck } from "react-icons/bi";
 import Text from "../ui/text";
 import { useState } from "react";
-import { CgChevronUp } from "react-icons/cg";
+import { CgChevronDown, CgChevronUp } from "react-icons/cg";
 import { formatCurrency } from "@/lib/helpers";
 
 const PricingItem = ({
@@ -17,6 +17,7 @@ const PricingItem = ({
   cycle: "monthly" | "yearly";
   blurItems: string[];
   onSelectPlan: (item: any) => void;
+  currentPlan?: boolean;
 }) => {
   // console.log(blurItems);
   // return null;
@@ -35,11 +36,11 @@ const PricingItem = ({
         <Text.Paragraph className="font-bold">
           {item?.name.split(" - ")[0]}
         </Text.Paragraph>
-        {isRecommended ? (
+        {/* {isRecommended ? (
           <span className=" px-3 py-2 rounded-full text-base text-white bg-black">
-            Recommended
+            {"Recommended"}
           </span>
-        ) : null}
+        ) : null} */}
       </div>
 
       <span className="flex-rows gap-2 mb-1">
@@ -113,7 +114,7 @@ const PricingItem = ({
             {showall ? "See less Features" : "See more features"}
           </Text.SmallText>
 
-          <CgChevronUp />
+          {showall ? <CgChevronUp /> : <CgChevronDown />}
         </button>
       </div>
     </div>

@@ -15,6 +15,13 @@ import RequestSubmitToast from "./home/request-submit-toast";
 import { useSubCalc } from "@/hook/useSubCalc";
 import { useSkills } from "@/hook/useSkills";
 import { usePricing } from "@/hook/usePricing";
+import { usePageNavigator } from "@/hook/navigator";
+import { BiCheck, BiPlus } from "react-icons/bi";
+import { SUB_EXTRA_ID } from "@/utils/types";
+import { useSocket } from "@/contexts/socket-contexts";
+import { useCopyToClipboard } from "@/hook/useCopy";
+import { BsCopy } from "react-icons/bs";
+import { CgCheck } from "react-icons/cg";
 
 const ROTATE_MS = 4000; // auto-advance every 4s
 
@@ -22,7 +29,7 @@ const DashboardHeader = () => {
   const { curUser, loadingCurUser } = useUser();
   const [openModal, setOpenModal] = useState(false);
   const user = curUser?.data;
-  const { warning } = useToast();
+  const { warning, error } = useToast();
   const { daysLeft } = useSubCalc(user?.subscription);
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -30,29 +37,41 @@ const DashboardHeader = () => {
   const { request_subscriptions, isLoadingRequestSub } = usePricing();
 
   const { skills, loadingSkills } = useSkills();
+  const { curPathname, navigator } = usePageNavigator();
 
-  // console.log(request_subscriptions);
+  const { isCopied, copy } = useCopyToClipboard();
+
+  console.log(request_subscriptions);
 
   const allSkils = skills?.data || [];
 
-  // console.log(allSkils);
+  const isSubsPage = curPathname.includes("manage-subscription");
+
+  // console.log(request_subscriptions);
 
   const handleCloseModal = () => setOpenModal(false);
   const handleOpenModal = () => {
+    if (isSubsPage) {
+      const extraSub = "new_sub";
+      navigator?.navigate(`/pricing?new=${extraSub}`, "push");
+      sessionStorage.setItem(SUB_EXTRA_ID, extraSub);
+      return;
+    }
+
     const planType = user?.subscriptions?.find((user: any) =>
       user?.status?.toLowerCase()?.includes("active")
     );
 
-    setOpenModal(true);
+    // setOpenModal(true);
 
-    // if (daysLeft > 0)
-    //   warning({
-    //     render: (api) => <RequestSubmitToast subscription={planType} />,
-    //     vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
-    //   });
-    // else {
-    //   setOpenModal(true);
-    // }
+    if (daysLeft > 0)
+      warning({
+        render: (api) => <RequestSubmitToast subscription={planType} />,
+        vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
+      });
+    else {
+      setOpenModal(true);
+    }
   };
 
   const stop = () => {
@@ -97,14 +116,46 @@ const DashboardHeader = () => {
   return (
     <>
       <Modal isOpen={openModal} onClose={handleCloseModal}>
-        <RequestModal skillsList={allSkils} />
+        <RequestModal
+          skillsList={allSkils}
+          subsList={request_subscriptions}
+          closeModal={handleCloseModal}
+        />
       </Modal>
       <div className="flex flex-col gap-5 w-full">
-        <Text.SubHeading className="font-semibold capitalize">
-          Welcome back,{" "}
-          {user?.businessName?.toLowerCase() || user?.firstName?.toLowerCase()}
-        </Text.SubHeading>
+        <div className="flex-cols  gap-2">
+          <Text.SubHeading className="font-semibold capitalize">
+            Welcome back,{" "}
+            {user?.businessName?.toLowerCase() ||
+              user?.firstName?.toLowerCase()}
+          </Text.SubHeading>
+          <div className=" gap-3">
+            <Text.Paragraph className=" capitalize text-sm">
+              Account ID:
+            </Text.Paragraph>
 
+            {user?.accountId && (
+              <div className="flex-rows items-center gap-2">
+                <span className="uppercase text-sm font-semibold">
+                  {user?.accountId}
+                </span>
+                <button
+                  className="cursor-pointer "
+                  onClick={() => copy(user?.accountId)}
+                >
+                  {isCopied ? (
+                    <div className="border border-light-0 p-[2px] rounded-sm flex items-center">
+                      <BiCheck />
+                      <p>copied</p>
+                    </div>
+                  ) : (
+                    <BsCopy />
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
         <section
           className="relative w-full rounded-lg overflow-hidden shadow-sm"
           aria-roledescription="carousel"
@@ -148,10 +199,18 @@ const DashboardHeader = () => {
 
               <Button variant="tertiary" onClick={handleOpenModal}>
                 <Button.Icon className="h-4 w-4 relative">
-                  <Image src={icons.requestIconActive} fill alt="button icon" />
+                  {isSubsPage ? (
+                    <BiPlus size={16} className="font-black" />
+                  ) : (
+                    <Image
+                      src={icons.requestIconActive}
+                      fill
+                      alt="button icon"
+                    />
+                  )}
                 </Button.Icon>
                 <Button.Text className="text-xs md:text-sm">
-                  Submit a request
+                  {isSubsPage ? "Add New Location" : " Submit a request"}
                 </Button.Text>
               </Button>
             </div>

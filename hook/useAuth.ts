@@ -104,14 +104,14 @@ export const useAuth = () => {
       toast.error(msg);
       return;
     }
-    if (!extraInfo.equipmentAgeCategory) {
-      const msg = "Please select your equipment age range";
-      handleExtraErrors("eqAge", msg);
-      handleExtraErrors("homeAddress", "");
+    // if (!extraInfo.equipmentAgeCategory) {
+    //   const msg = "Please select your equipment age range";
+    //   handleExtraErrors("eqAge", msg);
+    //   handleExtraErrors("homeAddress", "");
 
-      toast.error(msg);
-      return;
-    }
+    //   toast.error(msg);
+    //   return;
+    // }
     if (!extraInfo.acceptTerms) {
       const msg = "Please accept our T&cs";
       handleExtraErrors("acceptTerms", msg);
@@ -123,8 +123,8 @@ export const useAuth = () => {
     setIsLoading(true);
     try {
       const payload = {
-        subscriptionType: extraInfo.subscriptionType,
-        equipmentAgeCategory: data.eqAge,
+        subscriptionType: extraInfo.subscriptionType || "BUSINESS",
+        equipmentAgeCategory: "1-4",
         coverageAddress: extraInfo.coverageAddress,
         email: data.email,
         firstName: data?.firstName,
@@ -136,9 +136,10 @@ export const useAuth = () => {
           number: data.number,
         },
         acceptTerms: extraInfo.acceptTerms,
-        ...(extraInfo?.subscriptionType === "BUSINESS"
-          ? { businessName: data?.businessName }
-          : null),
+        // ...(extraInfo?.subscriptionType === "BUSINESS"
+        //   ? { businessName: data?.businessName }
+        //   : null),
+        businessName: data?.businessName,
       };
 
       // console.log(payload);

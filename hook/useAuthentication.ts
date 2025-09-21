@@ -43,6 +43,7 @@ export const useAuthentication = () => {
       error: "",
     }));
     try {
+      sessionStorage.clear();
       const isOtp = sessionStorage.getItem(IS_OTP);
 
       const isRest = Boolean(isOtp);

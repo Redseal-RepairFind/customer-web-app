@@ -4,12 +4,12 @@ import "@/styles/globals.css";
 import { Jost } from "next/font/google";
 import MainLayout from "@/components/ui/main-layout";
 import { GoogleMapsProvider } from "@/components/ui/google-maps-provider";
-import { Toaster } from "react-hot-toast";
 import { ToastProvider } from "@/contexts/toast-contexts";
+import { ClientToaster } from "@/components/ui/client-toast";
 
 const jost = Jost({
   subsets: ["latin"],
-  variable: "--font-jost", // creates a CSS variable you can use
+  variable: "--font-jost", // creates a CSS variable
 });
 
 export const metadata: Metadata = {
@@ -26,32 +26,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${jost.variable}  antialiased min-h-dvh flex-col flex justify-between`}
-      >
-        <ToastProvider>
+    <html lang="en" className={jost.variable}>
+      <body className="antialiased min-h-dvh flex-col flex justify-between">
+        <ToastProvider placement="top-center">
           <MainLayout>
             <GoogleMapsProvider>{children}</GoogleMapsProvider>
           </MainLayout>
         </ToastProvider>
 
-        <Toaster
-          toastOptions={{
-            style: {
-              fontFamily: "'Jost', sans-serif",
-              fontSize: "12px",
-              fontWeight: "700",
-            },
-            success: {
-              iconTheme: {
-                primary: "#000000",
-                secondary: "#ffffff",
-              },
-            },
-          }}
-        />
+        <ClientToaster />
       </body>
     </html>
   );
 }
+
+//

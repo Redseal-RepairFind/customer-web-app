@@ -14,11 +14,15 @@ import { useEffect, useRef, useState } from "react";
 import { usePageNavigator } from "@/hook/navigator";
 import { useAuthentication } from "@/hook/useAuthentication";
 
-gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger); // ✨ register
-
 const Home = () => {
   const [navOpen, setNavOpen] = useState(false);
   const { navigator } = usePageNavigator();
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      gsap.registerPlugin(useGSAP, SplitText, ScrollTrigger);
+    }
+  }, []);
 
   // Intro hero animations
   useGSAP(() => {
@@ -89,7 +93,6 @@ const Home = () => {
     <main className=" relative ">
       <Navigation onMenuOpen={() => setNavOpen(true)} />
       <NavWindow open={navOpen} onClose={() => setNavOpen(false)} nav={nav} />
-
       <section className="bg-black lg:px-5 px-4 pt-24">
         <div className="flex items-center justify-center   w-full  h-dvh">
           <div className="flex flex-col items-center  lg:justify-between w-full lg:px-8 xl:px-16">
