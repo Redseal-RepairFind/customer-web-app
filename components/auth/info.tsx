@@ -85,9 +85,10 @@ const UserInformation = () => {
 
   // console.log(extraI);
 
-  const fieldsInput = field?.toUpperCase()?.includes("RESIDENTIAL")
-    ? residentialAcctType
-    : businessAcctType;
+  const fieldsInput = businessAcctType;
+  // const fieldsInput = field?.toUpperCase()?.includes("RESIDENTIAL")
+  //   ? residentialAcctType
+  //   : businessAcctType;
 
   const setQueryParam = useCallback(
     (key: string, value?: string | null) => {

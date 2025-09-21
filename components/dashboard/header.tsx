@@ -29,7 +29,7 @@ const DashboardHeader = () => {
   const { curUser, loadingCurUser } = useUser();
   const [openModal, setOpenModal] = useState(false);
   const user = curUser?.data;
-  const { warning } = useToast();
+  const { warning, error } = useToast();
   const { daysLeft } = useSubCalc(user?.subscription);
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);

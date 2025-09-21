@@ -6,7 +6,6 @@ import MainLayout from "@/components/ui/main-layout";
 import { GoogleMapsProvider } from "@/components/ui/google-maps-provider";
 import { ToastProvider } from "@/contexts/toast-contexts";
 import { ClientToaster } from "@/components/ui/client-toast";
-import RouteSpy from "@/components/ui/root-spy";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -29,9 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={jost.variable}>
       <body className="antialiased min-h-dvh flex-col flex justify-between">
-        {process.env.NODE_ENV === "development" ? <RouteSpy /> : null}
-
-        <ToastProvider>
+        <ToastProvider placement="top-center">
           <MainLayout>
             <GoogleMapsProvider>{children}</GoogleMapsProvider>
           </MainLayout>

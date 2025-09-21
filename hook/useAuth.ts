@@ -123,7 +123,7 @@ export const useAuth = () => {
     setIsLoading(true);
     try {
       const payload = {
-        subscriptionType: extraInfo.subscriptionType,
+        subscriptionType: extraInfo.subscriptionType || "BUSINESS",
         equipmentAgeCategory: "1-4",
         coverageAddress: extraInfo.coverageAddress,
         email: data.email,
@@ -136,9 +136,10 @@ export const useAuth = () => {
           number: data.number,
         },
         acceptTerms: extraInfo.acceptTerms,
-        ...(extraInfo?.subscriptionType === "BUSINESS"
-          ? { businessName: data?.businessName }
-          : null),
+        // ...(extraInfo?.subscriptionType === "BUSINESS"
+        //   ? { businessName: data?.businessName }
+        //   : null),
+        businessName: data?.businessName,
       };
 
       // console.log(payload);

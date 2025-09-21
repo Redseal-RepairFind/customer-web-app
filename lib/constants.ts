@@ -404,16 +404,16 @@ export const businessAcctType: {
   inputType: string;
   id: string;
 }[] = [
-  {
-    title: "Account Type",
-    type: "drop_down",
-    placeHolder: "Residential Subscription",
-    id: "acctType",
-    icon: icons.downIcon,
-    notice: "",
-    inputType: "",
-    list: accountType,
-  },
+  // {
+  //   title: "Account Type",
+  //   type: "drop_down",
+  //   placeHolder: "Residential Subscription",
+  //   id: "acctType",
+  //   icon: icons.downIcon,
+  //   notice: "",
+  //   inputType: "",
+  //   list: accountType,
+  // },
   {
     title: "Business Name",
     type: "input",

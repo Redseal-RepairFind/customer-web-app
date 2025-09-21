@@ -155,14 +155,18 @@ const Branches = () => {
       </div> */}
 
       <div className="grid-2">
-        {subscriptions?.map((sub) => (
-          <BranchCard
-            key={sub?.id}
-            item={sub}
-            size="full"
-            onOpenUpgrade={handleOpenModal}
-          />
-        ))}
+        {subscriptions?.map((sub) => {
+          if (sub?.status === "PENDING") return null;
+
+          return (
+            <BranchCard
+              key={sub?.id}
+              item={sub}
+              size="full"
+              onOpenUpgrade={handleOpenModal}
+            />
+          );
+        })}
       </div>
       <div ref={sentinelRef} className="h-12" />
 

@@ -29,7 +29,9 @@ const MultiBranch = () => {
 
   if (isFetching) return <LoadingTemplate />;
 
-  const first4 = subscriptions?.slice(0, 3);
+  const first4 = subscriptions
+    ?.filter((sub) => sub?.status !== "PENDING")
+    ?.slice(0, 3);
 
   // console.log();
 
