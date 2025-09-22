@@ -34,6 +34,7 @@ const Branches = () => {
     sentinelRef,
     isRefetchingSubs,
     handleReactivatePlan,
+    handleContinuePlan,
   } = usePricing();
 
   // console.log(hasNextPage);
@@ -97,6 +98,7 @@ const Branches = () => {
           handleCancelPlan={handleCancelPlan}
           isCheckingout={isCheckingout}
           onReactivate={handleReactivatePlan}
+          onContinue={handleContinuePlan}
         />
       </Modal>
       <DashboardHeader />
@@ -156,7 +158,7 @@ const Branches = () => {
 
       <div className="grid-2">
         {subscriptions?.map((sub) => {
-          if (sub?.status === "PENDING") return null;
+          // if (sub?.status === "PENDING") return null;
 
           return (
             <BranchCard

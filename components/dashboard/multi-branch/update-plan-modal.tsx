@@ -17,6 +17,7 @@ const UpdatePlanModal = ({
   handleCancelPlan,
   isCheckingout,
   onReactivate,
+  onContinue,
 }: {
   plan: Subscription;
   close: () => void;
@@ -25,6 +26,7 @@ const UpdatePlanModal = ({
   handleCancelPlan: any;
   isCheckingout: boolean;
   onReactivate: any;
+  onContinue: any;
 }) => {
   const router = useRouter();
 
@@ -99,11 +101,11 @@ const UpdatePlanModal = ({
 
         <div className="input-container flex items-center">
           <Text.Paragraph className="text-start text-sm text-dark-500">
-            {plan?.planType} - {plan.billingFrequency}
+            {plan?.planName || plan?.planType} - {plan.billingFrequency}
           </Text.Paragraph>
         </div>
       </div>
-      <div className="flex-cols mb-2 w-full">
+      {/* <div className="flex-cols mb-2 w-full">
         <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
           Age of Equipment
         </Text.Paragraph>
@@ -115,7 +117,7 @@ const UpdatePlanModal = ({
             {plan?.equipmentAgeCategory} years
           </Text.Paragraph>
         </SpecialBox>
-      </div>
+      </div> */}
       {plan?.status === "ACTIVE" ? (
         <div className="flex-rows justify-between gap-2 w-full">
           <Button
@@ -144,6 +146,27 @@ const UpdatePlanModal = ({
             </Button.Text>
           </Button>
         </div>
+      ) : plan?.status === "PENDING" ? (
+        <Button
+          className="w-full"
+          onClick={async () => {
+            await onContinue({
+              subscriptionId: plan?.id,
+            });
+
+            close();
+          }}
+          disabled={isCheckingout}
+        >
+          {isCheckingout ? (
+            <Button.Icon>
+              <ClipLoader size={20} color="#fff" />
+            </Button.Icon>
+          ) : null}
+          <Button.Text>
+            {isCheckingout ? "Creating session..." : "Continue plan"}
+          </Button.Text>
+        </Button>
       ) : (
         <Button
           className="w-full"

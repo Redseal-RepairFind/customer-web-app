@@ -61,6 +61,8 @@ const PaymentModal = ({
 
   // console.log(equivalentYearlyPlan);
 
+  const fivePercent = (n: number) => n * 0.05;
+
   useEffect(() => {
     const { yearlylyPlans, monthlyPlans } = equivalentYearlyPlan;
 
@@ -84,7 +86,7 @@ const PaymentModal = ({
   const onSubmit = async () => {
     const predictions = selectedPredictions?.prediction;
 
-    console.log(isUpgrade);
+    // console.log(isUpgrade);
     if (!predictions?.latitude) {
       toast.error("Enter a valid address");
       return;
@@ -226,20 +228,29 @@ const PaymentModal = ({
         <Text.Paragraph className="font-semibold">
           Subscription plan
         </Text.Paragraph>
-        <div className=" border-b border-b-light-10 flex-row-between py-3">
-          <Text.SmallText>{`${subPlan?.name?.split(" - ")[0]} - ${
-            subPlan?.billingFrequency
-          }`}</Text.SmallText>
-          <Text.SmallText>
-            {formatCurrency(subPlan?.priceDetails?.discountedPrice)}
-          </Text.SmallText>
+        <div className="border-b border-b-light-10">
+          <div className="  flex-row-between py-3">
+            <Text.SmallText>{`${subPlan?.name?.split(" - ")[0]} - ${
+              subPlan?.billingFrequency
+            }`}</Text.SmallText>
+            <Text.SmallText>
+              {formatCurrency(subPlan?.priceDetails?.discountedPrice)}
+            </Text.SmallText>
+          </div>
+          <div className="  flex-row-between py-3">
+            <Text.SmallText>GST</Text.SmallText>
+            <Text.SmallText>5%</Text.SmallText>
+          </div>
         </div>
         <div className="  flex-row-between py-3">
           <Text.SmallText className="font-semibold text-sm">
             Total
           </Text.SmallText>
           <Text.SmallText className="font-semibold text-sm">
-            {formatCurrency(subPlan?.priceDetails?.discountedPrice)}
+            {formatCurrency(
+              subPlan?.priceDetails?.discountedPrice +
+                fivePercent(subPlan?.priceDetails?.discountedPrice)
+            )}
           </Text.SmallText>
         </div>
       </div>

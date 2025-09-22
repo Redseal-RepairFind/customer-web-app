@@ -244,6 +244,31 @@ export const usePricing = (planId?: string) => {
       setIsCheckingOut(false);
     }
   };
+  const handleContinuePlan = async (payload: UpgradeType) => {
+    setIsCheckingOut(true);
+    try {
+      const res = await pricingActions.continuePlan(payload);
+      toast.success(
+        res?.message || res?.data?.message || "Plan Continuity failed"
+      );
+
+      const url = res?.url || res?.data?.url;
+
+      if (url && typeof window !== "undefined") {
+        // ✅ open in new tab
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+
+      console.log(res);
+      await refetch();
+    } catch (error) {
+      const errMsg = formatError(error);
+      console.error("CheckoutError", error);
+      toast.error(errMsg || "checkout failed");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
 
   useEffect(() => {
     if (curPathname === "/upgrade_subscription" && Boolean(planId)) {
@@ -290,5 +315,6 @@ export const usePricing = (planId?: string) => {
     handleCheckoutSession,
     isRefetchingSubs,
     handleReactivatePlan,
+    handleContinuePlan,
   };
 };

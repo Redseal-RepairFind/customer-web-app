@@ -84,6 +84,7 @@ export type Subscription = {
   startDate: string; // ISO string
   status: "ACTIVE" | "INACTIVE" | "CANCELLED" | string;
   subscriptionType: "RESIDENTIAL" | "COMMERCIAL" | string;
+  planName?: string;
 };
 
 export type SubscriptionResponse = {
@@ -199,6 +200,7 @@ export interface Subscriptions {
   status: "ACTIVE" | "CANCELLED" | "EXPIRED" | string;
   subscriptionType: "RESIDENTIAL" | "COMMERCIAL" | string;
   remainingCredits: number;
+  planName?: string;
 }
 export type UpgradeType = {
   subscriptionId: string;

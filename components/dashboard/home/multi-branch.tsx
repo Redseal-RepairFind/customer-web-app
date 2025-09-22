@@ -104,11 +104,16 @@ export const BranchCard = ({
 }) => {
   const { daysLeft } = useSubCalc(item, item?.billingFrequency);
 
-  console.log(item);
+  // console.log(item);
 
   const jobSummary = item?.jobCounts;
 
   // console.log(item);
+  const plan =
+    typeof item?.planName === "string" ? item.planName : item?.planName?.[0];
+  const basePlanName = plan ? plan.split(/\s*[-–—]\s*/)[0].trim() : "";
+
+  // console.log(typeof item?.planName);
 
   return (
     <Box className="flex-cols gap-3">
@@ -191,10 +196,10 @@ export const BranchCard = ({
           <div className="flex-row-between gap-2">
             <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-1">
               <Text.Paragraph className="text-sm text-dark-500">
-                Plan:
+                Plan Name:
               </Text.Paragraph>
               <Text.SmallText className="text-sm text-dark-500 font-bold">
-                {item?.planType}
+                {basePlanName || item?.planType}
               </Text.SmallText>
             </div>
             <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row gap-1">
@@ -221,7 +226,14 @@ export const BranchCard = ({
               </Button.Icon>
               <Button.Text>Manage</Button.Text>
             </Button>
-          ) : item?.status === "PENDING" ? null : (
+          ) : item?.status === "PENDING" ? (
+            <Button variant="secondary" onClick={() => onOpenUpgrade?.(item)}>
+              {/* <Button.Icon>
+                <BiEdit size={24} />
+              </Button.Icon> */}
+              <Button.Text>Continue</Button.Text>
+            </Button>
+          ) : (
             <Button variant="secondary" onClick={() => onOpenUpgrade?.(item)}>
               {/* <Button.Icon>
                 <BiEdit size={24} />

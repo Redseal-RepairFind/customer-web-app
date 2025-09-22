@@ -52,6 +52,7 @@ const PricingItem = ({
         <Text.Heading className="font-black">
           {formatCurrency(item?.priceDetails?.discountedPrice)}
         </Text.Heading>
+        <Text.SmallText className="font-semibold text-xs">+GST</Text.SmallText>
 
         <Text.SubHeading>/{cycle}</Text.SubHeading>
       </span>
