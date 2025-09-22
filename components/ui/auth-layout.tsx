@@ -45,7 +45,7 @@ const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="lg:hidden flex">
             <RepairfindLogo />
           </div>
-          {curPathname.includes("login") || curPathname.includes("signup") ? (
+          {/* {curPathname.includes("login") || curPathname.includes("signup") ? (
             <Dropdown className="w-[221px]">
               <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
                 <span className="flex-rows">
@@ -100,7 +100,8 @@ const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
                 ))}
               </Dropdown.Content>
             </Dropdown>
-          ) : null}
+          ) : null} */}
+          <div></div>
         </div>
 
         <div
