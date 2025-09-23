@@ -386,7 +386,7 @@ export const NavWindow = ({
         className="absolute left-0 right-0 top-0 h-[80%] bg-white z-5 p-5 rounded-b-2xl shadow-xl"
       >
         <div className="flex-row-between mb-8">
-          <RepairfindLogo nav />
+          <RepairfindLogo nav type="link" />
           <button
             className=" cursor-pointer"
             aria-label="Close"

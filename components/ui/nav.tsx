@@ -141,7 +141,7 @@ const Navigation = ({ onMenuOpen }: { onMenuOpen: () => void }) => {
       }}
       aria-label="Primary"
     >
-      <div ref={logoWrapRef} className="flex items-center">
+      <div ref={logoWrapRef} className="flex items-center ">
         <RepairfindLogo type="link" nav />
       </div>
 

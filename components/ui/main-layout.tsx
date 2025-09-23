@@ -47,9 +47,9 @@ export default function MainLayout({
         </main>
 
         {/* wrapper gives  the auto top margin that sticks it to the bottom when short */}
-        <div className="mt-auto">
+        {/* <div className="mt-auto">
           <Footer />
-        </div>
+        </div> */}
       </div>
     </QueryClientProvider>
   );

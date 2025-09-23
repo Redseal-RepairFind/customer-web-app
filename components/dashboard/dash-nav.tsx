@@ -18,7 +18,7 @@ const DashNav = () => {
     <aside className="hidden lg:block border-r bg-black  overflow-y-hidden relative z-[100] w-[240px]">
       <div className="fixed top-0 h-screen overflow-y-auto no-scrollbar p-4 bg-black">
         <div className="mt-4">
-          <RepairfindLogo nav />
+          <RepairfindLogo nav type="link" />
         </div>
 
         <div className="mt-5 h-full overflow-y-hidden">
