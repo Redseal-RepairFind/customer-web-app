@@ -2,6 +2,11 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  async redirects() {
+    return [
+      { source: "/favicon.ico", destination: "/icon.png", permanent: true },
+    ];
+  },
   images: {
     domains: [
       "ipalas3bucket.s3.us-east-2.amazonaws.com",

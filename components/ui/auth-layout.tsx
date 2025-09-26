@@ -106,7 +106,7 @@ const Auth_Layout = ({ children }: { children: React.ReactNode }) => {
 
         <div
           className={`w-full ${
-            curPathname === "/signup/info" ? "mt-24 lg:mt-0" : ""
+            curPathname.includes("/signup") ? "mt-24 lg:mt-0" : ""
           }`}
         >
           {children}

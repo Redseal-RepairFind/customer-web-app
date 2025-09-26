@@ -47,7 +47,7 @@ export const repairActions = {
       if (contractorId) params.append("contractorId", contractorId);
 
       const response = await http.get(
-        `${url}/jobs?${params.toString()}`,
+        `${url}/web-jobs?${params.toString()}`,
         withAuth()
       );
 

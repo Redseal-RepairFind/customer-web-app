@@ -39,9 +39,12 @@ export const pricingActions = {
     }
   },
 
-  getSubscriptionPlan: async () => {
+  getSubscriptionPlan: async (planCategory: "RESIDENTIAL" | "BUSINESS") => {
     try {
-      const response = await http.get(`${url}/subscription-plans`, withAuth());
+      const response = await http.get(
+        `${url}/subscription-plans?planCategory=${planCategory}`,
+        withAuth()
+      );
 
       return response?.data;
     } catch (error: any) {

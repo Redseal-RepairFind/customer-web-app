@@ -389,6 +389,9 @@ input[type="time"]::-webkit-clear-button {
   .grid-3 {
     @apply grid md:grid-cols-2 lg:grid-cols-3 gap-4;
   }
+  .grid-4 {
+    @apply grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+  }
 
   .lay-bg {
     @apply w-full max-w-[1536px] mx-auto;

@@ -102,9 +102,19 @@ const PlanLog = ({ plans }: { plans: PLANSTYPE }) => {
 
 export default PlanLog;
 
-export const PlanBadge = ({ planName }: { planName: string }) => {
+export const PlanBadge = ({
+  planName,
+  className,
+  defaultPadding = "px-8 min-h-[38px]",
+}: {
+  planName: string;
+  className?: string;
+  defaultPadding?: string;
+}) => {
   return (
-    <div className="px-8 flex items-center justify-center  min-h-[38px] border border-light-10 rounded-full capitalize">
+    <div
+      className={` ${defaultPadding} flex items-center justify-center   border border-light-10 rounded-full capitalize ${className}`}
+    >
       <Text.SmallText>{planName}</Text.SmallText>
     </div>
   );

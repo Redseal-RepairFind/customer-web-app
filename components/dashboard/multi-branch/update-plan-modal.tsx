@@ -5,9 +5,10 @@ import { Subscription } from "@/utils/types";
 import { SpecialBox } from "../home/job-toast-modal";
 import Dropdown from "@/components/ui/dropdown";
 import Button from "@/components/ui/custom-btn";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { usePricing } from "@/hook/usePricing";
 import { ClipLoader } from "react-spinners";
+import { useNavigateWithParams } from "@/hook/useNavigateWithParams";
 
 const UpdatePlanModal = ({
   plan,
@@ -29,10 +30,24 @@ const UpdatePlanModal = ({
   onContinue: any;
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = new URLSearchParams(useSearchParams()?.toString() || "");
+  const { navigate } = useNavigateWithParams();
+
+  // Set or update query params
 
   const handleNavigateToUpgrade = () => {
     const encodedPlanId = encodeURIComponent(plan.id); // Encode the plan ID to avoid special characters breaking the URL
-    router.push(`/upgrade_subscription?planId=${encodedPlanId}`);
+
+    const type = plan?.planType?.includes("RESIDENTIAL")
+      ? "RESIDENTIAL"
+      : "BUSINESS";
+
+    sessionStorage.setItem("type", type);
+    navigate(`/upgrade_subscription`, {
+      planId: encodedPlanId,
+      type: type,
+    });
   };
 
   console.log(plan);

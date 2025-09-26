@@ -31,7 +31,9 @@ const UserInformation = () => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const field = params.get("type");
+  const field = params.get("type") || "BUSINESS";
+
+  // console.log(field);
 
   const [dropdown, setDropdown] = useState<any>();
   const [acceptTerms, setAcceptTerms] = useState(false);
@@ -39,14 +41,14 @@ const UserInformation = () => {
     pass: false,
     confirm: false,
   });
-  const initPlan = accountType?.find((acct) => acct.id === field);
+  const initPlan = accountType?.find((acct) => acct.id === "BUSINESS");
   const [selectedPlan, setselectedPlan] = useState(initPlan);
   const [selectedPredictions, setSelectedPredictions] = useState<any>("");
 
   const predictions = selectedPredictions?.prediction;
 
   // console.log(extraInfo);
-
+  // console.log(selectedPlan);
   const {
     handleSignup,
     isLoading,
@@ -85,10 +87,9 @@ const UserInformation = () => {
 
   // console.log(extraI);
 
-  const fieldsInput = businessAcctType;
-  // const fieldsInput = field?.toUpperCase()?.includes("RESIDENTIAL")
-  //   ? residentialAcctType
-  //   : businessAcctType;
+  const fieldsInput = field?.toUpperCase()?.includes("BUSINESS")
+    ? businessAcctType
+    : residentialAcctType;
 
   const setQueryParam = useCallback(
     (key: string, value?: string | null) => {

@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useMemo } from "react";
 import Modal from "@/components/ui/customModal";
 import Text from "@/components/ui/text";
 import Box from "../home/box";
@@ -10,6 +11,7 @@ import { useState } from "react";
 import { dummyCommHistory, messageTemplates } from "@/lib/dasboard-constatns";
 import Button from "@/components/ui/custom-btn";
 import { formatTo12Hour } from "@/lib/helpers";
+import Badge from "@/components/ui/badge";
 
 const TechModal = ({
   tech,
@@ -210,50 +212,189 @@ const CommItem = ({ item }: Item) => {
   );
 };
 
-export const PageToggler = ({
+type BtnItem = {
+  /** Visible text */
+  label: string;
+  /** Unique value used for selection */
+  value: string;
+  /** Optional numeric/string badge (e.g., counts) */
+  badgeCount?: number | string;
+  /** Icon can be an <img> URL (string) or a ReactNode (e.g., <SomeIcon />) */
+  icon?: string | React.ReactNode;
+  disabled?: boolean;
+};
+
+type PageTogglerProps = {
+  setSwitched: (v: any) => void;
+  switched: any;
+  /** Legacy props (kept intact) */
+  btn1?: string;
+  btn2?: string;
+  /** New richer API: any number of buttons with badges/icons */
+  btns?: BtnItem[];
+  size?: "sm" | "md" | "lg";
+  className?: string;
+};
+
+export const PageToggler: React.FC<PageTogglerProps> = ({
   setSwitched,
   switched,
   btn1,
   btn2,
-}: {
-  setSwitched: any;
-  switched: string;
-  btn1: string;
-  btn2: string;
+  btns,
+  size = "md",
+  className = "",
 }) => {
+  // Build a normalized options list while keeping backward compatibility
+  const options = useMemo<BtnItem[]>(() => {
+    if (btns && btns.length > 0) return btns;
+
+    const legacy = [btn1, btn2]
+      .filter(Boolean)
+      .map((label) => ({ label: label as string, value: label as string }));
+
+    return legacy.length >= 2
+      ? legacy
+      : [
+          { label: "One", value: "One" },
+          { label: "Two", value: "Two" },
+        ];
+  }, [btn1, btn2, btns]);
+
+  const selectedIndex = Math.max(
+    0,
+    options.findIndex((o) => o.value === switched)
+  );
+  const segWidthPct = 100 / options.length;
+
+  const dims = useMemo(() => {
+    switch (size) {
+      case "sm":
+        return {
+          h: "h-8",
+          pad: "p-1",
+          text: "text-xs",
+          pill: "h-6",
+          padRem: 0.25 * 2,
+        };
+      case "lg":
+        return {
+          h: "h-14",
+          pad: "p-2.5",
+          text: "text-sm md:text-base",
+          pill: "h-10",
+          padRem: 0.625 * 2,
+        };
+      default:
+        return {
+          h: "h-12",
+          pad: "p-2",
+          text: "text-xs md:text-sm",
+          pill: "h-8",
+          padRem: 0.5 * 2,
+        };
+    }
+  }, [size]);
+
   return (
     <>
-      <div className="relative w-full h-12 rounded-full bg-light-400 grid grid-cols-2 p-2 overflow-hidden">
-        {/* Highlight Background */}
+      <div
+        role="tablist"
+        aria-label="Page toggler"
+        className={`relative w-full rounded-full bg-light-400 overflow-hidden ${dims.h} ${dims.pad} grid ${className}`}
+        style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }}
+      >
+        {/* Highlight */}
         <div
-          className={`absolute left-2 right-2 top-2 h-8 w-[calc(50%-0.5rem)] rounded-full bg-white shadow-md transition-transform duration-300 ease-in-out ${
-            switched === btn1 ? "translate-x-0" : "translate-x-full"
-          }`}
-        />
+          className="absolute top-0 left-0 w-full h-full pointer-events-none"
+          aria-hidden="true"
+        >
+          <div
+            className={`absolute top-[50%] -translate-y-[50%] rounded-full bg-white shadow-md ${dims.pill} transition-transform duration-300 ease-in-out`}
+            style={{
+              width: `calc(${segWidthPct}% - ${dims.padRem}rem)`,
+              transform: `translateX(calc(${selectedIndex * 100}% + ${
+                dims.padRem / 2
+              }rem))`,
+              left: 0,
+            }}
+          ></div>
+        </div>
 
         {/* Buttons */}
-        <button
-          className={`relative z-10 transition-colors duration-300 ease-in-out ${
-            switched === btn1 ? "text-black" : "text-dark-500"
-          } cursor-pointer text-xs md:text-sm`}
-          onClick={() => setSwitched(btn1)}
-        >
-          {btn1}
-        </button>
-        <button
-          className={`relative z-10 transition-colors duration-300 ease-in-out ${
-            switched === btn2 ? "text-black" : "text-dark-500"
-          } cursor-pointer text-xs md:text-sm`}
-          onClick={() => setSwitched(btn2)}
-        >
-          {btn2}
-        </button>
+        {options.map((opt, idx) => {
+          const isSelected = opt.value === switched;
+          const disabled = !!opt.disabled;
+
+          const badge =
+            opt.badgeCount !== undefined && opt.badgeCount !== null ? (
+              <Badge count={opt.badgeCount} isActive />
+            ) : null;
+
+          const icon =
+            typeof opt.icon === "string" ? (
+              <img
+                src={opt.icon}
+                alt=""
+                aria-hidden="true"
+                className="w-4 h-4 shrink-0"
+                loading="lazy"
+              />
+            ) : opt.icon ? (
+              <span
+                className="w-4 h-4 shrink-0 flex items-center justify-center"
+                aria-hidden="true"
+              >
+                {opt.icon}
+              </span>
+            ) : null;
+
+          return (
+            <button
+              key={opt.value}
+              role="tab"
+              aria-selected={isSelected}
+              aria-controls={`seg-panel-${opt.value}`}
+              tabIndex={isSelected ? 0 : -1}
+              disabled={disabled}
+              className={`relative z-10 ${dims.h} ${dims.text}
+                transition-colors duration-300 ease-in-out
+                ${isSelected ? "text-black" : "text-dark-500"}
+                ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+                flex items-center justify-center gap-2 select-none p-4 h-full -translate-y-[20%] md:-translate-y-[25%] `}
+              onClick={() => !disabled && setSwitched(opt.value)}
+              onKeyDown={(e) => {
+                if (disabled) return;
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setSwitched(opt.value);
+                }
+                if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                  e.preventDefault();
+                  const next = (idx + 1) % options.length;
+                  setSwitched(options[next].value);
+                }
+                if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                  e.preventDefault();
+                  const prev = (idx - 1 + options.length) % options.length;
+                  setSwitched(options[prev].value);
+                }
+              }}
+            >
+              {icon}
+              <span className="inline-flex items-center mx-2">
+                <span>{opt.label}</span>
+                {badge}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Content Switch with Fade Transition */}
+      {/* Content Switch with Fade Transition (kept as-is) */}
       <div
         className="transition-opacity duration-300 ease-in-out"
-        key={switched} // forces re-render on switch
+        key={switched}
       ></div>
     </>
   );

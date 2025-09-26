@@ -136,8 +136,8 @@ const DashNav = () => {
                 );
               })}
 
-              <div className="w-50 min-h-32 rounded-lg bg-light-main relative p-4 flex-col gap-4">
-                <div className="absolute h-12 left-0 right-0 top-[-14] flex justify-center">
+              <div className="w-50 min-h-32 rounded-lg bg-light-main relative p-4 flex-col gap-4 ">
+                <div className="absolute h-12 left-0 right-0 top-[-15px] flex justify-center">
                   <span className="h-8 w-8 rounded-full border-white bg-dark border flex items-center justify-center">
                     <Image
                       src={icons.chatIcon}

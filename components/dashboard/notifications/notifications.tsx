@@ -42,12 +42,12 @@ const Notifs = () => {
 
         <PlanBadge planName={`${unreadCount} unread`} />
       </div>
-      <PageToggler
+      {/* <PageToggler
         setSwitched={setSwitched}
         switched={switched}
         btn1="Notifications"
         btn2="Actions"
-      />
+      /> */}
 
       {switched.toLowerCase() === "notifications" ? (
         <div className="gap-2 flex-cols">

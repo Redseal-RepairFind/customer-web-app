@@ -106,18 +106,20 @@ const PricingItem = ({
           })
         : null} */}
 
-      <div
-        className="flex-row-center w-full mt-10"
-        onClick={() => setShowall((sh) => !sh)}
-      >
-        <button className="flex-rows gap-3 cursor-pointer">
-          <Text.SmallText>
-            {showall ? "See less Features" : "See more features"}
-          </Text.SmallText>
+      {item?.feat > 5 && (
+        <div
+          className="flex-row-center w-full mt-10"
+          onClick={() => setShowall((sh) => !sh)}
+        >
+          <button className="flex-rows gap-3 cursor-pointer">
+            <Text.SmallText>
+              {showall ? "See less Features" : "See more features"}
+            </Text.SmallText>
 
-          {showall ? <CgChevronUp /> : <CgChevronDown />}
-        </button>
-      </div>
+            {showall ? <CgChevronUp /> : <CgChevronDown />}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

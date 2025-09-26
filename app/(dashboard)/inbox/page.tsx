@@ -1,4 +1,5 @@
 // app/dashboard/page.tsx
+import Inbox from "@/components/dashboard/inbox/inbox";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const InboxHome = () => {
-  return <main>Lorem ipsum dolor sit amet.</main>;
+  return <Inbox />;
 };
 
 export default InboxHome;

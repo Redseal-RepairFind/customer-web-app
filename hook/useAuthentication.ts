@@ -78,10 +78,14 @@ export const useAuthentication = () => {
       const isUnknown = res?.data?.equipmentAgeCategory
         ?.toLowerCase()
         ?.includes("unknown");
+
+      const type = sessionStorage.getItem("type");
       if (isUnknown) {
         navigator.navigate("/dashboard", "replace");
       } else {
-        navigator.navigate("/pricing", "replace");
+        navigator.navigate(`/pricing?type=${type}`, "replace");
+
+        sessionStorage.removeItem("type");
       }
     } catch (error: any) {
       const errMsg = formatError(error);

@@ -1,5 +1,4 @@
 // app/dashboard/page.tsx
-import dynamic from "next/dynamic";
 import type { Metadata } from "next";
 import SubscriptionAgreementPage from "@/components/public/sub-terms";
 

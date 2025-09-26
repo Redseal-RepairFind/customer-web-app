@@ -136,10 +136,10 @@ export const useAuth = () => {
           number: data.number,
         },
         acceptTerms: extraInfo.acceptTerms,
-        // ...(extraInfo?.subscriptionType === "BUSINESS"
-        //   ? { businessName: data?.businessName }
-        //   : null),
-        businessName: data?.businessName,
+        ...(extraInfo?.subscriptionType === "BUSINESS"
+          ? { businessName: data?.businessName }
+          : null),
+        // businessName: data?.businessName,
       };
 
       // console.log(payload);
@@ -155,6 +155,8 @@ export const useAuth = () => {
       navigator.navigate("/otp", "replace");
 
       toast.success(res.message);
+
+      sessionStorage.setItem("type", extraInfo.subscriptionType || "BUSINESS");
     } catch (error: any) {
       const errMsg = formatError(error);
       console.error("signup error", error);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Text from "../ui/text";
 import ToggleBtn from "../ui/toggle-btn";
 import PlacesAutocomplete from "../ui/places-autocomplete";
@@ -16,7 +16,7 @@ import Button from "../ui/custom-btn";
 import { usePageNavigator } from "@/hook/navigator";
 import toast from "react-hot-toast";
 import { SUB_EXTRA_ID } from "@/utils/types";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Image, { StaticImageData } from "next/image";
 import { ClipLoader } from "react-spinners";
 import { InputContainer } from "../auth/signup-item";
@@ -29,9 +29,11 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const { navigator } = usePageNavigator();
   const user = curUser?.data;
   const params = useSearchParams();
-
+  const pathname = usePathname();
   const isNewParams = params?.get("new") || "";
   const isNew = sessionStorage?.getItem(SUB_EXTRA_ID) || isNewParams;
+
+  const type = params.get("type") || "BUSINESS";
   const [unitNumber, setUnitNumber] = useState("");
   const router = useRouter();
   // console.log(isNew);
@@ -129,15 +131,36 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
       });
     }
   }, [user, isNew, isUpgrade]);
+
+  const setQueryParam = useCallback(
+    (key: string, value?: string | null) => {
+      const nextParams = new URLSearchParams(params.toString());
+      if (!value) nextParams.delete(key);
+      else nextParams.set(key, value);
+
+      const nextUrl = `${pathname}${nextParams.size ? `?${nextParams}` : ""}`;
+      const currentUrl = `${pathname}${params.size ? `?${params}` : ""}`;
+
+      if (nextUrl !== currentUrl) router.replace(nextUrl, { scroll: false });
+    },
+    [pathname, params, router]
+  );
+
+  useEffect(() => {
+    setQueryParam("type", subType?.id ?? null);
+  }, [subType?.id, setQueryParam]);
+
+  // console.log(subType);
+
   if (loadingCurUser || loadingSubsPlans) return <LoadingTemplate />;
 
   const plansToRender = toggle ? yearlylyPlans : monthlyPlans;
   const handleCloseInfoModal = () => setPaymentInfo({ info: {}, open: false });
   const handleOpenInfoModal = (item: any) => {
-    // if (!subType?.name) {
-    //   toast.error("Select a subscription type to proceed ");
-    //   return;
-    // }
+    if (!subType?.name) {
+      toast.error("Select a subscription type to proceed ");
+      return;
+    }
     if (!selectedPredictions?.prediction) {
       toast.error("Kindly enter an address");
       return;
@@ -158,7 +181,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   // console.log(isUpgrade);
 
   return (
-    <main className="w-full my-12 xl:px-16 lg:px-8">
+    <main className="w-full my-12  lg:px-8">
       {isUpgrade ? (
         <Modal isOpen={openModal} onClose={handleCLOSEMODAL}>
           <div className="flex-cols gap-3">
@@ -216,7 +239,13 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
 
       {isUpgrade ? (
         <>
-          <Button onClick={() => router.back()} variant="secondary">
+          <Button
+            onClick={() => {
+              router.back();
+              sessionStorage.removeItem("type");
+            }}
+            variant="secondary"
+          >
             <Button.Icon>
               <CgChevronLeft size={24} color="#000" />
             </Button.Icon>
@@ -297,7 +326,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
               </Text.Paragraph>
             </div>
           </div>
-          {isUpgrade && (
+          {
             <div className="flex-col gap-4 mb-4 ">
               <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00 ">
                 Subscription Type
@@ -319,7 +348,9 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                     <Dropdown.Item
                       key={item.id}
                       className="border-b border-b-dark-200"
-                      onClick={() => setSubType(item)}
+                      onClick={() => {
+                        setSubType(item);
+                      }}
                     >
                       <Text.Paragraph className="text-dark-200">
                         {item?.name}
@@ -329,7 +360,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                 </Dropdown.Content>
               </Dropdown>
             </div>
-          )}
+          }
           <div className="flex-col gap-4 mb-4 ">
             <div className="flex-rows mb-2">
               <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
@@ -424,7 +455,9 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
           ) : null}
         </>
       )}
-      <div className="grid-3 w-full">
+      <div
+        className={` ${plansToRender?.length > 3 ? "grid-4" : "grid-3"} w-full`}
+      >
         {plansToRender.map((pla: any, i: number) => {
           // console.log(dropdown?.id);
           let ids: string[] = [];

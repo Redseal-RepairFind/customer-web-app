@@ -26,10 +26,15 @@ export const usePricing = (planId?: string) => {
   const page = searchParams.get("page") || "1";
   const planType = searchParams.get("planType");
   const search = searchParams.get("search") || "";
+  // const planId = searchParams.get()
+  const upgradeType = planId ? sessionStorage.getItem("type") : "";
+  const type = searchParams.get("type") || upgradeType || "BUSINESS";
+
+  // console.log(type);
 
   const { data: subPlans, isLoading: loadingSubsPlans } = useQuery({
-    queryKey: ["subscription_plan"],
-    queryFn: () => pricingActions.getSubscriptionPlan(),
+    queryKey: ["subscription_plan", type],
+    queryFn: () => pricingActions.getSubscriptionPlan(type as "BUSINESS"),
     // enabled: curPathname === "/pricing",
     staleTime: 5 * 60_000,
   });
@@ -189,6 +194,8 @@ export const usePricing = (planId?: string) => {
       // console.log(res);
 
       await refetch();
+
+      sessionStorage.removeItem("type");
       navigator.navigate("/manage-subscription", "replace");
       // const url = res?.url || res?.data?.url;
       // window.location.href = url;

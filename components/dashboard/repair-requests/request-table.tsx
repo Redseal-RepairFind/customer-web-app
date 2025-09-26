@@ -30,6 +30,7 @@ import {
   JobRatingModal,
 } from "../home/job-toast-modal";
 import RepairDropdown from "./table-menu";
+import Badge from "@/components/ui/badge";
 
 interface IProps {
   children: React.ReactNode;
@@ -42,6 +43,8 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const [open, setOpen] = useState(false);
   const [tech, setTech] = useState<any>();
   const { warning } = useToast();
+
+  // console.log(data[0]?.missedCallsCount, data[0]?.unreadMessages, "table data");
 
   const [openCompleted, setOpenCompleted] = useState({
     jobInfo: null,
@@ -308,10 +311,11 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                 >
                   <div className="flex flex-row items-center gap-2 font-normal text-sm">
                     {rep.id === "1" ? (
-                      <RadioCheck
-                        checked={check}
-                        setChecked={() => setCheck((ch) => !ch)}
-                      />
+                      // <RadioCheck
+                      //   checked={check}
+                      //   setChecked={() => setCheck((ch) => !ch)}
+                      // />
+                      <></>
                     ) : null}
                     <span>{rep.name}</span>
                   </div>
@@ -325,10 +329,10 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
               <Tr key={rep.jobId}>
                 {/* Job ID (visible on mobile) */}
                 <Td className="flex items-center gap-2">
-                  <RadioCheck
+                  {/* <RadioCheck
                     checked={check}
                     setChecked={() => setCheck((ch) => !ch)}
-                  />
+                  /> */}
                   <div>
                     <Text.SmallHeading className="text-sm font-semibold">
                       {rep.jobId}
@@ -376,36 +380,60 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
 
                 {/* Actions (visible on mobile) */}
                 <Td className="hidden md:table-cell">
-                  <div className="flex items-center">
-                    <button
-                      className="mr-2 items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer"
-                      onClick={() => {
-                        setOpen(true);
-                        setTech(rep);
-                      }}
-                    >
-                      <Image
-                        src={icons.callIcon}
-                        height={20}
-                        width={20}
-                        alt="Call icon"
-                      />
-                    </button>
-                    <button
-                      className="items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer"
-                      onClick={() => {
-                        setOpen(true);
-                        setTech(rep);
-                      }}
-                    >
-                      <Image
-                        src={icons.chatIconActive2}
-                        height={20}
-                        width={20}
-                        alt="Chat icon"
-                      />
-                    </button>
-                  </div>
+                  {rep?.contractors?.length > 0 && (
+                    <div className="flex items-center">
+                      <button
+                        className="mr-2 items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer relative"
+                        onClick={() => {
+                          setOpen(true);
+                          setTech(rep);
+                        }}
+                      >
+                        {rep?.missedCallsCount > 0 && (
+                          <span
+                            className="
+                absolute top-0 right-0
+                translate-x-1 -translate-y-1
+                pointer-events-none
+              "
+                          >
+                            <Badge count={rep?.missedCallsCount} isActive />
+                          </span>
+                        )}
+                        <Image
+                          src={icons.callIcon}
+                          height={20}
+                          width={20}
+                          alt="Call icon"
+                        />
+                      </button>
+                      <button
+                        className="items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer relative"
+                        onClick={() => {
+                          setOpen(true);
+                          setTech(rep);
+                        }}
+                      >
+                        {rep?.unreadMessages > 0 && (
+                          <span
+                            className="
+                absolute top-0 right-0
+                translate-x-1 -translate-y-1
+                pointer-events-none
+              "
+                          >
+                            <Badge count={rep?.unreadMessages} isActive />
+                          </span>
+                        )}
+                        <Image
+                          src={icons.chatIconActive2}
+                          height={20}
+                          width={20}
+                          alt="Chat icon"
+                        />
+                      </button>
+                    </div>
+                  )}
                 </Td>
 
                 {/* More (visible on mobile — part of actions) */}

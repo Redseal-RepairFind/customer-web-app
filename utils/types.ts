@@ -321,6 +321,193 @@ export type Contract = {
   isDraft: boolean;
 };
 
+export type MessageItem = {
+  createdAt: string; // ISO 8601 timestamp
+  dispute: string | null; // Dispute details, or null if no dispute
+  entity: string; // Entity ID (e.g., '68c4276265bb848bad1aea48')
+  entityType: "jobs"; // Type of entity (hardcoded as 'jobs')
+  heading: {
+    name: string; // Name of the entity (e.g., 'Aaron Electrical')
+    image: string; // URL of the image
+    lastMessage: string; // Last message sent
+    lastMessageAt: string; // Timestamp of last message
+    unreadCount: number; // Number of unread messages
+  };
+  id: string; // Job ID
+  isBlocked: boolean; // Blocked status
+  isBlockedBy: string | null; // ID of the entity that blocked, or null
+  isLocked: boolean; // Locked status
+  job: string; // Job ID (links to job entity)
+  lastMessage: string; // Last message content
+  lastMessageAt: string; // Timestamp of the last message
+  members: {
+    member: string; // ID of the member
+    memberType: "customers" | "contractors"; // Type of the member
+  }[]; // Array of job members (customers and contractors)
+  quotation: string; // Quotation ID
+  type: "JOB"; // Type of entity (hardcoded as 'JOB')
+  updatedAt: string; // ISO 8601 timestamp
+};
+
+export type singleConversationType = {
+  job: string;
+  createdAt: string;
+  dispute: string | null;
+  entity: {
+    _id: string;
+    reference: string;
+    customer: string;
+    status: string; // E.g., 'DISPUTED'
+    type: string; // E.g., 'REPAIR'
+    category: string; // E.g., 'Electrical'
+    description: string; // E.g., 'Lucky Test Subscription Job'
+    title: string; // E.g., 'Electrical'
+    location: {
+      address: string; // E.g., '1 Mount Zion Ln, Abakpa, Enugu 400103, Enugu, Nigeria'
+      city: string; // E.g., 'Enugu'
+      country: string; // E.g., 'Nigeria'
+      latitude: string; // E.g., '37.58821704'
+      longitude: string; // E.g., '-122.41138618'
+      _id: string;
+    };
+    date: string; // E.g., '2025-09-12T14:59:00.000Z'
+    tags: string[]; // Array of tags, e.g., []
+    payments: any[]; // Array of payments, define structure if needed
+    myQuotation: string | null;
+    emergency: boolean;
+    isAssigned: boolean;
+    isChangeOrder: boolean;
+    distance: string;
+    hideFrom: any[]; // Define the type if needed
+    viewedBy: string[]; // Array of user IDs who viewed the job
+    isViewed: boolean;
+    reminders: {
+      type: "AT_START_TIME";
+      sentToContractorAt: string;
+      sentToCustomerAt: string;
+      customerMessage: string;
+      contractorMessage: string;
+    }[];
+    enquiries: any[]; // Define the structure of enquiries if needed
+    totalEnquires: number;
+    hasUnrepliedEnquiry: boolean;
+    isSaved: boolean;
+    revisitEnabled: boolean;
+    bookingViewedByContractor: boolean;
+    language: string; // E.g., 'en'
+    requiresSiteVisit: boolean;
+    isDisputable: boolean;
+    isPublicRequest: boolean;
+    conversations: {
+      id: string;
+      contractor: string;
+      quotation: string;
+    }[];
+    contractors: string[]; // Array of contractor IDs
+    isFromWeb: boolean;
+    subscription: string;
+    media: any[]; // Array of media, define structure if needed
+    jobHistory: {
+      eventType: string;
+      timestamp: string;
+      payload: {
+        contractor?: string;
+        appVersion: string;
+        deviceId: string;
+        appType: string;
+        confirmedBy?: string;
+        jobDay?: string;
+        estimates?: {
+          description: string;
+          quantity: number;
+          rate: number;
+          amount: number;
+        }[];
+      };
+      _id: string;
+    }[];
+    quotations: {
+      id: string;
+      contractor: string;
+      isBid: boolean;
+      _id: string;
+    }[];
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+    contract: string;
+    contractor: string;
+    schedule: {
+      startDate: string;
+      estimatedDuration: number;
+      type: "JOB_DAY";
+      remark: string;
+      _id: string;
+      endDate: string;
+    };
+    statusUpdate: {
+      awaitingConfirmation: boolean;
+      isCustomerAccept: boolean;
+      isContractorAccept: boolean;
+      status: "REJECTED" | "APPROVED" | string;
+      _id: string;
+    };
+    totalQuotations: number;
+    expiresIn: string | null;
+    jobId: string;
+    id: string;
+  };
+  entityType: "jobs";
+  heading: {
+    name: string; // E.g., 'Aaron Electrical'
+    image: string; // Image URL, E.g., 'https://repairfindbucket.s3-eu-west-3.amazonaws.com/e6acc06f-839c-4017-9a99-884c5cb680b8.jpg'
+    lastMessage: string; // E.g., 'Job marked as complete by contractor'
+    lastMessageAt: string; // E.g., '2025-09-12T16:12:56.145Z'
+    unreadCount: number; // E.g., 1
+    language: string; // E.g., 'en'
+  };
+  isBlocked: boolean;
+  isLocked: boolean;
+  members: {
+    member: string; // ID of the member (user)
+    memberType: "customers" | "contractors"; // Type of the member
+  }[];
+  quotation: string; // Quotation ID
+  type: "JOB"; // Job type
+  updatedAt: string;
+  lastMessage: string; // Last message content
+  lastMessageAt: string; // Timestamp of last message
+  id: string; // ID of the job conversation
+};
+
+type MessagePayload = {
+  eventType: string; // E.g., 'JOB_MARKED_COMPLETE_BY_CONTRACTOR'
+  job: string; // Job ID
+  contractor: string; // Contractor ID
+  customer: string; // Customer ID
+  booking: string; // Booking ID
+};
+
+export type Message = {
+  _id: string; // Unique ID for the message
+  conversation: string; // Conversation ID
+  sender: string; // Sender ID
+  senderType: "contractors" | "customers"; // Sender type
+  messageType: "ALERT" | string; // Type of message (ALERT, etc.)
+  message: string; // The actual message content
+  readBy: string[]; // List of users who have read the message
+  entity: string; // Entity ID related to the message (e.g., Job ID)
+  entityType: "jobs"; // Type of entity (hardcoded as 'jobs')
+  payload: MessagePayload; // Additional payload data (e.g., job status)
+  createdAt: string; // Timestamp when the message was created
+  media: any[]; // Array of media files (if any, define the structure if needed)
+  updatedAt: string; // Timestamp when the message was last updated
+  __v: number; // Version key
+  isOwn: boolean; // Whether the message was sent by the user themselves
+};
+
+export type MessagesData = Message[];
+
 export const LANG_ID = "rpf_lng";
 
 export const SUB_EXTRA_ID = "extra_sub";

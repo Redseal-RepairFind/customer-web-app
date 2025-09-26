@@ -83,6 +83,8 @@ const PaymentModal = ({
     }
   }, [plan, toggle, equivalentYearlyPlan]);
 
+  console.log(subPlan);
+
   const onSubmit = async () => {
     const predictions = selectedPredictions?.prediction;
 
@@ -106,13 +108,14 @@ const PaymentModal = ({
         ...(unitNUmber && { description: unitNUmber }),
       },
       planId: subPlan?._id,
-      // equipmentAgeCategory: dropdown?.id,
+      equipmentAgeCategory: dropdown?.id || "1-4",
       subscriptionType:
         curUser?.data?.subscriptions[0]?.subscriptionType || "RESIDENTIAL",
-      ...(user?.businessName ? { businessName: user?.businessName } : null),
+      // ...(user?.businessName ? { businessName: user?.businessName } : null),
+      businessName: user?.businessName || user?.name,
     };
 
-    // console.log(payload);
+    console.log(user);
 
     await handleCheckout(payload as any);
   };

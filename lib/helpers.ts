@@ -1,4 +1,5 @@
 import Cookies from "js-cookie";
+// import heic2any from "heic2any";
 
 export const confirmPasswordCharacters = (chars: string) => {
   const minLength = /^.{8,}$/;
@@ -206,3 +207,21 @@ export const STATUS_META: Record<string, StatusMeta> = {
     report: "Job request pending approval",
   },
 };
+
+// export const handleHeicFile = async (file: File) => {
+//   if (file.type === "image/heic") {
+//     const result = await heic2any({ blob: file, toType: "image/jpeg" });
+
+//     // Normalize result: heic2any can return Blob | Blob[]
+//     const blob = Array.isArray(result) ? result[0] : result;
+
+//     const convertedFile = new File(
+//       [blob],
+//       file.name.replace(/\.heic$/i, ".jpg"),
+//       { type: "image/jpeg" }
+//     );
+
+//     return convertedFile;
+//   }
+//   return file;
+// };
