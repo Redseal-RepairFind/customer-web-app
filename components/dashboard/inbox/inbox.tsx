@@ -55,7 +55,7 @@ const Inbox = () => {
 
       <section className="flex flex-col gap-3">
         {switched?.label === "Messages" || switched === "Message"
-          ? flattenedMessages?.map((message: MessageItem) => (
+          ? flattenedMessages?.map((message: any) => (
               <ConversationItem
                 type="message"
                 item={message}

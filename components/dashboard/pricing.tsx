@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Text from "../ui/text";
 import ToggleBtn from "../ui/toggle-btn";
 import PlacesAutocomplete from "../ui/places-autocomplete";
@@ -21,7 +21,6 @@ import Image, { StaticImageData } from "next/image";
 import { ClipLoader } from "react-spinners";
 import { InputContainer } from "../auth/signup-item";
 import { useAuthentication } from "@/hook/useAuthentication";
-import { BsChevronBarLeft } from "react-icons/bs";
 import { CgChevronLeft } from "react-icons/cg";
 
 const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
@@ -73,7 +72,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
     isUpgrade && singleSubPlans?.billingFrequency === "ANNUALLY" ? true : false
   );
 
-  // console.log(monthlyPlans);
+  console.log(stp);
 
   useEffect(() => {
     if (isUpgrade && singleSubPlans?.billingFrequency === "ANNUALLY") {
@@ -123,32 +122,64 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
       const initAgeCat = equipmentAge.find(
         (eq) => eq.id === user.subscriptions[0].equipmentAgeCategory
       );
-      console.log("new shite");
+      // console.log("new shite");
       setDropdown(initAgeCat || null);
       setSelectedPredictions({
         prediction: user.subscriptions[0].coverageAddress || "",
         modal: false,
       });
+
+      // setSubType()
     }
   }, [user, isNew, isUpgrade]);
 
-  const setQueryParam = useCallback(
-    (key: string, value?: string | null) => {
-      const nextParams = new URLSearchParams(params.toString());
-      if (!value) nextParams.delete(key);
-      else nextParams.set(key, value);
-
-      const nextUrl = `${pathname}${nextParams.size ? `?${nextParams}` : ""}`;
-      const currentUrl = `${pathname}${params.size ? `?${params}` : ""}`;
-
-      if (nextUrl !== currentUrl) router.replace(nextUrl, { scroll: false });
-    },
-    [pathname, params, router]
-  );
+  // place near the top of your component
+  const didInitType = useRef(false);
 
   useEffect(() => {
-    setQueryParam("type", subType?.id ?? null);
-  }, [subType?.id, setQueryParam]);
+    if (didInitType.current) return;
+
+    const desiredType = user?.subscriptions?.[0]?.subscriptionType;
+    if (!desiredType) return; // wait until user is available
+
+    const search = typeof window !== "undefined" ? window.location.search : "";
+    const sp = new URLSearchParams(search);
+    const existing = sp.get("type");
+
+    if (existing) {
+      // already has a type -> don't touch
+      didInitType.current = true;
+      return;
+    }
+
+    sp.set("type", desiredType); // set once
+    const next = `${pathname}?${sp.toString()}`;
+
+    const tp = accountType?.find((acc) => acc.id === desiredType);
+
+    setSubType(tp);
+    router.replace(next, { scroll: false });
+    didInitType.current = true;
+  }, [user, pathname, router]);
+
+  // const setQueryParam = useCallback(
+  //   (key: string, value?: string | null) => {
+  //     const nextParams = new URLSearchParams(params.toString());
+  //     if (!value) nextParams.delete(key);
+  //     else nextParams.set(key, value);
+
+  //     const nextUrl = `${pathname}${nextParams.size ? `?${nextParams}` : ""}`;
+  //     const currentUrl = `${pathname}${params.size ? `?${params}` : ""}`;
+
+  //     if (nextUrl !== currentUrl) router.replace(nextUrl, { scroll: false });
+  //   },
+  //   [pathname, params, router]
+  // );
+
+  // useEffect(() => {
+  //   if (!subType?.id) return; // ⬅️ do nothing if we don't have a value yet
+  //   setQueryParam("type", subType.id); // ⬅️ only set when we have a real value
+  // }, [subType?.id, setQueryParam]);
 
   // console.log(subType);
 
@@ -348,8 +379,15 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                     <Dropdown.Item
                       key={item.id}
                       className="border-b border-b-dark-200"
+                      // when user picks a subtype
                       onClick={() => {
                         setSubType(item);
+                        // sync the URL here instead of a separate effect
+                        const next = new URLSearchParams(params.toString());
+                        next.set("type", item.id);
+                        router.replace(`${pathname}?${next.toString()}`, {
+                          scroll: false,
+                        });
                       }}
                     >
                       <Text.Paragraph className="text-dark-200">

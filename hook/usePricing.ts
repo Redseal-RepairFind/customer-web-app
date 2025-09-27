@@ -24,11 +24,14 @@ export const usePricing = (planId?: string) => {
   const [singleSubPlans, setSubPlans] = useState<any>();
   const limit = searchParams.get("limit") || "10";
   const page = searchParams.get("page") || "1";
-  const planType = searchParams.get("planType");
+  const planType =
+    searchParams.get("planType") || sessionStorage?.getItem("type");
   const search = searchParams.get("search") || "";
   // const planId = searchParams.get()
   const upgradeType = planId ? sessionStorage.getItem("type") : "";
   const type = searchParams.get("type") || upgradeType || "BUSINESS";
+
+  console.log(planType);
 
   // console.log(type);
 

@@ -18,8 +18,13 @@ import { FaPaperPlane, FaPaperclip } from "react-icons/fa";
 import { formatTo12Hour } from "@/lib/helpers";
 
 const SingleChatItem = ({ id }: { id: string }) => {
-  const { singleChat, isLoadingSingleChat, flattenedChatMessages } =
-    useMessages();
+  const {
+    singleChat,
+    isLoadingSingleChat,
+    flattenedChatMessages,
+    isSending,
+    handleSendMessage,
+  } = useMessages();
   const [message, setMessage] = useState("");
 
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -73,9 +78,18 @@ const SingleChatItem = ({ id }: { id: string }) => {
           attachments={attachments}
           setAttachments={setAttachments}
           setMessage={setMessage}
-          updateDummyMessage={(item: Message) =>
-            setMessagesToRender((mes) => [...mes, item])
-          }
+          onSend={async () => {
+            await handleSendMessage({
+              id,
+              message: {
+                message,
+                // media: attachments,
+                type: "TEXT",
+              },
+            });
+            setAttachments([]);
+            setMessage("");
+          }}
         />
       </div>
     </main>
@@ -188,14 +202,13 @@ const ChatItem = ({ chat }: { chat: Message }) => {
 };
 
 type ChatInputProps = {
-  // onSend: (message: string, attachments?: File[]) => Promise<void>;
+  onSend: () => Promise<void>;
   message: string;
   setMessage: Dispatch<SetStateAction<string>>;
   attachments: File[];
   setAttachments: Dispatch<SetStateAction<File[]>>;
   disabled?: boolean;
   placeholder?: string;
-  updateDummyMessage?: (item: Message) => void;
 };
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -205,7 +218,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   setAttachments,
   attachments,
   setMessage,
-  updateDummyMessage,
+  onSend,
 }) => {
   const [isSending, setIsSending] = useState(false);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -213,48 +226,23 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSend = () => {
-    const newMsg: any = {
-      _id: `${Date.now()}`,
-      message,
-      media: attachments.map((f) => URL.createObjectURL(f)),
-      sender: "me",
-      senderType: "customers",
-      conversation: null,
-      createdAt: new Date().toISOString(),
-      isOwn: true,
-    };
+  // const handleSend = () => {
 
-    updateDummyMessage?.(newMsg);
-    setMessage("");
-    setAttachments([]);
+  const handleSend = async () => {
+    if (!message.trim() && attachments.length === 0) return;
+
+    const medias = attachments?.map((attch) => URL.createObjectURL(attch));
+
+    try {
+      await onSend();
+      setMessage("");
+      setAttachments([]);
+    } catch (err) {
+      console.error("Error sending message:", err);
+    } finally {
+      setIsSending(false);
+    }
   };
-
-  // const handleSend = async () => {
-  //   if (!message.trim() && attachments.length === 0) return;
-
-  //   const medias = attachments?.map((attch) => URL.createObjectURL(attch));
-
-  //   updateDummyMessage({
-  //     _id: (Math.random() * 10000)?.toString(),
-  //     message,
-  //     media: medias,
-  //     conversation: null,
-  //     sender: "",
-  //   });
-  //   console.log(message);
-  //   setIsSending(true);
-
-  //   try {
-  //     // await onSend(message.trim(), attachments);
-  //     setMessage("");
-  //     setAttachments([]);
-  //   } catch (err) {
-  //     console.error("Error sending message:", err);
-  //   } finally {
-  //     setIsSending(false);
-  //   }
-  // };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {

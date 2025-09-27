@@ -83,7 +83,7 @@ export const useAuthentication = () => {
       if (isUnknown) {
         navigator.navigate("/dashboard", "replace");
       } else {
-        navigator.navigate(`/pricing?type=${type}`, "replace");
+        navigator.navigate(`/pricing`, "replace");
 
         sessionStorage.removeItem("type");
       }

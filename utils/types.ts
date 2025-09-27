@@ -481,11 +481,11 @@ export type singleConversationType = {
 };
 
 type MessagePayload = {
-  eventType: string; // E.g., 'JOB_MARKED_COMPLETE_BY_CONTRACTOR'
-  job: string; // Job ID
-  contractor: string; // Contractor ID
-  customer: string; // Customer ID
-  booking: string; // Booking ID
+  eventType?: string; // E.g., 'JOB_MARKED_COMPLETE_BY_CONTRACTOR'
+  job?: string; // Job ID
+  contractor?: string; // Contractor ID
+  customer?: string; // Customer ID
+  booking?: string; // Booking ID
 };
 
 export type Message = {
@@ -506,6 +506,15 @@ export type Message = {
   isOwn: boolean; // Whether the message was sent by the user themselves
 };
 
+export type OutgoingPayload =
+  | { id: string; message: { type: "TEXT"; message: string } }
+  | {
+      id: string;
+      message: {
+        type: "MEDIA";
+        media?: { url: string; duration?: number; metrics?: string[] }[];
+      };
+    };
 export type MessagesData = Message[];
 
 export const LANG_ID = "rpf_lng";

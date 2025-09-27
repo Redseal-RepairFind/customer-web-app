@@ -11,6 +11,7 @@ import { usePricing } from "@/hook/usePricing";
 import { formatCurrency } from "@/lib/helpers";
 import { SubscriptionType } from "@/utils/types";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { CgCheck, CgChevronDown } from "react-icons/cg";
@@ -50,6 +51,8 @@ const PaymentModal = ({
   const [toggle, setToggle] = useState(
     plan?.billingFrequency === "ANNUALLY" ? true : false
   );
+
+  const type = useSearchParams().get("type");
   const { curUser } = useUser();
 
   const user = curUser?.data;
@@ -83,7 +86,7 @@ const PaymentModal = ({
     }
   }, [plan, toggle, equivalentYearlyPlan]);
 
-  console.log(subPlan);
+  // console.log(curUser?.data);
 
   const onSubmit = async () => {
     const predictions = selectedPredictions?.prediction;
@@ -110,7 +113,9 @@ const PaymentModal = ({
       planId: subPlan?._id,
       equipmentAgeCategory: dropdown?.id || "1-4",
       subscriptionType:
-        curUser?.data?.subscriptions[0]?.subscriptionType || "RESIDENTIAL",
+        type ||
+        curUser?.data?.subscriptions[0]?.subscriptionType ||
+        "RESIDENTIAL",
       // ...(user?.businessName ? { businessName: user?.businessName } : null),
       businessName: user?.businessName || user?.name,
     };
@@ -277,7 +282,9 @@ const PaymentModal = ({
         <Text.Paragraph className="text-sm lg:text-base">
           I agree to the{" "}
           <Link
-            href="/subscription_agreement"
+            href={`/subscription_agreement?type=${
+              type || curUser?.data?.planCategory
+            }`}
             target="_blank"
             rel="noopener noreferrer"
             className="font-semibold underline"

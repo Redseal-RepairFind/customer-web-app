@@ -1,11 +1,60 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Text from "../ui/text";
+import { useSearchParams } from "next/navigation";
 
-export default function SubscriptionAgreementPage() {
+/**
+ * SubscriptionAgreementPage
+ * - Adds a top-level toggle to switch between Business (Commercial) and Residential (Homeowner) terms.
+ * - Business tab renders your original content as-is.
+ * - Residential tab renders terms adapted from the "Homeowner Subscription Services Agreement" (PDF).
+ *
+ * NOTE:
+ * If you want a direct download link for the residential PDF, add an href to your hosted copy.
+ */
+
+type TabKey = "business" | "residential";
+
+function TabToggle({
+  active,
+  onChange,
+}: {
+  active: TabKey;
+  onChange: (k: TabKey) => void;
+}) {
+  const base =
+    "w-full sm:w-auto px-4 py-2 rounded-t-xl  transition focus:outline-none focus:ring cursor-pointer";
+  const activeCls = "bg-black text-white border-black-600 shadow-sm";
+  const inactiveCls = "bg-white text-gray-700 border-gray-300 hover:bg-gray-50";
+
   return (
-    <section className="mx-auto max-w-4xl px-4 py-10 space-y-8">
+    <div className="flex items-center gap-2 border-b">
+      <button
+        type="button"
+        className={`${base} ${active === "business" ? activeCls : inactiveCls}`}
+        onClick={() => onChange("business")}
+        aria-pressed={active === "business"}
+      >
+        Business (Commercial)
+      </button>
+      <button
+        type="button"
+        className={`${base} ${
+          active === "residential" ? activeCls : inactiveCls
+        }`}
+        onClick={() => onChange("residential")}
+        aria-pressed={active === "residential"}
+      >
+        Residential (Homeowner)
+      </button>
+    </div>
+  );
+}
+
+function BusinessTerms() {
+  return (
+    <section className="space-y-8">
       <header className="space-y-2">
         <Text.Heading>RepairFind Subscription Agreement</Text.Heading>
         <Text.SubParagraph>
@@ -499,6 +548,323 @@ export default function SubscriptionAgreementPage() {
           ARBITRATION CLAUSE, AND CLASS ACTION WAIVER.
         </Text.SubParagraph>
       </footer>
+    </section>
+  );
+}
+
+function ResidentialTerms() {
+  return (
+    <section className="space-y-8">
+      <header className="space-y-2">
+        <Text.Heading>Homeowner Subscription Services Agreement</Text.Heading>
+        <Text.SubParagraph>RepairFind Technologies Inc.</Text.SubParagraph>
+        <Text.SubParagraph>Last Updated: September 24, 2025</Text.SubParagraph>
+        {/* Optional: host your PDF and link it below */}
+        {/* <Text.LinkText href="/agreements/homeowner.pdf" target="_blank" rel="noopener noreferrer">Download PDF</Text.LinkText> */}
+      </header>
+
+      {/* 1. Subscription Plans & Services */}
+      <section className="space-y-3">
+        <Text.SmallHeading>
+          1. Subscription Plans &amp; Services
+        </Text.SmallHeading>
+        <Text.SubParagraph>
+          We offer three tiered Plans. Higher tiers include all benefits of the
+          lower tiers.
+        </Text.SubParagraph>
+
+        <div className="overflow-x-auto">
+          <table className="w-full border border-gray-200 text-left text-sm">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="p-3 border-b">Plan</th>
+                <th className="p-3 border-b">Monthly Fee</th>
+                <th className="p-3 border-b">Troubleshooting Calls</th>
+                <th className="p-3 border-b">Service Repair Credit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="p-3 border-b">Peace of Mind</td>
+                <td className="p-3 border-b">$14.99</td>
+                <td className="p-3 border-b">1 / year (up to 1 hr)</td>
+                <td className="p-3 border-b">$500 (labour @ $150/hr)</td>
+              </tr>
+              <tr>
+                <td className="p-3 border-b">Comfort</td>
+                <td className="p-3 border-b">$19.99</td>
+                <td className="p-3 border-b">2 / year</td>
+                <td className="p-3 border-b">$1,000 (labour @ $150/hr)</td>
+              </tr>
+              <tr>
+                <td className="p-3 border-b">Total Care</td>
+                <td className="p-3 border-b">$23.99</td>
+                <td className="p-3 border-b">3 / year</td>
+                <td className="p-3 border-b">$1,500 (labour @ $150/hr)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <Text.SubParagraph>
+          <strong>Annual Preventive Maintenance &amp; Inspection</strong> is
+          included and increases by tier: Plumbing, Electrical, and HVAC
+          visual/safety checks (Peace of Mind); enhanced checks such as sump
+          pump/water heater flush and GFCI/AFCI tests (Comfort); and
+          comprehensive checks including thermostat calibration and refrigerant
+          line inspection (Total Care).
+        </Text.SubParagraph>
+        <Text.SubParagraph>
+          <strong>Member Pricing:</strong> 30% discount on all repair labour and
+          upgrade projects.
+        </Text.SubParagraph>
+        <Text.SubParagraph>
+          <strong>Digital Dashboard:</strong> All service visits are logged for
+          homeowner records.
+        </Text.SubParagraph>
+        <Text.SubParagraph>
+          <strong>Hot Water Tank Replacement (Total Care):</strong> Labour cost
+          covered once per term (parts/tank not included).
+        </Text.SubParagraph>
+      </section>
+
+      {/* 2. Add-On Bundles */}
+      <section className="space-y-3">
+        <Text.SmallHeading>2. Add-On Bundles</Text.SmallHeading>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>
+            <Text.SubParagraph>
+              <strong>Appliance Bundle (+$9.99/mo):</strong> Annual inspection
+              for Refrigerator, Stove/Oven, and Dishwasher or Washer/Dryer; 30%
+              off appliance repairs/new installs.
+            </Text.SubParagraph>
+          </li>
+          <li>
+            <Text.SubParagraph>
+              <strong>Outdoor Comfort (+$12.99/mo):</strong> Hot tub/pool system
+              maintenance; 30% off repairs and installs.
+            </Text.SubParagraph>
+          </li>
+          <li>
+            <Text.SubParagraph>
+              <strong>Safety &amp; Warmth (+$10.99/mo):</strong> Fireplace &amp;
+              chimney inspection, safety compliance checks.
+            </Text.SubParagraph>
+          </li>
+          <li>
+            <Text.SubParagraph>
+              <strong>Whole-Home (+$19.99/mo):</strong> Includes all bundles
+              above.
+            </Text.SubParagraph>
+          </li>
+        </ul>
+      </section>
+
+      {/* 3. Payment & Credit Application */}
+      <section className="space-y-3">
+        <Text.SmallHeading>
+          3. Payment &amp; Credit Application
+        </Text.SmallHeading>
+        <Text.SubParagraph>
+          <strong>Monthly:</strong> Credits accrue monthly, carry within the
+          current term, and expire at term end.
+        </Text.SubParagraph>
+        <Text.SubParagraph>
+          <strong>Annual Prepay:</strong> Pay for 11 months and get 1 free; full
+          yearly credit available immediately. Once any credit is used, plan
+          becomes non-cancellable/non-refundable.
+        </Text.SubParagraph>
+        <Text.SubParagraph>
+          <strong>Early Cancellation:</strong> Unused credits are forfeited.
+        </Text.SubParagraph>
+      </section>
+
+      {/* 4. Service Request & Eligibility */}
+      <section className="space-y-3">
+        <Text.SmallHeading>
+          4. Service Request &amp; Eligibility
+        </Text.SmallHeading>
+        <Text.SubParagraph>
+          Requests must be submitted via the official RepairFind Dashboard
+          (phone/email not valid).
+        </Text.SubParagraph>
+        <Text.SubParagraph>
+          <strong>Eligibility:</strong> Fixed residential Premises; equipment in
+          safe, operable, code-compliant condition; designate primary systems
+          (Electrical/Plumbing/HVAC) in the application.
+        </Text.SubParagraph>
+        <Text.SubParagraph>
+          <strong>Not Eligible:</strong> Commercial properties; mobile units;
+          systems under manufacturer warranty/third-party agreements; known
+          pre-existing conditions or code violations; shared systems where
+          Subscriber is not sole owner/operator.
+        </Text.SubParagraph>
+      </section>
+
+      {/* 5. Single Location Restriction */}
+      <section className="space-y-3">
+        <Text.SmallHeading>5. Single Location Restriction</Text.SmallHeading>
+        <Text.SubParagraph>
+          Subscription applies only to the single address provided and cannot be
+          transferred/shared without written consent.
+        </Text.SubParagraph>
+      </section>
+
+      {/* 6. Service Request & Authorization Protocol */}
+      <section className="space-y-3">
+        <Text.SmallHeading>
+          6. Service Request &amp; Authorization Protocol
+        </Text.SmallHeading>
+        <Text.SubParagraph>
+          All requests must be submitted via app/web; third-party, unauthorized
+          work voids coverage for that issue and related issues; Subscriber must
+          provide safe access during regular hours.
+        </Text.SubParagraph>
+      </section>
+
+      {/* 7. Waiting Period & Initial Inspection */}
+      <section className="space-y-3">
+        <Text.SmallHeading>
+          7. Waiting Period &amp; Initial Inspection
+        </Text.SmallHeading>
+        <Text.SubParagraph>
+          30-day waiting period from start date; standard calls not covered
+          during this period (emergency services may be available at standard
+          rates). Initial inspection may be required; failure to provide access
+          may result in termination.
+        </Text.SubParagraph>
+      </section>
+
+      {/* 8. Exclusions */}
+      <section className="space-y-3">
+        <Text.SmallHeading>8. Exclusions</Text.SmallHeading>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>
+            <Text.SubParagraph>
+              External events (fire, flood, lightning, windstorm, earthquake,
+              acts of God, pests), accident, negligence, grease blockages,
+              vandalism, theft.
+            </Text.SubParagraph>
+          </li>
+          <li>
+            <Text.SubParagraph>
+              Costs to bring premises/equipment to code;
+              upgrades/renovations/alterations; excluded components (e.g., heat
+              exchangers, humidifiers, flue systems, cosmetic parts).
+            </Text.SubParagraph>
+          </li>
+          <li>
+            <Text.SubParagraph>
+              Hazardous materials (mould, asbestos, lead, chemicals);
+              testing/remediation/abatement excluded.
+            </Text.SubParagraph>
+          </li>
+          <li>
+            <Text.SubParagraph>
+              Parts, materials, filters, fluids, or customer-supplied items
+              (prohibited).
+            </Text.SubParagraph>
+          </li>
+          <li>
+            <Text.SubParagraph>
+              Pre-existing conditions or code violations prior to plan start.
+            </Text.SubParagraph>
+          </li>
+        </ul>
+      </section>
+
+      {/* 9. Billing & Subscription Term */}
+      <section className="space-y-3">
+        <Text.SmallHeading>
+          9. Billing &amp; Subscription Term
+        </Text.SmallHeading>
+        <Text.SubParagraph>
+          Monthly fees charged to payment method on file. Initial term is one
+          year, auto-renews annually unless cancelled per terms. Prices may
+          change with 30 days’ notice.
+        </Text.SubParagraph>
+      </section>
+
+      {/* 10. Cancellation Policy */}
+      <section className="space-y-3">
+        <Text.SmallHeading>10. Cancellation Policy</Text.SmallHeading>
+        <Text.SubParagraph>
+          Cancel within first 30 days for full refund of subscription fee. After
+          30 days, you may cancel anytime (no refunds for prepaid periods) and
+          unused credits are forfeited. Requests must be in writing.
+        </Text.SubParagraph>
+        <Text.SubParagraph>
+          Company may cancel for cause (e.g., non-payment, breach, failure to
+          provide inspection access) or without cause with 30 days’ written
+          notice.
+        </Text.SubParagraph>
+      </section>
+
+      {/* 11. Limitation of Liability */}
+      <section className="space-y-3">
+        <Text.SmallHeading>11. Limitation of Liability</Text.SmallHeading>
+        <Text.SubParagraph>
+          Total liability is capped at the total amount paid under the Plan in
+          the preceding 12 months; no indirect, incidental, special, or
+          consequential damages.
+        </Text.SubParagraph>
+      </section>
+
+      {/* 12. General Provisions */}
+      <section className="space-y-3">
+        <Text.SmallHeading>12. General Provisions</Text.SmallHeading>
+        <ul className="list-disc pl-6 space-y-2">
+          <li>
+            <Text.SubParagraph>
+              Governing law: as specified for the homeowner’s jurisdiction.
+            </Text.SubParagraph>
+          </li>
+          <li>
+            <Text.SubParagraph>
+              Entire agreement; changes to terms may occur; continued use
+              indicates acceptance.
+            </Text.SubParagraph>
+          </li>
+          <li>
+            <Text.SubParagraph>
+              One complimentary project consultation and estimate per term;
+              certified professionals per RepairFind standards.
+            </Text.SubParagraph>
+          </li>
+        </ul>
+      </section>
+
+      {/* Acknowledgement */}
+      <footer className="space-y-2">
+        <Text.SmallHeading>Acknowledgement</Text.SmallHeading>
+        <Text.SubParagraph>
+          BY ACTIVATING A PLAN, THE SUBSCRIBER ACKNOWLEDGES THEY HAVE READ,
+          UNDERSTOOD, AND AGREE TO BE BOUND BY ALL TERMS AND CONDITIONS OF THIS
+          AGREEMENT, INCLUDING THE LIMITATION OF LIABILITY.
+        </Text.SubParagraph>
+      </footer>
+    </section>
+  );
+}
+
+export default function SubscriptionAgreementPage() {
+  const params = useSearchParams();
+
+  const isBiz = params?.get("type");
+  const [active, setActive] = useState<TabKey>(
+    isBiz === "BUSINESS" ? "business" : "residential"
+  );
+
+  return (
+    <section className="mx-auto max-w-4xl px-4 py-10 space-y-8">
+      {/* Toggle */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <Text.Heading className="!mb-0">Subscription Agreements</Text.Heading>
+        <TabToggle active={active} onChange={setActive} />
+      </div>
+
+      {/* Body */}
+      {active === "business" ? <BusinessTerms /> : <ResidentialTerms />}
     </section>
   );
 }
