@@ -158,6 +158,16 @@ html {
   background-color: #000000;
 }
 
+/* styles/globals.css */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 /* Style the input box */
 input[type="time"] {
   appearance: none; /* Remove browser default styles */

@@ -494,7 +494,7 @@ export type Message = {
   sender: string; // Sender ID
   senderType: "contractors" | "customers"; // Sender type
   messageType: "ALERT" | string; // Type of message (ALERT, etc.)
-  message: string; // The actual message content
+  message: string | any; // The actual message content
   readBy: string[]; // List of users who have read the message
   entity: string; // Entity ID related to the message (e.g., Job ID)
   entityType: "jobs"; // Type of entity (hardcoded as 'jobs')

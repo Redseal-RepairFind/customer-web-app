@@ -28,13 +28,10 @@ const Inbox = () => {
     fetchNextMessagesPage,
     hasNextMessagesPage,
     isFetchingNextMessagesPage,
-    messagesStatus,
-    refetchMessages,
     isLoadingMessages,
     flattenedMessages,
     sentinelRef,
   } = useMessages();
-  console.log(messagesStatus);
   // console.log(allMessages);
 
   if (isLoadingMessages) return <LoadingTemplate />;
