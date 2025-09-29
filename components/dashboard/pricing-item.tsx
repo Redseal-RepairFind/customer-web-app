@@ -22,7 +22,9 @@ const PricingItem = ({
   console.log(item);
   // return null;
   const [showall, setShowall] = useState(false);
-  const feats = showall ? item?.features : item?.features.slice(0, 5) || [];
+  const feats = showall ? item?.features : item?.features?.slice(0, 5) || [];
+
+  console.log(feats);
 
   return (
     <div
@@ -75,10 +77,12 @@ const PricingItem = ({
       {feats?.map((feat: any, i: number) => {
         // const splitedText = feat?;
 
+        console.log(feat?.status);
+
         return (
           <div className="flex gap-2 items-start mt-2" key={i}>
-            <div className="h-4 w-4 rounded-sm border flex items-center justify-center border-dark-600 mt-1">
-              {feat?.status === "INCLUDED" ? <BiCheck size={14} /> : null}
+            <div className="h-4 min-w-4 rounded-sm border flex items-center justify-center border-dark-600 mt-1">
+              {feats[i]?.status === "INCLUDED" ? <BiCheck size={14} /> : null}
             </div>
 
             <Text.Paragraph className="text-dark-400 text-base">
@@ -91,8 +95,8 @@ const PricingItem = ({
           </div>
         );
       })}
-      {showall
-        ? item?.benefits.map((feat: any, i: number) => {
+      {/* {showall
+        ? feats?.benefits.map((feat: any, i: number) => {
             const splitedText = feat?.split(" - ");
             return (
               <div className="flex gap-2 items-start mt-2" key={i}>
@@ -108,9 +112,9 @@ const PricingItem = ({
               </div>
             );
           })
-        : null}
+        : null} */}
 
-      {item?.feat > 5 && (
+      {
         <div
           className="flex-row-center w-full mt-10"
           onClick={() => setShowall((sh) => !sh)}
@@ -123,7 +127,7 @@ const PricingItem = ({
             {showall ? <CgChevronUp /> : <CgChevronDown />}
           </button>
         </div>
-      )}
+      }
     </div>
   );
 };
