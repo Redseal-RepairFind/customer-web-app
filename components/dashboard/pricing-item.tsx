@@ -91,8 +91,8 @@ const PricingItem = ({
           </div>
         );
       })}
-      {/* {showall
-        ? item?.benefits.map((feat, i) => {
+      {showall
+        ? item?.benefits.map((feat: any, i: number) => {
             const splitedText = feat?.split(" - ");
             return (
               <div className="flex gap-2 items-start mt-2" key={i}>
@@ -108,7 +108,7 @@ const PricingItem = ({
               </div>
             );
           })
-        : null} */}
+        : null}
 
       {item?.feat > 5 && (
         <div

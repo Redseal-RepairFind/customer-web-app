@@ -506,6 +506,21 @@ export type Message = {
   isOwn: boolean; // Whether the message was sent by the user themselves
 };
 
+export type AgoraType = {
+  channelName: string;
+  role: string;
+};
+
+export type MakeCallType = {
+  toUser: string;
+  toUserType: string;
+};
+
+export type EndCall = {
+  event: "missed" | "declined" | "ended";
+  id: string;
+};
+
 export type OutgoingPayload =
   // | { id: string; message: { type: "TEXT"; message: string } }
   // |

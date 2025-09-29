@@ -1,20 +1,7 @@
 import { http, withAuth } from "@/lib/api/axios/http";
+import { AgoraType, EndCall, MakeCallType } from "@/utils/types";
 const url = "/customer/voicecall";
 
-type AgoraType = {
-  channelName: string;
-  role: string;
-};
-
-type MakeCallType = {
-  toUser: string;
-  toUserType: string;
-};
-
-type EndCall = {
-  event: "missed" | "declined" | "ended";
-  id: string;
-};
 // type data = AgoraType;
 
 export const callApi = {

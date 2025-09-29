@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import AgoraRTC, { IAgoraRTCClient, ILocalAudioTrack } from "agora-rtc-sdk-ng";
 import { useSocket } from "@/contexts/socket-contexts";
 import { CallState } from "@/components/dashboard/inbox/call-portal";
+import { callApi } from "@/lib/api/actions/dashboard-actions/inbox-calls/calls";
+import { MakeCallType } from "@/utils/types";
 
 type Phase = CallState | "idle";
 type Role = "caller" | "callee";
@@ -185,6 +187,20 @@ export function useCallEngine(appId: string) {
     setMuted(target);
   }, [muted]);
 
+  const handleStartCall = async ({ toUser, toUserType }: MakeCallType) => {
+    try {
+      const res = await callApi.startCall({
+        toUser,
+        toUserType,
+      });
+
+      // const
+      return res;
+    } catch (error: any) {
+      console.error("call start error:", error);
+    }
+  };
+
   return {
     // state
     phase,
@@ -201,6 +217,7 @@ export function useCallEngine(appId: string) {
     join,
     end,
     toggleMute,
+    handleStartCall,
   };
 }
 
