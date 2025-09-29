@@ -507,14 +507,17 @@ export type Message = {
 };
 
 export type OutgoingPayload =
-  | { id: string; message: { type: "TEXT"; message: string } }
-  | {
-      id: string;
-      message: {
-        type: "MEDIA";
-        media?: { url: string; duration?: number; metrics?: string[] }[];
-      };
+  // | { id: string; message: { type: "TEXT"; message: string } }
+  // |
+
+  {
+    id: string;
+    message: {
+      type: "MEDIA" | "TEXT";
+      media?: File[];
+      message?: string;
     };
+  };
 export type MessagesData = Message[];
 
 export const LANG_ID = "rpf_lng";

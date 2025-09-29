@@ -2,7 +2,7 @@
 
 import Text from "@/components/ui/text";
 import { PlanBadge } from "../home/plan-log";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageToggler } from "../repair-requests/technician-modal";
 import { SpecialBox } from "../home/job-toast-modal";
 import Image from "next/image";
@@ -14,7 +14,10 @@ import { useMessages } from "@/hook/useMessages";
 import { ClipLoader } from "react-spinners";
 import LoadingTemplate from "@/components/ui/spinner";
 import { MessageItem } from "@/utils/types";
-import { formatDateProper } from "@/lib/helpers";
+import { formatDateProper, trim100 } from "@/lib/helpers";
+import { useSocket } from "@/contexts/socket-contexts";
+import EmptyPage from "@/components/ui/empty";
+import { useUser } from "@/hook/useMe";
 
 const togglers = [
   { label: "Messages", value: "Message", badgeCount: 1 },
@@ -34,12 +37,18 @@ const Inbox = () => {
   } = useMessages();
   // console.log(allMessages);
 
+  const { curUser } = useUser();
+
+  console.log(curUser?.data?._id);
+
+  // useEffect(() => {});
+
   if (isLoadingMessages) return <LoadingTemplate />;
   return (
     <main className="flex flex-col gap-5">
       <div className="flex-row-between">
         <Text.Heading>Inbox</Text.Heading>
-        <PlanBadge planName={`${3} active conversations`} />
+        {/* <PlanBadge planName={`${3} active conversations`} /> */}
       </div>
 
       {/* <PageToggler
@@ -48,34 +57,38 @@ const Inbox = () => {
         btns={togglers}
       /> */}
 
-      <ConversationHeader
-        header="Conversations with Technicians"
-        tag="Chat with technicians assigned to your ongoing jobs. You can only message technicians while you have active work with them."
-      />
+      {flattenedMessages?.length > 0 ? (
+        <>
+          <ConversationHeader
+            header="Conversations with Technicians"
+            tag="Chat with technicians assigned to your ongoing jobs. You can only message technicians while you have active work with them."
+          />
+          <section className="flex flex-col gap-3">
+            {switched?.label === "Messages" || switched === "Message"
+              ? flattenedMessages?.map((message: any) => (
+                  <ConversationItem
+                    type="message"
+                    item={message}
+                    key={message?.id}
+                  />
+                ))
+              : // <ConversationItem
+                //   type="call"
+                //   item={{
+                //     name: "Mike Johnson",
+                //     id: "(555) 123-4567 Plumbing - Kitchen Job #1234",
+                //     progress: "Awaiting arrival",
+                //     sm: "Today at 10:45 AM - Duration 5:32",
+                //     status: "incoming call",
+                //   }}
+                // />
 
-      <section className="flex flex-col gap-3">
-        {switched?.label === "Messages" || switched === "Message"
-          ? flattenedMessages?.map((message: any) => (
-              <ConversationItem
-                type="message"
-                item={message}
-                key={message?.id}
-              />
-            ))
-          : // <ConversationItem
-            //   type="call"
-            //   item={{
-            //     name: "Mike Johnson",
-            //     id: "(555) 123-4567 Plumbing - Kitchen Job #1234",
-            //     progress: "Awaiting arrival",
-            //     sm: "Today at 10:45 AM - Duration 5:32",
-            //     status: "incoming call",
-            //   }}
-            // />
-
-            null}
-      </section>
-
+                null}
+          </section>
+        </>
+      ) : (
+        <EmptyPage message="You do not have any active chats" tytle="Chats" />
+      )}
       <div ref={sentinelRef} className="h-12" />
 
       <div className="flex-row-center w-full">
@@ -111,7 +124,7 @@ const ConversationItem = ({
 }) => {
   const router = useRouter();
 
-  console.log();
+  // console.log(item?.lastMessage);
   return (
     <SpecialBox
       isBtn
@@ -140,7 +153,7 @@ const ConversationItem = ({
               /> */}
             </div>
             <Text.SmallText className="text-sm text-dark-500 text-start">
-              {item?.lastMessage}
+              {trim100(item?.lastMessage)}
             </Text.SmallText>
             {type === "message" && (
               <Text.SmallText className="text-sm text-dark-500 text-start"></Text.SmallText>

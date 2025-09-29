@@ -153,6 +153,13 @@ export const getTimeAgo = (dateString: string): string => {
   return actionDate.toLocaleDateString(undefined, options); // Uses browser's locale
 };
 
+// simple and safe for emojis/graphemes
+export const trim100 = (s?: string) => {
+  const str = s ?? "";
+  const chars = Array.from(str);
+  return chars.length > 100 ? chars.slice(0, 100).join("") + "…" : str;
+};
+
 export const STATUS_PROGRESS: Record<string, string> = {
   BOOKED: "Technician scheduled; awaiting arrival",
   ONGOING: "Work in progress on site",

@@ -19,12 +19,12 @@ export const dashboardNav = [
     icon: icons.subIcon,
     activeIcon: icons.subIconActive,
   },
-  // {
-  //   name: "Inbox",
-  //   route: "/inbox",
-  //   icon: icons.chatIcon,
-  //   activeIcon: icons.chatIconActive,
-  // },
+  {
+    name: "Inbox",
+    route: "/inbox",
+    icon: icons.chatIcon,
+    activeIcon: icons.chatIconActive,
+  },
   // {
   //   name: "Maintenance Log",
   //   route: "/maintenance-log",

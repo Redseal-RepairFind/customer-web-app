@@ -31,7 +31,7 @@ const DashNav = () => {
               {dashboardNav.map((dash) => (
                 <Link
                   className={`${
-                    curPathname === dash.route
+                    curPathname.includes(dash.route)
                       ? "bg-white"
                       : "bg-transparent hover:bg-dark-600"
                   } flex-rows py-2 px-3 rounded-lg gap-2    transition-all duration-300`}
@@ -41,7 +41,9 @@ const DashNav = () => {
                   <span className="h-5 w-5 relative">
                     <Image
                       src={
-                        curPathname === dash.route ? dash.activeIcon : dash.icon
+                        curPathname.includes(dash.route)
+                          ? dash.activeIcon
+                          : dash.icon
                       }
                       fill
                       alt="Icons"
@@ -49,7 +51,7 @@ const DashNav = () => {
                   </span>
                   <Text.SmallText
                     className={`${
-                      curPathname === dash.route
+                      curPathname.includes(dash.route)
                         ? "text-dark-main"
                         : "text-light-main"
                     } text-sm`}

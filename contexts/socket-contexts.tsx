@@ -53,10 +53,15 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       console.log("JOB_MARKED_COMPLETE", data);
     };
 
+    const handleIncomingCallEvent = (data: any) => {
+      console.log("NEW_INCOMING_CALL", data);
+    };
+
     SocketsService.socket.on("connect", handleConnect);
     SocketsService.socket.on("disconnect", handleDisconnect);
     SocketsService.subscribe("RED_DOT_ALERT", handleRedDotAlert);
     SocketsService.subscribe("JOB_MARKED_COMPLETE", handleJobMarkComplete);
+    SocketsService.subscribe("NEW_INCOMING_CALL", handleIncomingCallEvent);
 
     if (notificationBagde) {
       setBadge(notificationBagde.data?.totalCount || 0);

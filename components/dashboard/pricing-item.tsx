@@ -19,7 +19,7 @@ const PricingItem = ({
   onSelectPlan: (item: any) => void;
   currentPlan?: boolean;
 }) => {
-  // console.log(blurItems);
+  console.log(item);
   // return null;
   const [showall, setShowall] = useState(false);
   const feats = showall ? item?.features : item?.features.slice(0, 5) || [];
@@ -43,18 +43,20 @@ const PricingItem = ({
         ) : null} */}
       </div>
 
-      <span className="flex-rows gap-2 mb-1">
+      <span className="flex  gap-2 mb-1">
         {item?.billingFrequency === "ANNUALLY" ? (
-          <Text.SubHeading className="text-red-500 font-semibold line-through">
+          <Text.SubHeading className="text-red-500 line-through text-sm font-semibold">
             {formatCurrency(item?.priceDetails?.basePrice || "")}
           </Text.SubHeading>
         ) : null}
-        <Text.Heading className="font-black">
+        <Text.Heading className="xl:font-black font-black lg:text-lg md:font-black">
           {formatCurrency(item?.priceDetails?.discountedPrice)}
         </Text.Heading>
         <Text.SmallText className="font-semibold text-xs">+GST</Text.SmallText>
 
-        <Text.SubHeading>/{cycle}</Text.SubHeading>
+        <Text.SubHeading className="text-sm font-semibold">
+          /{cycle}
+        </Text.SubHeading>
       </span>
 
       <Text.Paragraph className="text-dark-500 mb-2">
@@ -75,12 +77,14 @@ const PricingItem = ({
 
         return (
           <div className="flex gap-2 items-start mt-2" key={i}>
-            <BiCheck />
+            <div className="h-4 w-4 rounded-sm border flex items-center justify-center border-dark-600 mt-1">
+              {feat?.status === "INCLUDED" ? <BiCheck size={14} /> : null}
+            </div>
 
-            <Text.Paragraph className="text-dark-400 text-xl">
+            <Text.Paragraph className="text-dark-400 text-base">
               {feat.name}
               {"  "}
-              <span className="text-sm font-light sm:ml-1">
+              <span className="text-xs font-light sm:ml-1">
                 {feat.description}
               </span>
             </Text.Paragraph>
