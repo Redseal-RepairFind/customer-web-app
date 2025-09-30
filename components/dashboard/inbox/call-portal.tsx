@@ -162,7 +162,7 @@ export default function CallPortal({
 
   return (
     <div
-      className="fixed inset-0 z-[1000] bg-black/85 text-white"
+      className="fixed inset-0 z-[1000] bg-black text-white"
       role="dialog"
       aria-modal="true"
       aria-label="Call portal"
@@ -171,7 +171,7 @@ export default function CallPortal({
       }}
     >
       {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between bg-black/30 backdrop-blur-sm">
+      <div className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between bg-black backdrop-blur-sm">
         <div className="flex items-center gap-3 min-w-0">
           <Avatar name={data.name} url={data.image} />
           <div className="min-w-0">
@@ -239,7 +239,7 @@ export default function CallPortal({
           </div>
 
           {/* Local PiP */}
-          <div className="absolute bottom-4 right-4 w-44 h-28 rounded-lg overflow-hidden border border-neutral-600/70 bg-black/40 backdrop-blur">
+          <div className="absolute bottom-4 right-4 w-44 h-28 rounded-lg overflow-hidden border border-neutral-600/70 bg-black backdrop-blur">
             {renderLocalPreview ? (
               renderLocalPreview()
             ) : (
