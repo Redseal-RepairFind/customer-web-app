@@ -21,7 +21,7 @@ export const callApi = {
   },
   startCall: async (data: MakeCallType) => {
     try {
-      const response = await http.post(`${url}}`, data, withAuth());
+      const response = await http.post(`${url}`, data, withAuth());
 
       return response.data;
     } catch (error: any) {

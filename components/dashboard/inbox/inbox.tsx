@@ -18,6 +18,7 @@ import { formatDateProper, trim100 } from "@/lib/helpers";
 import { useSocket } from "@/contexts/socket-contexts";
 import EmptyPage from "@/components/ui/empty";
 import { useUser } from "@/hook/useMe";
+import { useCall } from "@/contexts/call-provider";
 
 const togglers = [
   { label: "Messages", value: "Message", badgeCount: 1 },
@@ -39,7 +40,7 @@ const Inbox = () => {
 
   const { curUser } = useUser();
 
-  console.log(curUser?.data?._id);
+  // console.log(curUser?.data?._id);
 
   // useEffect(() => {});
 
@@ -47,7 +48,7 @@ const Inbox = () => {
   return (
     <main className="flex flex-col gap-5">
       <div className="flex-row-between">
-        <Text.Heading>Inbox</Text.Heading>
+        <Text.Heading>Inbox {curUser?.data?._id}</Text.Heading>
         {/* <PlanBadge planName={`${3} active conversations`} /> */}
       </div>
 
@@ -124,6 +125,8 @@ const ConversationItem = ({
 }) => {
   const router = useRouter();
 
+  const { handleStartCall } = useCall();
+
   // console.log(item?.lastMessage);
   return (
     <SpecialBox
@@ -181,7 +184,16 @@ const ConversationItem = ({
 
         <div>
           <div className="flex items-center ">
-            <button className="mr-2 items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer relative">
+            <button
+              className="mr-2 items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer relative"
+              onClick={async (e) => {
+                e.stopPropagation();
+                await handleStartCall({
+                  toUser: "68d698c574428303dc8c3fa2",
+                  toUserType: "customers",
+                });
+              }}
+            >
               <Image
                 src={icons.callIcon}
                 height={20}
