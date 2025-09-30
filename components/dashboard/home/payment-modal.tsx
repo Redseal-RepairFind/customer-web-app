@@ -292,7 +292,7 @@ const PaymentModal = ({
 
         <Text.Paragraph className="text-sm lg:text-base">
           I agree to the{" "}
-          {/* <Link
+          <Link
             href={`/subscription_agreement?type=${
               type || curUser?.data?.planCategory
             }`}
@@ -301,13 +301,13 @@ const PaymentModal = ({
             className="font-semibold underline"
           >
             Terms of Service
-          </Link> */}
-          <button
+          </Link>
+          {/* <button
             className="font-semibold underline cursor-pointer"
             onClick={() => setTermsMoal(true)}
           >
             Terms of Service{" "}
-          </button>
+          </button> */}
           *
         </Text.Paragraph>
       </div>

@@ -376,37 +376,37 @@ const UserInformation = () => {
 
         <Text.Paragraph className="text-sm lg:text-base">
           By creating an account, you agree to our{" "}
-          {/* <Link
+          <Link
             href={"/terms"}
             className="underline font-semibold cursor-pointer"
             target="_blank"
             rel="noopener noreferrer"
           >
             Terms of Service
-          </Link>{" "} */}
-          <button
+          </Link>{" "}
+          {/* <button
             className="font-semibold underline cursor-pointer"
             onClick={() => setTermsMoal(true)}
           >
             Terms of Service
-          </button>
+          </button> */}
           {"  "}
-          and{" "}
+          {/* and{" "}
           <button
             className="font-semibold underline cursor-pointer"
             onClick={() => setTermsMoal(true)}
           >
             Privacy Policy{" "}
-          </button>
-          {/* and{" "} */}
-          {/* <Link
+          </button> */}
+          and{" "}
+          <Link
             href={"/policy"}
             className="underline font-semibold cursor-pointer"
             target="_blank"
             rel="noopener noreferrer"
           >
             Privacy Policy
-          </Link> */}
+          </Link>
         </Text.Paragraph>
       </div>
 
