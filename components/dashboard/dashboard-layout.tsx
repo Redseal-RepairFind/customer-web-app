@@ -6,7 +6,12 @@ import DashNav from "./dash-nav";
 import { NavWindow } from "../landing";
 import { dashboardNav, otherNav } from "@/lib/dasboard-constatns";
 import { useSocket } from "@/contexts/socket-contexts";
-import { CallEngineProvider } from "@/contexts/call-provider";
+import dynamic from "next/dynamic";
+// ⬇️ Load the provider only on the client. Netlify SSR won't evaluate it.
+const CallEngineProvider = dynamic(
+  () => import("@/contexts/call-provider").then((m) => m.CallEngineProvider),
+  { ssr: false }
+);
 
 export default function ClientDashboardLayout({
   children,
