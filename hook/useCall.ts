@@ -7,6 +7,7 @@ import AgoraRTC, {
   IAgoraRTCRemoteUser,
   ILocalAudioTrack,
   IRemoteAudioTrack,
+  NetworkQuality,
 } from "agora-rtc-sdk-ng";
 import { useSocket } from "@/contexts/socket-contexts";
 import { CallState } from "@/components/dashboard/inbox/call-portal";
@@ -24,17 +25,52 @@ type OutgoingSession = {
   appId: string;
   callId: string;
   channel: string;
-  token: string; // caller token
-  uid: number; // caller uid
+  token: string;
+  uid: number;
   name?: string;
   image?: string;
 };
+
+type JoinParams = {
+  appId: string;
+  channel: string;
+  token: string;
+  uid: number;
+};
+
+type EndReason = "ended" | "missed" | "declined";
+
+/* =================================================================================
+ * Small utils
+ * ================================================================================= */
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+
+async function waitFor<T>(
+  getter: () => T | null | undefined,
+  timeoutMs = 5000,
+  intervalMs = 50
+): Promise<T | null> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const v = getter();
+    if (v != null) return v as T;
+    await sleep(intervalMs);
+  }
+  return getter() ?? null;
+}
+
+function normalizeEndReason(input: unknown): EndReason {
+  if (input === "ended" || input === "missed" || input === "declined") {
+    return input;
+  }
+  return "ended";
+}
 
 /* =================================================================================
  * Helpers (iPad/Safari)
  * ================================================================================= */
 
-/** Resume a shared AudioContext so autoplay works on iOS/iPadOS Safari. */
 async function unlockAudioOnce(): Promise<void> {
   try {
     const Ctx =
@@ -53,7 +89,6 @@ async function unlockAudioOnce(): Promise<void> {
   }
 }
 
-/** Ask explicitly for mic permission so prompt shows on a user gesture. */
 async function requestMicPermission(): Promise<boolean> {
   try {
     const tmp = await AgoraRTC.createMicrophoneAudioTrack();
@@ -64,6 +99,18 @@ async function requestMicPermission(): Promise<boolean> {
   } catch (e) {
     console.error("[CALL] Mic permission denied:", e);
     return false;
+  }
+}
+
+async function getPreferredMicId(): Promise<string | undefined> {
+  try {
+    const list = await AgoraRTC.getMicrophones();
+    if (!list.length) return undefined;
+    const builtIn =
+      list.find((d) => /macbook|built[- ]?in/i.test(d.label)) ?? list[0];
+    return builtIn.deviceId || undefined;
+  } catch {
+    return undefined;
   }
 }
 
@@ -78,10 +125,16 @@ export function useCallEngine(appId: string) {
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const micRef = useRef<ILocalAudioTrack | null>(null);
   const remoteAudioRef = useRef<Map<number, IRemoteAudioTrack>>(new Map());
-  const wiredRef = useRef(false); // wire client listeners once
-  const joinedRef = useRef(false); // prevent duplicate joins
 
-  // Engine state
+  // one-off guards
+  const wiredRef = useRef(false);
+  const joinedRef = useRef(false);
+  const endingRef = useRef(false); // idempotent end()
+
+  // timers
+  const lowBitrateTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // phase/state
   const [phase, setPhase] = useState<Phase>("idle");
   const [role, setRole] = useState<Role | null>(null);
 
@@ -94,6 +147,27 @@ export function useCallEngine(appId: string) {
   const [remoteImage, setRemoteImage] = useState<string | undefined>();
   const [muted, setMuted] = useState(false);
 
+  // diagnostics
+  const [localLevel, setLocalLevel] = useState<number>(0);
+  const [uplinkQuality, setUplinkQuality] = useState<NetworkQuality | 0>(0);
+  const [downlinkQuality, setDownlinkQuality] = useState<NetworkQuality | 0>(0);
+
+  // param refs for race-free joins
+  const joinParamsRef = useRef<JoinParams | null>(null);
+  const volEnabledRef = useRef(false); // guard enableAudioVolumeIndicator
+
+  const setJoinParams = (p: {
+    channel: string;
+    token: string;
+    uid: number;
+  }) => {
+    if (!appId) return;
+    joinParamsRef.current = { appId, ...p };
+  };
+  const clearJoinParams = () => {
+    joinParamsRef.current = null;
+  };
+
   /* -----------------------------------------------------------------------------
    * Init Agora client once + events
    * --------------------------------------------------------------------------- */
@@ -104,99 +178,122 @@ export function useCallEngine(appId: string) {
     clientRef.current = client;
     console.log("[CALL] Agora client created");
 
-    if (wiredRef.current) return;
-    wiredRef.current = true;
+    if (!wiredRef.current) {
+      wiredRef.current = true;
 
-    client.on("connection-state-change", (cur, prev, reason) => {
-      console.log("[CALL] connection-state-change:", { prev, cur, reason });
-      if (
-        (cur === "CONNECTING" || cur === "RECONNECTING") &&
-        phase !== "connecting"
-      ) {
-        setPhase("connecting");
-      }
-      if (
-        cur === "CONNECTED" &&
-        (phase === "connecting" ||
-          phase === "reconnecting" ||
-          phase === "outgoing")
-      ) {
-        setPhase("active");
-      }
-      if (cur === "DISCONNECTED" && phase !== "idle" && phase !== "ended") {
-        setPhase("reconnecting");
-      }
-    });
-
-    client.on("exception", (e) => console.warn("[CALL] Agora exception:", e));
-
-    // Remote audio subscribe & play via explicit <audio> for iOS
-    const removeRemoteEl = (uidNum: number) => {
-      const el = document.querySelector<HTMLAudioElement>(
-        `audio[data-agora-remote="${uidNum}"]`
-      );
-      if (el?.parentNode) el.parentNode.removeChild(el);
-    };
-
-    client.on(
-      "user-published",
-      async (user: IAgoraRTCRemoteUser, mediaType: "audio" | "video") => {
-        console.log("[CALL] user-published:", user.uid, mediaType);
-        if (mediaType !== "audio") return;
-        try {
-          await client.subscribe(user, "audio");
-          const track = user.audioTrack;
-          if (track) {
-            const el = document.createElement("audio");
-            el.autoplay = true;
-            el.setAttribute("playsinline", "");
-            el.setAttribute("webkit-playsinline", "");
-            el.setAttribute("data-agora-remote", String(user.uid));
-            el.style.position = "fixed";
-            el.style.left = "-9999px";
-            document.body.appendChild(el);
-            track.setVolume(100);
-            track.play();
-            remoteAudioRef.current.set(user.uid as number, track);
-            console.log("[CALL] remote audio playing:", user.uid);
-          }
-        } catch (err) {
-          console.error("[CALL] subscribe error:", err);
+      client.on("connection-state-change", (cur, prev, reason) => {
+        console.log("[CALL] connection-state-change:", { prev, cur, reason });
+        if (
+          (cur === "CONNECTING" || cur === "RECONNECTING") &&
+          phase !== "connecting"
+        ) {
+          setPhase("connecting");
         }
-      }
-    );
+        if (
+          cur === "CONNECTED" &&
+          (phase === "connecting" ||
+            phase === "reconnecting" ||
+            phase === "outgoing")
+        ) {
+          setPhase("active");
+        }
+        if (cur === "DISCONNECTED" && phase !== "idle" && phase !== "ended") {
+          setPhase("reconnecting");
+        }
+      });
 
-    client.on(
-      "user-unpublished",
-      (user: IAgoraRTCRemoteUser, mt: "audio" | "video") => {
-        console.log("[CALL] user-unpublished:", user.uid, mt);
+      client.on("exception", (e) => {
+        console.warn("[CALL] Agora exception:", e);
+        if (e?.code === 2003) {
+          if (lowBitrateTimerRef.current) {
+            clearTimeout(lowBitrateTimerRef.current);
+          }
+          lowBitrateTimerRef.current = setTimeout(async () => {
+            try {
+              const mic = micRef.current;
+              if (!mic) return;
+              await mic.setEnabled(true);
+              setTimeout(async () => {
+                if (localLevel <= 1) {
+                  console.warn("[CALL] Low bitrate persists — recreating mic");
+                  await recreateAndPublishMic("speech_standard");
+                }
+              }, 1500);
+            } catch (err) {
+              console.warn("[CALL] Low bitrate soft-recovery error:", err);
+            }
+          }, 3000);
+        }
+      });
+
+      const removeRemoteEl = (uidNum: number) => {
+        const el = document.querySelector<HTMLAudioElement>(
+          `audio[data-agora-remote="${uidNum}"]`
+        );
+        if (el?.parentNode) el.parentNode.removeChild(el);
+      };
+
+      client.on(
+        "user-published",
+        async (user: IAgoraRTCRemoteUser, mediaType: "audio" | "video") => {
+          console.log("[CALL] user-published:", user.uid, mediaType);
+          if (mediaType !== "audio") return;
+          try {
+            await client.subscribe(user, "audio");
+            const track = user.audioTrack;
+            if (track) {
+              const el = document.createElement("audio");
+              el.autoplay = true;
+              el.setAttribute("playsinline", "");
+              el.setAttribute("webkit-playsinline", "");
+              el.setAttribute("data-agora-remote", String(user.uid));
+              el.style.position = "fixed";
+              el.style.left = "-9999px";
+              document.body.appendChild(el);
+              track.setVolume(100);
+              track.play();
+              remoteAudioRef.current.set(user.uid as number, track);
+              console.log("[CALL] remote audio playing:", user.uid);
+            }
+          } catch (err) {
+            console.error("[CALL] subscribe error:", err);
+          }
+        }
+      );
+
+      client.on(
+        "user-unpublished",
+        (user: IAgoraRTCRemoteUser, mt: "audio" | "video") => {
+          console.log("[CALL] user-unpublished:", user.uid, mt);
+          const track = remoteAudioRef.current.get(user.uid as number);
+          try {
+            track?.stop();
+          } catch {}
+          remoteAudioRef.current.delete(user.uid as number);
+          removeRemoteEl(user.uid as number);
+        }
+      );
+
+      client.on("user-left", (user: IAgoraRTCRemoteUser) => {
+        console.log("[CALL] user-left:", user.uid);
         const track = remoteAudioRef.current.get(user.uid as number);
         try {
           track?.stop();
         } catch {}
         remoteAudioRef.current.delete(user.uid as number);
         removeRemoteEl(user.uid as number);
-      }
-    );
+      });
 
-    client.on("user-left", (user: IAgoraRTCRemoteUser) => {
-      console.log("[CALL] user-left:", user.uid);
-      const track = remoteAudioRef.current.get(user.uid as number);
-      try {
-        track?.stop();
-      } catch {}
-      remoteAudioRef.current.delete(user.uid as number);
-      removeRemoteEl(user.uid as number);
-    });
-
-    client.on("token-privilege-will-expire", () =>
-      console.warn("[CALL] token will expire soon")
-    );
-    client.on("token-privilege-did-expire", () =>
-      console.error("[CALL] token expired")
-    );
+      client.on("token-privilege-will-expire", () =>
+        console.warn("[CALL] token will expire soon")
+      );
+      client.on("token-privilege-did-expire", () =>
+        console.error("[CALL] token expired")
+      );
+    }
 
     return () => {
+      lowBitrateTimerRef.current && clearTimeout(lowBitrateTimerRef.current);
       client.removeAllListeners();
       clientRef.current = null;
       console.log("[CALL] Agora client disposed");
@@ -205,7 +302,39 @@ export function useCallEngine(appId: string) {
   }, []); // mount once
 
   /* -----------------------------------------------------------------------------
-   * Cleanup (unpublish → stop/close → remove remote audios → leave)
+   * Diagnostics wiring (volume indicator + network quality)
+   * --------------------------------------------------------------------------- */
+  useEffect(() => {
+    const client = clientRef.current;
+    if (!client) return;
+
+    if (!volEnabledRef.current) {
+      client.enableAudioVolumeIndicator();
+      volEnabledRef.current = true;
+    }
+
+    const onVol = (vols: Array<{ uid: number; level: number }>) => {
+      const me = vols.find((v) => v.uid === uid || v.uid === 0);
+      if (me) setLocalLevel(me.level);
+    };
+    const onNet = (stats: {
+      uplinkNetworkQuality: NetworkQuality;
+      downlinkNetworkQuality: NetworkQuality;
+    }) => {
+      setUplinkQuality(stats.uplinkNetworkQuality);
+      setDownlinkQuality(stats.downlinkNetworkQuality);
+    };
+
+    client.on("volume-indicator", onVol);
+    client.on("network-quality", onNet);
+    return () => {
+      client.off("volume-indicator", onVol);
+      client.off("network-quality", onNet);
+    };
+  }, [uid]);
+
+  /* -----------------------------------------------------------------------------
+   * Cleanup
    * --------------------------------------------------------------------------- */
   const cleanup = useCallback(async () => {
     const client = clientRef.current;
@@ -238,30 +367,61 @@ export function useCallEngine(appId: string) {
       console.warn("[CALL] cleanup error:", err);
     } finally {
       joinedRef.current = false;
+      clearJoinParams();
     }
   }, []);
 
-  const end = useCallback(async () => {
-    try {
-      await cleanup();
-    } finally {
-      setPhase("ended");
-      setTimeout(() => {
-        setPhase("idle");
-        setRole(null);
-        setCallId(null);
-        setChannel(null);
-        setToken(null);
-        setUid(null);
-        setRemoteName("Unknown");
-        setRemoteImage(undefined);
-        setMuted(false);
-      }, 400);
-    }
-  }, [cleanup]);
+  /* -----------------------------------------------------------------------------
+   * End (idempotent, source-aware, event-safe)
+   * --------------------------------------------------------------------------- */
+  const end = useCallback(
+    async (
+      reasonOrEvt: unknown = "ended",
+      source: "local" | "remote" = "local"
+    ) => {
+      if (endingRef.current) {
+        console.log("[CALL] end() ignored: already ending");
+        return;
+      }
+      endingRef.current = true;
+
+      const reason: EndReason = normalizeEndReason(reasonOrEvt);
+
+      try {
+        await cleanup();
+
+        // Only notify server if *we* initiated the end. Server echoes CALL_ENDED.
+        if (source === "local" && callId) {
+          try {
+            await callApi.endCall({ event: reason, id: callId });
+          } catch (error: any) {
+            console.error("[CALL] endCall API error:", error);
+          }
+        }
+      } finally {
+        setPhase("ended");
+        setTimeout(() => {
+          setPhase("idle");
+          setRole(null);
+          setCallId(null);
+          setChannel(null);
+          setToken(null);
+          setUid(null);
+          setRemoteName("Unknown");
+          setRemoteImage(undefined);
+          setMuted(false);
+          setLocalLevel(0);
+          setUplinkQuality(0);
+          setDownlinkQuality(0);
+          endingRef.current = false;
+        }, 400);
+      }
+    },
+    [cleanup, callId]
+  );
 
   /* -----------------------------------------------------------------------------
-   * Socket: NEW_INCOMING_CALL → seed callee
+   * Socket: NEW_INCOMING_CALL + CALL_ENDED
    * --------------------------------------------------------------------------- */
   useEffect(() => {
     if (!socket) return;
@@ -274,8 +434,8 @@ export function useCallEngine(appId: string) {
       const incoming = {
         callId: p?.callId,
         channel: p?.channel,
-        token: p?.token, // callee token
-        uid: Number(p?.uid), // callee uid
+        token: p?.token,
+        uid: Number(p?.uid),
         name: p?.name,
         image: p?.image,
       };
@@ -297,22 +457,29 @@ export function useCallEngine(appId: string) {
       setUid(incoming.uid);
       setRemoteName(incoming.name || "Unknown");
       setRemoteImage(incoming.image);
+      setJoinParams({
+        channel: incoming.channel,
+        token: incoming.token,
+        uid: incoming.uid,
+      });
       setPhase("incoming");
       console.log("[CALL] incoming call set:", incoming);
     };
 
     socket.on("NEW_INCOMING_CALL", handleIncoming);
-    socket.on("Conversation", handleIncoming); // some servers
+    socket.on("Conversation", handleIncoming);
 
     const handleEnded = (obj: any) => {
-      const type = obj?.type ?? obj?.payload?.type;
+      const type = obj?.type ?? obj?.payload?.type ?? obj?.event;
       if (type !== "CALL_ENDED") return;
-      // If we’re actively joining/active, you may choose to ignore server-ended for a moment:
-      if (phase === "active" || phase === "connecting") {
-        console.log("[CALL] ignoring CALL_ENDED during join/active");
-        return;
-      }
-      end();
+
+      const evt =
+        (obj?.payload?.event as EndReason) ??
+        (obj?.event as EndReason) ??
+        "ended";
+
+      // Treat socket as a REMOTE termination; don't ping API again.
+      void end(evt, "remote");
     };
     socket.on("CALL_ENDED", handleEnded);
 
@@ -321,102 +488,230 @@ export function useCallEngine(appId: string) {
       socket.off("Conversation", handleIncoming);
       socket.off("CALL_ENDED", handleEnded);
     };
-  }, [socket, end, phase]);
+  }, [socket, end]);
 
   /* -----------------------------------------------------------------------------
-   * Caller: seed outgoing session
+   * Caller: seed outgoing session (state + refs) and optionally auto-join
    * --------------------------------------------------------------------------- */
   const startOutgoing = useCallback(
     (s: OutgoingSession, opts?: { autoJoinCaller?: boolean }) => {
       setRole("caller");
       setCallId(s.callId);
       setChannel(s.channel);
-      setToken(s.token); // caller token
-      setUid(Number(s.uid)); // caller uid
+      setToken(s.token);
+      setUid(Number(s.uid));
       setRemoteName(s.name || "Unknown");
       setRemoteImage(s.image);
+      setJoinParams({ channel: s.channel, token: s.token, uid: Number(s.uid) });
       setPhase("outgoing");
       console.log("[CALL] start outgoing:", s);
 
-      // Optional: auto-join caller if startOutgoing was triggered by a user gesture
       if (opts?.autoJoinCaller) {
-        void preflightAndJoin(); // safe fire-and-forget
+        void preflightAndJoin(); // will pull from refs safely
       }
     },
-    // preflightAndJoin defined below; dependency added later via array ref
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
   /* -----------------------------------------------------------------------------
-   * Join (both sides). Do NOT call automatically on iPad without a tap.
+   * Internal: (re)create + publish mic with auto-recovery handlers
    * --------------------------------------------------------------------------- */
-  const join = useCallback(async () => {
-    console.log("[CALL] join with:", {
-      appId,
-      channel,
-      uid,
-      hasToken: !!token,
-      role,
-    });
-    if (!appId || !token || !channel || uid == null) {
-      console.warn("[CALL] join aborted: missing params");
-      return;
-    }
-
-    try {
-      setPhase((p) => (p === "incoming" ? "connecting" : p));
+  const recreateAndPublishMic = useCallback(
+    async (
+      quality: "speech_low_quality" | "speech_standard" = "speech_standard"
+    ) => {
       const client = clientRef.current!;
-      await client.join(appId, channel, token, uid);
-      console.log("[CALL] joined channel");
+      const old = micRef.current;
+      if (old) {
+        try {
+          await client.unpublish([old]);
+        } catch {}
+        try {
+          old.stop();
+          old.close();
+        } catch {}
+      }
 
+      const microphoneId = await getPreferredMicId();
       const mic = await AgoraRTC.createMicrophoneAudioTrack({
-        encoderConfig: "speech_low_quality",
+        encoderConfig: quality,
+        microphoneId,
       });
+
+      mic.on("track-ended", async () => {
+        console.warn("[CALL] mic track ended — attempting auto-recovery");
+        try {
+          await recreateAndPublishMic(quality);
+          setMuted(false);
+          console.log("[CALL] mic auto-recovered and republished");
+        } catch (e) {
+          console.error("[CALL] mic auto-recovery failed:", e);
+        }
+      });
+
       micRef.current = mic;
       await client.publish([mic]);
-      console.log("[CALL] published local mic");
-
       setMuted(false);
-      setPhase("active");
-    } catch (e) {
-      console.error("[CALL] join/publish failed:", e);
-      // Keep user in incoming/outgoing to allow retry on iPad
-      setPhase((p) =>
-        p === "incoming" ? "incoming" : p === "outgoing" ? "outgoing" : "ended"
-      );
-    }
-  }, [appId, channel, token, uid, role]);
+      console.log("[CALL] published local mic");
+    },
+    []
+  );
 
   /* -----------------------------------------------------------------------------
-   * Preflight (iOS/iPadOS): unlock audio + prompt mic, then join.
-   * Call this from a BUTTON TAP (Accept/Call).
+   * Join core (reads params object)
    * --------------------------------------------------------------------------- */
-  const preflightAndJoin = useCallback(async () => {
-    if (joinedRef.current) return;
-    joinedRef.current = true;
-    try {
-      await unlockAudioOnce();
-      const ok = await requestMicPermission();
-      if (!ok) {
-        joinedRef.current = false;
-        // Keep current phase so user can retry tapping Accept/Call
+  const joinWithParams = useCallback(
+    async (jp: JoinParams) => {
+      const { appId: a, channel: c, token: t, uid: u } = jp;
+      console.log("[CALL] join with:", {
+        appId: a,
+        channel: c,
+        uid: u,
+        hasToken: !!t,
+        role,
+      });
+      if (!a || !t || !c || u == null) {
+        console.warn("[CALL] join aborted: missing params");
         return;
       }
-      await join();
-    } catch (e) {
-      console.error("[CALL] preflightAndJoin failed:", e);
-      joinedRef.current = false;
-    }
-  }, [join]);
 
-  // Now that preflightAndJoin exists, patch startOutgoing deps (React rule relaxed above).
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {}, [preflightAndJoin]);
+      try {
+        setPhase((p) => (p === "incoming" ? "connecting" : p));
+        const client = clientRef.current!;
+        await client.join(a, c, t, u);
+        console.log("[CALL] joined channel");
+        await recreateAndPublishMic("speech_standard");
+        setPhase("active");
+      } catch (e) {
+        console.error("[CALL] join/publish failed:", e);
+        setPhase((p) =>
+          p === "incoming"
+            ? "incoming"
+            : p === "outgoing"
+            ? "outgoing"
+            : "ended"
+        );
+      }
+    },
+    [recreateAndPublishMic, role]
+  );
 
   /* -----------------------------------------------------------------------------
-   * End call
+   * Public join: tries state, then refs
    * --------------------------------------------------------------------------- */
+  const join = useCallback(async () => {
+    const st = { appId, channel, token, uid };
+    if (st.appId && st.channel && st.token && typeof st.uid === "number") {
+      await joinWithParams({
+        appId: st.appId,
+        channel: st.channel,
+        token: st.token,
+        uid: st.uid,
+      } as JoinParams);
+      return;
+    }
+    const jp = joinParamsRef.current;
+    if (jp) {
+      await joinWithParams(jp);
+      return;
+    }
+    console.warn("[CALL] join aborted: missing params (no state or refs)");
+  }, [appId, channel, token, uid, joinWithParams]);
+
+  /* -----------------------------------------------------------------------------
+   * Preflight → ensure params → join
+   *  - Callee: waits up to 5s for socket to set params
+   *  - Caller: can optionally fetch session first (no race)
+   * --------------------------------------------------------------------------- */
+  const preflightAndJoin = useCallback(
+    async (opts?: { fetchSession?: () => Promise<OutgoingSession | null> }) => {
+      if (joinedRef.current) return;
+      joinedRef.current = true;
+      try {
+        await unlockAudioOnce();
+        const ok = await requestMicPermission();
+        if (!ok) {
+          joinedRef.current = false;
+          return;
+        }
+
+        // If provided, fetch the session (caller flow). This guarantees params.
+        if (opts?.fetchSession) {
+          const s = await opts.fetchSession();
+          if (s && s.channel && s.token && s.uid) {
+            setRole("caller");
+            setCallId(s.callId);
+            setChannel(s.channel);
+            setToken(s.token);
+            setUid(Number(s.uid));
+            setRemoteName(s.name || "Unknown");
+            setRemoteImage(s.image);
+            setJoinParams({
+              channel: s.channel,
+              token: s.token,
+              uid: Number(s.uid),
+            });
+            setPhase("outgoing");
+          }
+        }
+
+        // Wait for params from either state or refs
+        const params = await waitFor<JoinParams>(() => {
+          const sOk =
+            appId && channel && token && typeof uid === "number"
+              ? ({
+                  appId,
+                  channel: channel!,
+                  token: token!,
+                  uid: uid!,
+                } as JoinParams)
+              : null;
+          return sOk ?? joinParamsRef.current ?? null;
+        });
+
+        if (!params) {
+          console.warn("[CALL] preflight join aborted: no params available");
+          joinedRef.current = false;
+          return;
+        }
+
+        await joinWithParams(params);
+      } catch (e) {
+        console.error("[CALL] preflightAndJoin failed:", e);
+        joinedRef.current = false;
+      }
+    },
+    [appId, channel, token, uid, joinWithParams]
+  );
+
+  /**
+   * Convenience: full caller flow in one call from a button:
+   * - Unlock audio & get mic perm
+   * - startCall (server) → map → set refs/state
+   * - join
+   */
+  const preflightStartCallAndJoin = useCallback(
+    async ({ toUser, toUserType }: MakeCallType) => {
+      return preflightAndJoin({
+        fetchSession: async () => {
+          try {
+            const res = await callApi.startCall({ toUser, toUserType });
+            const s = mapCreateSessionResponseToOutgoingSession(
+              res?.data ?? res,
+              appId
+            );
+            console.log("[CALL] create-session mapped:", s);
+            return s;
+          } catch (e) {
+            console.error("[CALL] start call error:", e);
+            return null;
+          }
+        },
+      });
+    },
+    [appId, preflightAndJoin]
+  );
 
   /* -----------------------------------------------------------------------------
    * Local mute
@@ -435,24 +730,26 @@ export function useCallEngine(appId: string) {
   }, [muted]);
 
   /* -----------------------------------------------------------------------------
-   * Optional: API helper to start a call (caller)
+   * Optional: API helper to start a call (legacy; still exported)
    * --------------------------------------------------------------------------- */
-  const handleStartCall = async ({ toUser, toUserType }: MakeCallType) => {
-    console.log("[CALL] starting call…");
-    try {
-      const res = await callApi.startCall({ toUser, toUserType });
-      const session = mapCreateSessionResponseToOutgoingSession(
-        res?.data ?? res,
-        appId
-      );
-      console.log("[CALL] create-session mapped:", session);
-      // You can set autoJoinCaller: true if this handler is invoked by a button tap.
-      startOutgoing(session, { autoJoinCaller: true });
-      return res;
-    } catch (error: any) {
-      console.error("[CALL] start call error:", error);
-    }
-  };
+  const handleStartCall = useCallback(
+    async ({ toUser, toUserType }: MakeCallType) => {
+      console.log("[CALL] starting call…");
+      try {
+        const res = await callApi.startCall({ toUser, toUserType });
+        const session = mapCreateSessionResponseToOutgoingSession(
+          res?.data ?? res,
+          appId
+        );
+        console.log("[CALL] create-session mapped:", session);
+        startOutgoing(session, { autoJoinCaller: true });
+        return res;
+      } catch (error: any) {
+        console.error("[CALL] start call error:", error);
+      }
+    },
+    [appId, startOutgoing]
+  );
 
   return {
     // state
@@ -464,14 +761,19 @@ export function useCallEngine(appId: string) {
     remoteName,
     remoteImage,
     muted,
+    // diagnostics
+    localLevel,
+    uplinkQuality,
+    downlinkQuality,
 
     // actions
-    startOutgoing,
-    join,
-    end,
+    startOutgoing, // if you already have session
+    join, // if you already have params
+    end, // end("ended" | "missed" | "declined", "local" | "remote")
     toggleMute,
-    handleStartCall,
-    preflightAndJoin, // <-- use this for iPad: Accept/Call button should trigger this
+    handleStartCall, // legacy caller: start then auto-join
+    preflightAndJoin, // callee: Accept OR caller with params
+    preflightStartCallAndJoin, // caller: one-shot startCall → join (no race)
   };
 }
 
@@ -490,8 +792,8 @@ export function mapCreateSessionResponseToOutgoingSession(
     appId,
     callId: call?._id,
     channel: channelName,
-    token: call?.fromUserToken, // caller token
-    uid: Number(call?.fromUserUid), // caller uid
+    token: call?.fromUserToken,
+    uid: Number(call?.fromUserUid),
     name: call?.heading?.name,
     image: call?.heading?.image,
   } as const;

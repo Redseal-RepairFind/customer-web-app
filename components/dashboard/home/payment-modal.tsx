@@ -1,9 +1,11 @@
 "use client";
 
 import { InputContainer } from "@/components/auth/signup-item";
+import SubscriptionAgreementPage from "@/components/public/sub-terms";
 import Button from "@/components/ui/custom-btn";
 import PlacesAutocomplete from "@/components/ui/places-autocomplete";
 import LoadingTemplate from "@/components/ui/spinner";
+import PortalModal from "@/components/ui/terms-portal";
 import Text from "@/components/ui/text";
 import ToggleBtn from "@/components/ui/toggle-btn";
 import { useUser } from "@/hook/useMe";
@@ -51,7 +53,7 @@ const PaymentModal = ({
   const [toggle, setToggle] = useState(
     plan?.billingFrequency === "ANNUALLY" ? true : false
   );
-
+  const [termsModal, setTermsMoal] = useState(false);
   const type = useSearchParams().get("type");
   const { curUser } = useUser();
 
@@ -127,6 +129,15 @@ const PaymentModal = ({
 
   return (
     <div className="w-full flex-cols gap-4 z-[1000]">
+      <PortalModal
+        isOpen={termsModal}
+        onClose={() => setTermsMoal(false)}
+        closeOnBackdrop
+        closeOnEsc
+      >
+        <SubscriptionAgreementPage />
+      </PortalModal>
+
       <div className="flex items-center justify-center gap-2 text-dark-400 ">
         <Text.Paragraph className="text-dark-400 text-sm lg:text-base text-nowrap">
           Billed monthly
@@ -281,7 +292,7 @@ const PaymentModal = ({
 
         <Text.Paragraph className="text-sm lg:text-base">
           I agree to the{" "}
-          <Link
+          {/* <Link
             href={`/subscription_agreement?type=${
               type || curUser?.data?.planCategory
             }`}
@@ -290,7 +301,13 @@ const PaymentModal = ({
             className="font-semibold underline"
           >
             Terms of Service
-          </Link>
+          </Link> */}
+          <button
+            className="font-semibold underline cursor-pointer"
+            onClick={() => setTermsMoal(true)}
+          >
+            Terms of Service{" "}
+          </button>
           *
         </Text.Paragraph>
       </div>

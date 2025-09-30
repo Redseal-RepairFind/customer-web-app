@@ -15,7 +15,6 @@ import {
   FaCog,
   FaPause,
   FaPlay,
-  FaWifi,
   FaVolumeUp,
   FaChevronDown,
 } from "react-icons/fa";
@@ -62,7 +61,7 @@ type Props = {
   onHold?: boolean;
 
   durationLabel?: string;
-  connection?: ConnectionInfo;
+  connection?: ConnectionInfo; // kept for API compatibility (unused)
 
   // actions
   onAccept?: () => void;
@@ -94,7 +93,7 @@ export default function CallPortal({
   screenSharing = false,
   onHold = false,
   durationLabel,
-  connection,
+  connection, // eslint-disable-line @typescript-eslint/no-unused-vars
   onAccept,
   onDecline,
   onEnd,
@@ -110,6 +109,8 @@ export default function CallPortal({
   renderLocalPreview,
 }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
+
+  console.log(data);
 
   // Trap focus + ESC close
   useEffect(() => {
@@ -149,15 +150,16 @@ export default function CallPortal({
 
   if (!isOpen) return null;
 
-  const statusText = getStatusText(state, onHold);
+  const statusText = getStatusText(state, onHold, role);
   const canShowAccept = state === "incoming";
   const canShowDecline = state === "incoming";
-  const canShowStandardDock = [
-    "active",
-    "on-hold",
+
+  // Minimal dock when ringing or answered
+  const showMinimalDock = [
+    "outgoing",
     "connecting",
     "reconnecting",
-    "outgoing",
+    "active",
   ].includes(state);
 
   return (
@@ -176,21 +178,10 @@ export default function CallPortal({
           <Avatar name={data.name} url={data.image} />
           <div className="min-w-0">
             <div className="font-semibold truncate">{data.name}</div>
-            <div className="text-xs text-white/70 flex items-center gap-2">
-              <StatusPill state={state} onHold={onHold} role={role} />
-              {durationLabel && state === "active" && (
-                <span>• {durationLabel}</span>
-              )}
-              {!!connection && (
-                <>
-                  <span>•</span>
-                  <Quality
-                    quality={connection.quality}
-                    label={connection.networkLabel}
-                  />
-                </>
-              )}
-            </div>
+            {/* Keep duration only; removed network bars/pill here */}
+            {durationLabel && state === "active" && (
+              <div className="text-xs text-white/70">{durationLabel}</div>
+            )}
           </div>
         </div>
 
@@ -222,23 +213,25 @@ export default function CallPortal({
         {/* Remote media area */}
         <div className="relative flex-1 rounded-2xl bg-neutral-800/50 overflow-hidden border border-neutral-700/60">
           {/* Screen share / video */}
+          {/* Screen share / video */}
           <div className="absolute inset-0">
             {screenSharing ? (
               <Placeholder label="Screen sharing" />
             ) : renderRemoteVideo ? (
               renderRemoteVideo()
             ) : (
-              // voice-first UI; show avatar/status
+              // voice-first UI; center avatar + name + status
               <div className="w-full h-full flex items-center justify-center">
                 <div className="flex flex-col items-center gap-3">
                   <Avatar size="lg" name={data.name} url={data.image} />
+                  <div className="text-lg font-semibold">{data.name}</div>
                   <div className="text-sm text-white/80">{statusText}</div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Local PiP */}
+          {/* Local PiP (kept for API compatibility) */}
           <div className="absolute bottom-4 right-4 w-44 h-28 rounded-lg overflow-hidden border border-neutral-600/70 bg-black backdrop-blur">
             {renderLocalPreview ? (
               renderLocalPreview()
@@ -257,7 +250,7 @@ export default function CallPortal({
           )}
         </div>
 
-        {/* Incoming accept/decline */}
+        {/* Incoming accept/decline (unchanged so flows elsewhere don't break) */}
         {canShowAccept && (
           <div className="mt-4 flex items-center justify-center gap-6">
             <CircleButton
@@ -275,10 +268,10 @@ export default function CallPortal({
           </div>
         )}
 
-        {/* Controls dock */}
-        {canShowStandardDock && (
+        {/* Minimal controls dock: only End, Mute, Speaker when ringing/answered */}
+        {showMinimalDock && (
           <div className="mt-4 mx-auto w-full max-w-3xl rounded-2xl bg-neutral-800/50 border border-neutral-700/60 p-3">
-            <div className="grid grid-cols-8 gap-2 place-items-center">
+            <div className="grid grid-cols-3 gap-2 place-items-center">
               <ToggleButton
                 active={!muted}
                 label={muted ? "Unmute" : "Mute"}
@@ -288,46 +281,12 @@ export default function CallPortal({
                 ariaLabel="Mute or unmute microphone"
               />
               <ToggleButton
-                active={false /* voice-first */}
-                label="Video"
-                onClick={onVideoToggle}
-                onIcon={<FaVideo />}
-                offIcon={<FaVideoSlash />}
-                ariaLabel="Toggle camera"
-              />
-              <ToggleButton
                 active={speakerOn}
                 label="Speaker"
                 onClick={onSpeakerToggle}
                 onIcon={<FaVolumeUp />}
                 offIcon={<FaVolumeUp />}
                 ariaLabel="Toggle speaker"
-              />
-              <ToggleButton
-                active={!!onHold}
-                label={onHold ? "Resume" : "Hold"}
-                onClick={onHoldToggle}
-                onIcon={<FaPause />}
-                offIcon={<FaPlay />}
-                ariaLabel="Hold or resume"
-              />
-              <ToggleButton
-                active={screenSharing}
-                label="Share"
-                onClick={onShareToggle}
-                onIcon={<FaDesktop />}
-                offIcon={<FaDesktop />}
-                ariaLabel="Toggle screen share"
-              />
-              <DockButton
-                label="Keypad"
-                icon={<FaRegKeyboard />}
-                onClick={onOpenKeypad}
-              />
-              <DockButton
-                label="Add"
-                icon={<FaUserPlus />}
-                onClick={onAddParticipant}
               />
               <DockButton
                 label="End"
@@ -337,16 +296,11 @@ export default function CallPortal({
                 ariaLabel="End call"
               />
             </div>
+            {/* Shortcuts kept; optional */}
             <div className="mt-2 text-center text-[11px] text-white/60">
               Shortcuts:{" "}
               <kbd className="px-1 py-0.5 bg-neutral-800/70 rounded">M</kbd>{" "}
               mute ·{" "}
-              <kbd className="px-1 py-0.5 bg-neutral-800/70 rounded">V</kbd>{" "}
-              video ·{" "}
-              <kbd className="px-1 py-0.5 bg-neutral-800/70 rounded">H</kbd>{" "}
-              hold ·{" "}
-              <kbd className="px-1 py-0.5 bg-neutral-800/70 rounded">S</kbd>{" "}
-              share ·{" "}
               <kbd className="px-1 py-0.5 bg-neutral-800/70 rounded">E</kbd> end
             </div>
           </div>
@@ -407,32 +361,6 @@ function Avatar({
     >
       {initials || "?"}
     </div>
-  );
-}
-
-function Quality({
-  quality,
-  label,
-}: {
-  quality: ConnectionInfo["quality"];
-  label?: string;
-}) {
-  const bars = [1, 2, 3, 4, 5];
-  return (
-    <span className="inline-flex items-center gap-1">
-      <FaWifi className="opacity-80" />
-      <span className="flex gap-0.5">
-        {bars.map((b) => (
-          <span
-            key={b}
-            className={`h-2 w-1.5 rounded-sm ${
-              quality >= b ? "bg-green-400" : "bg-neutral-700"
-            }`}
-          />
-        ))}
-      </span>
-      {label && <span className="text-white/70">{label}</span>}
-    </span>
   );
 }
 
