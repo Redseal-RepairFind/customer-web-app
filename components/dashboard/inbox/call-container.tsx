@@ -3,20 +3,15 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import CallPortal, { CallState } from "./call-portal";
-import {
-  useCallEngine,
-  mapCreateSessionResponseToOutgoingSession,
-} from "@/hook/useCall";
+import { mapCreateSessionResponseToOutgoingSession } from "@/hook/useCall";
 import { useUser } from "@/hook/useMe";
+import { useCall } from "@/contexts/call-provider";
 
-type Props = {
-  createSessionResponse?: any | null;
-};
+type Props = { createSessionResponse?: any | null };
 
 export default function CallPortalContainer({ createSessionResponse }: Props) {
-  const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID!;
   const {
-    // engine state
+    // engine state (from provider)
     phase,
     role,
     callId,
@@ -30,19 +25,19 @@ export default function CallPortalContainer({ createSessionResponse }: Props) {
     join,
     end,
     toggleMute,
-  } = useCallEngine(appId);
+  } = useCall(); // <-- THIS is the shared engine
 
-  const { curUser } = useUser();
+  const appId = process.env.NEXT_PUBLIC_AGORA_APP_ID!;
+  // const { curUser } = useUser();
   const startedRef = useRef(false);
 
-  // Auto-start caller flow exactly once when a create-session payload is provided
+  // Only if you pass createSessionResponse via props (optional path)
   useEffect(() => {
     if (!createSessionResponse || startedRef.current) return;
     const s = mapCreateSessionResponseToOutgoingSession(
       createSessionResponse?.data ?? createSessionResponse,
       appId
     );
-    // Only start if the payload actually has what we need
     if (s?.callId && s?.channel && s?.token && typeof s?.uid === "number") {
       startOutgoing(s);
       startedRef.current = true;
@@ -68,21 +63,17 @@ export default function CallPortalContainer({ createSessionResponse }: Props) {
       ? "ended"
       : "ended";
 
-  // Tailored call data for the CallPortal (uses your backend/event fields)
   const data = useMemo(
     () => ({
       callId: callId ?? "",
       channel: channel ?? "",
-      token: "", // not needed by the portal UI; the engine uses it internally
+      token: "", // portal UI doesn’t need it
       uid: typeof uid === "number" ? uid : 0,
       name: remoteName || "Unknown",
       image: remoteImage,
     }),
     [callId, channel, uid, remoteName, remoteImage]
   );
-
-  // If you want to show your own avatar in the local PiP later, it’s available:
-  const meAvatar = curUser?.data?.avatar as string | undefined;
 
   return (
     <CallPortal
@@ -98,7 +89,7 @@ export default function CallPortalContainer({ createSessionResponse }: Props) {
       screenSharing={false}
       durationLabel={undefined}
       connection={{ quality: 4, networkLabel: "Good" }}
-      onAccept={join} // callee accepts OR caller confirms -> join Agora
+      onAccept={join}
       onDecline={end}
       onEnd={end}
       onMuteToggle={toggleMute}
@@ -109,9 +100,6 @@ export default function CallPortalContainer({ createSessionResponse }: Props) {
       onOpenKeypad={() => {}}
       onAddParticipant={() => {}}
       onOpenSettings={() => {}}
-      // If you later render real <video> elements from the SDK:
-      // renderRemoteVideo={() => <YourRemoteVideo />}
-      // renderLocalPreview={() => <YourLocalPreview avatar={meAvatar} />}
     />
   );
 }

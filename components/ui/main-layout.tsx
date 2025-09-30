@@ -41,7 +41,9 @@ export default function MainLayout({
             }`}
           >
             <SocketProvider>
-              <ThemeRegistry>{children}</ThemeRegistry>
+              <>
+                <ThemeRegistry>{children}</ThemeRegistry>
+              </>
             </SocketProvider>
           </div>
         </main>

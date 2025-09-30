@@ -188,13 +188,20 @@ export function useCallEngine(appId: string) {
   }, [muted]);
 
   const handleStartCall = async ({ toUser, toUserType }: MakeCallType) => {
+    console.log("starting call...");
     try {
       const res = await callApi.startCall({
         toUser,
         toUserType,
       });
 
-      // const
+      const session = mapCreateSessionResponseToOutgoingSession(
+        res?.data ?? res,
+        appId
+      );
+
+      console.log(session, res);
+      startOutgoing(session);
       return res;
     } catch (error: any) {
       console.error("call start error:", error);
