@@ -25,6 +25,8 @@ import { countriesPhoneCodes } from "@/lib/countries";
 import { SignupValues } from "@/lib/signup-schema";
 import LoadingTemplate from "../ui/spinner";
 import Link from "next/link";
+import PortalModal from "../ui/terms-portal";
+import SubscriptionAgreementPage from "../public/sub-terms";
 
 const UserInformation = () => {
   const params = useSearchParams();
@@ -44,6 +46,7 @@ const UserInformation = () => {
   const initPlan = accountType?.find((acct) => acct.id === "BUSINESS");
   const [selectedPlan, setselectedPlan] = useState(initPlan);
   const [selectedPredictions, setSelectedPredictions] = useState<any>("");
+  const [termsModal, setTermsMoal] = useState(false);
 
   const predictions = selectedPredictions?.prediction;
 
@@ -373,23 +376,37 @@ const UserInformation = () => {
 
         <Text.Paragraph className="text-sm lg:text-base">
           By creating an account, you agree to our{" "}
-          <Link
+          {/* <Link
             href={"/terms"}
             className="underline font-semibold cursor-pointer"
             target="_blank"
             rel="noopener noreferrer"
           >
             Terms of Service
-          </Link>{" "}
+          </Link>{" "} */}
+          <button
+            className="font-semibold underline cursor-pointer"
+            onClick={() => setTermsMoal(true)}
+          >
+            Terms of Service
+          </button>
+          {"  "}
           and{" "}
-          <Link
+          <button
+            className="font-semibold underline cursor-pointer"
+            onClick={() => setTermsMoal(true)}
+          >
+            Privacy Policy{" "}
+          </button>
+          {/* and{" "} */}
+          {/* <Link
             href={"/policy"}
             className="underline font-semibold cursor-pointer"
             target="_blank"
             rel="noopener noreferrer"
           >
             Privacy Policy
-          </Link>
+          </Link> */}
         </Text.Paragraph>
       </div>
 
@@ -408,6 +425,15 @@ const UserInformation = () => {
       <div className="">
         <AuthQuestion link="/login" linkTxt="Log in" text="Have an account?" />
       </div>
+
+      <PortalModal
+        isOpen={termsModal}
+        onClose={() => setTermsMoal(false)}
+        closeOnBackdrop
+        closeOnEsc
+      >
+        <SubscriptionAgreementPage />
+      </PortalModal>
     </form>
   );
 };
