@@ -86,7 +86,7 @@ const RequestModal = ({
     <form className="w-full flex-cols gap-4 z-[1000]">
       <div className="flex-cols gap-2">
         <Text.SubHeading className="text-lg font-semibold">
-          Confirm payment information for your subscription
+          Confirm payment information for your Membership
         </Text.SubHeading>
         <Text.SmallText className="text-dark-500 text-sm">
           Fill out the form below to submit a new service request. We'll match
@@ -160,13 +160,13 @@ const RequestModal = ({
             <Text.Paragraph className="text-dark-500 text-sm">
               {subs
                 ? `${subs.coverageAddress.address}  - ${subs.planType || ""}`
-                : "Select Subscription address"}
+                : "Select Membership address"}
             </Text.Paragraph>
           </Dropdown.Trigger>
           <Dropdown.Content className="w-full bg-white">
             <Dropdown.Label className="flex-cols gap-2">
               <Text.Paragraph className="text-dark-500 ">
-                {"Select Subscription address"}
+                {"Select Membership address"}
               </Text.Paragraph>
             </Dropdown.Label>
 
@@ -196,8 +196,8 @@ const RequestModal = ({
             />
 
             <Text.Paragraph className="text-sm text-red-500">
-              Note: the selected subscription is not active at the moment, You
-              can not make repair requests to the selected location
+              Note: the selected Membership is not active at the moment, You can
+              not make repair requests to the selected location
             </Text.Paragraph>
           </div>
         ) : null}
@@ -317,7 +317,7 @@ const RequestModal = ({
           disabled={creatingRequest || subs?.status !== "ACTIVE"}
           onClick={async () => {
             if (!subs?.coverageAddress?.address) {
-              toast.error("Selected subscription have no coverage address");
+              toast.error("Selected Membership have no coverage address");
               return;
             }
             const payload = {

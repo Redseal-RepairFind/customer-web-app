@@ -27,7 +27,8 @@ export const useUser = () => {
       pricingActions.getMe$patmentMethod({
         include: "stripePaymentMethods",
       }),
-    enabled: curPathname === "/manage-subscription",
+    enabled:
+      curPathname === "/manage-subscription" || curPathname === "/pricing",
   });
 
   // console.log(

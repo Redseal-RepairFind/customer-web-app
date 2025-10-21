@@ -56,7 +56,7 @@ function BusinessTerms() {
   return (
     <section className="space-y-8">
       <header className="space-y-2">
-        <Text.Heading>RepairFind Subscription Agreement</Text.Heading>
+        <Text.Heading>RepairFind Membership Agreement</Text.Heading>
         <Text.SubParagraph>
           Administered by: RepairFind Technologies Inc. (“RepairFind”)
         </Text.SubParagraph>
@@ -83,7 +83,7 @@ function BusinessTerms() {
           1. Agreement Structure &amp; Nature of Services
         </Text.SmallHeading>
         <Text.Paragraph>
-          This Repair Subscription Agreement (“Agreement”) is a binding contract
+          This Repair Membership Agreement (“Agreement”) is a binding contract
           between RepairFind Technologies Inc. (“RepairFind,” “we,” “us,” or
           “our”) and the subscribing entity (“Subscriber,” “you,” or “your”).
         </Text.Paragraph>

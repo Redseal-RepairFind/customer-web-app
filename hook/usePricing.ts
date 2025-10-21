@@ -163,6 +163,21 @@ export const usePricing = (planId?: string) => {
       setIsCheckingOut(false);
     }
   };
+  const handleNewSubscription = async (payload: SubscriptionType) => {
+    setIsCheckingOut(true);
+    try {
+      const res = await pricingActions.activateNewSubscriptionPlan(payload);
+      toast.success(res?.message || res?.data?.message || "");
+      sessionStorage.removeItem("extra_sub");
+      navigator.navigate("/manage-subscription", "replace");
+    } catch (error) {
+      const errMsg = formatError(error);
+      console.error("CheckoutError", error);
+      toast.error(errMsg || "checkout failed");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
   const handleCheckoutSession = async () => {
     setIsCheckingOut(true);
     try {
@@ -326,5 +341,6 @@ export const usePricing = (planId?: string) => {
     isRefetchingSubs,
     handleReactivatePlan,
     handleContinuePlan,
+    handleNewSubscription,
   };
 };

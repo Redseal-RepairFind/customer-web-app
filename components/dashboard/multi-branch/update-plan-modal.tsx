@@ -111,7 +111,7 @@ const UpdatePlanModal = ({
 
       <div className="flex-cols mb-2 w-full">
         <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
-          Subscription Plan
+          Membership Plan
         </Text.Paragraph>
 
         <div className="input-container flex items-center">

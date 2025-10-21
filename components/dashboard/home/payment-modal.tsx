@@ -3,6 +3,7 @@
 import { InputContainer } from "@/components/auth/signup-item";
 import SubscriptionAgreementPage from "@/components/public/sub-terms";
 import Button from "@/components/ui/custom-btn";
+import Dropdown from "@/components/ui/dropdown";
 import PlacesAutocomplete from "@/components/ui/places-autocomplete";
 import LoadingTemplate from "@/components/ui/spinner";
 import PortalModal from "@/components/ui/terms-portal";
@@ -49,13 +50,17 @@ const PaymentModal = ({
   //   modal: false,
   // });
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const { handleCheckout, isCheckingout } = usePricing();
+  const { handleCheckout, isCheckingout, handleNewSubscription } = usePricing();
   const [toggle, setToggle] = useState(
     plan?.billingFrequency === "ANNUALLY" ? true : false
   );
   const [termsModal, setTermsMoal] = useState(false);
   const type = useSearchParams().get("type");
-  const { curUser } = useUser();
+  const newSub = useSearchParams().get("new");
+  const { curUser, curUser4PaymentMethod } = useUser();
+  const [stripePmd, setStripePmd] = useState<any>();
+
+  // console.log(curUser4PaymentMethod?.data?.stripePaymentMethods);
 
   const user = curUser?.data;
 
@@ -64,7 +69,7 @@ const PaymentModal = ({
 
   // console.log(selectedPredictions.prediction.country);
 
-  // console.log(equivalentYearlyPlan);
+  console.log(newSub);
 
   const fivePercent = (n: number) => n * 0.05;
 
@@ -120,12 +125,21 @@ const PaymentModal = ({
         "RESIDENTIAL",
       // ...(user?.businessName ? { businessName: user?.businessName } : null),
       businessName: user?.businessName || user?.name,
+      ...(newSub && { paymentMethodId: stripePmd?.id }),
     };
 
-    console.log(user);
+    // console.log(user);
+
+    if (newSub) {
+      handleNewSubscription(payload as any);
+
+      return;
+    }
 
     await handleCheckout(payload as any);
   };
+
+  const furtherDisable = newSub ? !stripePmd : false;
 
   return (
     <div className="w-full flex-cols gap-4 z-[1000]">
@@ -153,7 +167,7 @@ const PaymentModal = ({
         </Text.Paragraph>
       </div>
       <Text.SubHeading className="text-lg font-semibold">
-        Confirm payment information for your subscription
+        Confirm payment information for your Membership
       </Text.SubHeading>
       {/* <div className="flex-col gap-4 mb-4">
         <div className="flex-rows mb-2">
@@ -192,6 +206,53 @@ const PaymentModal = ({
           </Dropdown.Content>
         </Dropdown>
       </div> */}
+      {newSub && (
+        <div className="flex-col gap-4 mb-4 w-full relative">
+          <Text.Paragraph className="font-semibold">
+            Payment Method
+          </Text.Paragraph>
+
+          <Dropdown className="w-full">
+            <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
+              <Text.Paragraph className="text-dark-500">
+                {stripePmd?.card && (
+                  <span className="font-bold text-xl text-blue-800">
+                    {stripePmd?.card?.brand}
+                  </span>
+                )}{" "}
+                {"  "}
+                {stripePmd?.card
+                  ? `**** **** **** ${stripePmd?.card?.last4}`
+                  : "Select Payment method"}
+              </Text.Paragraph>
+            </Dropdown.Trigger>
+            <Dropdown.Content className="w-full bg-white">
+              <Dropdown.Label>
+                <Text.Paragraph className="text-dark-500">
+                  {"Select Equipment Age"}
+                </Text.Paragraph>
+              </Dropdown.Label>
+
+              {curUser4PaymentMethod?.data?.stripePaymentMethods.map(
+                (pd: any, i: number) => (
+                  <Dropdown.Item
+                    key={pd.id}
+                    className={`border-b border-b-light-0`}
+                    onClick={() => setStripePmd?.(pd)}
+                  >
+                    <Text.Paragraph className="text-dark-500">
+                      <span className="font-bold text-xl text-blue-800">
+                        {pd?.card?.brand}
+                      </span>{" "}
+                      **** **** **** {pd?.card?.last4}
+                    </Text.Paragraph>
+                  </Dropdown.Item>
+                )
+              )}
+            </Dropdown.Content>
+          </Dropdown>
+        </div>
+      )}
       <div className="flex-col gap-4 mb-4 w-full relative">
         <Text.Paragraph className="font-semibold">Address</Text.Paragraph>
 
@@ -245,7 +306,7 @@ const PaymentModal = ({
       </div>
       <div className="bg-light-500 min-h-30 rounded-lg p-2">
         <Text.Paragraph className="font-semibold">
-          Subscription plan
+          Membership plan
         </Text.Paragraph>
         <div className="border-b border-b-light-10">
           <div className="  flex-row-between py-3">
@@ -274,7 +335,7 @@ const PaymentModal = ({
         </div>
       </div>
       <Text.SubParagraph className="text-dark-500">
-        Once payment has been processed, your subscription will be active.
+        Once payment has been processed, your Membership will be active.
       </Text.SubParagraph>
 
       <div className="flex-rows gap-2">
@@ -315,13 +376,13 @@ const PaymentModal = ({
       <div className="flex-rows items-center gap-4">
         <Button
           onClick={() => onSubmit()}
-          disabled={!acceptTerms || isCheckingout}
+          disabled={!acceptTerms || isCheckingout || furtherDisable}
           className="cursor-pointer  mb-4 mt-8 min-h-10 relative w-full"
         >
           {isCheckingout ? (
             <LoadingTemplate isMessage={false} variant="small" />
           ) : (
-            <Button.Text>Confirm Subscription</Button.Text>
+            <Button.Text>Confirm Membership</Button.Text>
           )}
         </Button>
         <Button

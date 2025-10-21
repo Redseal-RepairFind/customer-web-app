@@ -52,6 +52,7 @@ export type SubscriptionType = {
     descrition?: string;
   };
   businessName?: string;
+  paymentMethodId?: string;
 };
 export type CoverageAddress = {
   latitude: string;

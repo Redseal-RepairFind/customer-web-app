@@ -189,7 +189,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const handleCloseInfoModal = () => setPaymentInfo({ info: {}, open: false });
   const handleOpenInfoModal = (item: any) => {
     if (!subType?.name) {
-      toast.error("Select a subscription type to proceed ");
+      toast.error("Select a Membership type to proceed ");
       return;
     }
     if (!selectedPredictions?.prediction) {
@@ -217,7 +217,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
         <Modal isOpen={openModal} onClose={handleCLOSEMODAL}>
           <div className="flex-cols gap-3">
             <Text.Paragraph className="my-2 text-dark-400 text-base text-center">
-              To Change your subscription Plan, kindly hit the proceed button
+              To Change your Membership Plan, kindly hit the proceed button
               bellow
             </Text.Paragraph>
             <div className="flex-rows gap-2">
@@ -283,7 +283,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
             <Button.Text>Back</Button.Text>
           </Button>
           <Text.Heading className="text-xl lg:text-3xl text-center">
-            Change Your Subscription Plan
+            Change Your Membership Plan
           </Text.Heading>
           <Text.Paragraph className="my-2 text-dark-400 text-sm text-center">
             Select a different Plan from your current one
@@ -333,7 +333,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
           )}
           <div className="flex-col-center w-full mb-8 ">
             <Text.Heading className="text-xl lg:text-3xl text-center">
-              RepairFind Subscription Plans
+              RepairFind Membership Plans
             </Text.Heading>
             <Text.Heading className="my-2 text-dark-400 text-xl lg:text-3xl text-center">
               We don’t sell repairs, we sells peace of mind
@@ -360,7 +360,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
           {
             <div className="flex-col gap-4 mb-4 ">
               <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00 ">
-                Subscription Type
+                Membership Type
               </Text.Paragraph>
               <Dropdown className="w-full">
                 <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
@@ -371,7 +371,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                 <Dropdown.Content className="w-full bg-white">
                   <Dropdown.Label>
                     <Text.Paragraph className="text-dark-500">
-                      Select Subscription type
+                      Select Membership type
                     </Text.Paragraph>
                   </Dropdown.Label>
 
@@ -406,7 +406,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
                   ? "Business Address"
                   : " Home Address"}
                 <span className="font-light text-xs sm:ml-1">
-                  (This is the address that will be linked to your subscription)
+                  (This is the address that will be linked to your Membership)
                 </span>
               </Text.Paragraph>
               <Text.SmallText className="text-dark-100 text-xs"></Text.SmallText>
@@ -477,11 +477,11 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
           </div> */}
           {dropdown?.id === "unknown" ? (
             <div className="flex-cols gap-2 my-4">
-              <Text.Paragraph>
+              {/* <Text.Paragraph>
                 *If you are not sure of your equipment age range, kindly proceed
                 without subscription for now, an agent will visit your address
                 to confirm, before you can proceed with your subscription
-              </Text.Paragraph>
+              </Text.Paragraph> */}
               <div>
                 <Button
                   onClick={() => navigator.navigate("/dashboard", "replace")}

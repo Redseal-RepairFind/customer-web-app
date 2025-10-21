@@ -63,7 +63,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   trackColor,
   fillColor,
 
-  ariaLabel = "Subscription progress",
+  ariaLabel = "Membership progress",
 
   showLabel = false,
   label,

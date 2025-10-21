@@ -15,6 +15,7 @@ import UpdatePlanModal from "./update-plan-modal";
 import { useUser } from "@/hook/useMe";
 import { ClipLoader } from "react-spinners";
 import { useRepairs } from "@/hook/useRepairs";
+import Button from "@/components/ui/custom-btn";
 
 const Branches = () => {
   const {
@@ -131,7 +132,7 @@ const Branches = () => {
         </div>
       </SpecialBox>
 
-      {/* <div className="flex-row-between">
+      <div className="flex-row-between">
         <Text.SmallHeading>Payment Methods</Text.SmallHeading>
         <Button
           variant="secondary"
@@ -144,7 +145,7 @@ const Branches = () => {
             </Button.Icon>
           ) : null}
           <Button.Text>
-            {isCheckingout ? "Creating session..." : "Add Payment Method"}
+            {isCheckingout ? "Creating session..." : "Manage Payment Methods"}
           </Button.Text>
         </Button>
       </div>
@@ -153,7 +154,7 @@ const Branches = () => {
         {paymentMethods?.map((mtd: any) => (
           <PaymentMethodItem method={mtd} key={mtd?.id} />
         ))}
-      </div> */}
+      </div>
 
       <div className="grid-2">
         {subscriptions?.map((sub) => {
@@ -187,6 +188,7 @@ const PaymentMethodItem = ({
   isDefault?: boolean;
   method: any;
 }) => {
+  console.log(method);
   return (
     <SpecialBox className="flex-cols border border-light-10 p-4">
       {isDefault ? (

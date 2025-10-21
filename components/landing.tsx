@@ -98,7 +98,7 @@ const Home = () => {
           <div className="flex flex-col items-center  lg:justify-between w-full lg:px-8 xl:px-16">
             <div className="flex flex-col items-center justify-center gap-2">
               <Text.Heading className="lg:text-4xl text-white font-bold text-center title">
-                One Subscription, Unlimited Peace of{" "}
+                One Membership, Unlimited Peace of{" "}
                 <br className="hidden lg:block" />
                 Mind for Your Home.
               </Text.Heading>
@@ -136,12 +136,12 @@ const Home = () => {
         <div className="flex flex-col md:flex-row gap-5 md:items-center  md:justify-between ">
           <div className="max-w-[400px] xl:max-w-[610px] flex-cols gap-2">
             <Text.Heading className="reveal">
-              Home Repairs, Simplified with Subscription
+              Home Repairs, Simplified with Membership
             </Text.Heading>
             <Text.Paragraph className="reveal">
               Skip the stress of finding contractors every time something
-              breaks. With a Repairfind subscription, you get guaranteed access
-              to trusted professionals, faster response times, and predictable
+              breaks. With a Repairfind Membership, you get guaranteed access to
+              trusted professionals, faster response times, and predictable
               costs — all in one plan. Keep your home running smoothly while we
               take care of the details.
             </Text.Paragraph>
@@ -176,7 +176,7 @@ const Home = () => {
 
           <div className="max-w-[400px] xl:max-w-[610px] flex-cols gap-2">
             <Text.Heading className="reveal">
-              One Subscription, Total Home Care{" "}
+              One Membership, Total Home Care{" "}
             </Text.Heading>
             <Text.Paragraph className="reveal">
               Subheading: From AC maintenance to plumbing emergencies,

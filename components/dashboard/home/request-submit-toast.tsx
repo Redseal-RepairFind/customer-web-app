@@ -23,8 +23,8 @@ const RequestSubmitToast = ({
 
       <div className="flex-cols gap-2">
         <Text.Paragraph className="text-white text-sm md:text-base font-bold">
-          New subscriptions come with a 30-day waiting period before you can
-          make your first request.
+          New Membership come with a 30-day waiting period before you can make
+          your first request.
         </Text.Paragraph>
 
         <Text.Paragraph className="text-white text-xs md:text-sm">
