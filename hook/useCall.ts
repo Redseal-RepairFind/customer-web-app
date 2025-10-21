@@ -124,7 +124,12 @@ export function useCallEngine(appId: string) {
   // Agora refs
   const clientRef = useRef<IAgoraRTCClient | null>(null);
   const micRef = useRef<ILocalAudioTrack | null>(null);
-  const remoteAudioRef = useRef<Map<number, IRemoteAudioTrack>>(new Map());
+  const remoteAudioRef = useRef<Map<any, IRemoteAudioTrack>>(new Map());
+  const remotePeersRef = useRef<Set<string>>(new Set());
+  const uidKey = (u: IAgoraRTCRemoteUser | { uid: any }) => String(u.uid);
+
+  // remote joined flag (set ONLY when remote actually publishes/plays)
+  const [joined, setJoined] = useState(false);
 
   // one-off guards
   const wiredRef = useRef(false);
@@ -252,7 +257,11 @@ export function useCallEngine(appId: string) {
               document.body.appendChild(el);
               track.setVolume(100);
               track.play();
-              remoteAudioRef.current.set(user.uid as number, track);
+              remoteAudioRef.current.set(uidKey, track);
+
+              // ✅ remote actually joined (we're hearing them)
+              setJoined(true);
+
               console.log("[CALL] remote audio playing:", user.uid);
             }
           } catch (err) {
@@ -271,6 +280,9 @@ export function useCallEngine(appId: string) {
           } catch {}
           remoteAudioRef.current.delete(user.uid as number);
           removeRemoteEl(user.uid as number);
+
+          // If nobody is remote now, reset joined
+          if (remoteAudioRef.current.size === 0) setJoined(false);
         }
       );
 
@@ -282,6 +294,8 @@ export function useCallEngine(appId: string) {
         } catch {}
         remoteAudioRef.current.delete(user.uid as number);
         removeRemoteEl(user.uid as number);
+
+        if (remoteAudioRef.current.size === 0) setJoined(false);
       });
 
       client.on("token-privilege-will-expire", () =>
@@ -300,6 +314,50 @@ export function useCallEngine(appId: string) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // mount once
+
+  useEffect(() => {
+    const client = clientRef.current;
+    if (!client) return;
+
+    const onUserJoined = (user: IAgoraRTCRemoteUser) => {
+      const key = uidKey(user);
+      remotePeersRef.current.add(key);
+      setJoined(true); // ✅ mark presence immediately on join
+      console.log(
+        "[CALL] user-joined:",
+        user.uid,
+        "peers:",
+        remotePeersRef.current.size
+      );
+    };
+
+    const onUserLeft = (user: IAgoraRTCRemoteUser) => {
+      const key = uidKey(user);
+      remotePeersRef.current.delete(key);
+      // stop/cleanup any leftover track handle
+      const t = remoteAudioRef.current.get(key);
+      try {
+        t?.stop();
+      } catch {}
+      remoteAudioRef.current.delete(key);
+
+      // update joined based on presence set
+      setJoined(remotePeersRef.current.size > 0);
+      console.log(
+        "[CALL] user-left:",
+        user.uid,
+        "peers:",
+        remotePeersRef.current.size
+      );
+    };
+
+    client.on("user-joined", onUserJoined);
+    client.on("user-left", onUserLeft);
+    return () => {
+      client.off("user-joined", onUserJoined);
+      client.off("user-left", onUserLeft);
+    };
+  }, []);
 
   /* -----------------------------------------------------------------------------
    * Diagnostics wiring (volume indicator + network quality)
@@ -361,6 +419,8 @@ export function useCallEngine(appId: string) {
       });
       remoteAudioRef.current.clear();
 
+      setJoined(false);
+
       await client?.leave();
       console.log("[CALL] left channel & cleaned up");
     } catch (err) {
@@ -413,6 +473,7 @@ export function useCallEngine(appId: string) {
           setLocalLevel(0);
           setUplinkQuality(0);
           setDownlinkQuality(0);
+          setJoined(false);
           endingRef.current = false;
         }, 400);
       }
@@ -462,6 +523,7 @@ export function useCallEngine(appId: string) {
         token: incoming.token,
         uid: incoming.uid,
       });
+      setJoined(false); // fresh session
       setPhase("incoming");
       console.log("[CALL] incoming call set:", incoming);
     };
@@ -503,6 +565,7 @@ export function useCallEngine(appId: string) {
       setRemoteName(s.name || "Unknown");
       setRemoteImage(s.image);
       setJoinParams({ channel: s.channel, token: s.token, uid: Number(s.uid) });
+      setJoined(false); // fresh session
       setPhase("outgoing");
       console.log("[CALL] start outgoing:", s);
 
@@ -561,6 +624,48 @@ export function useCallEngine(appId: string) {
   /* -----------------------------------------------------------------------------
    * Join core (reads params object)
    * --------------------------------------------------------------------------- */
+  // Retry helper (exponential backoff) for join()
+  async function joinWithRetry(
+    client: IAgoraRTCClient,
+    params: { appId: string; channel: string; token: string; uid: number },
+    {
+      attempts = 3,
+      baseDelayMs = 600, // first backoff
+    } = {}
+  ): Promise<void> {
+    let lastErr: any = null;
+
+    for (let i = 0; i < attempts; i++) {
+      try {
+        await client.join(
+          params.appId,
+          params.channel,
+          params.token,
+          params.uid
+        );
+        return; // success
+      } catch (err: any) {
+        lastErr = err;
+
+        // For any error, leave/reset before retrying (prevents half-open state)
+        try {
+          await client.leave();
+        } catch {}
+
+        const delay = Math.round(
+          baseDelayMs * Math.pow(2, i) + Math.random() * 200
+        );
+        console.warn(
+          `[CALL] join attempt ${i + 1} failed. Retrying in ${delay}ms…`,
+          err
+        );
+        await new Promise((r) => setTimeout(r, delay));
+      }
+    }
+
+    throw lastErr;
+  }
+
   const joinWithParams = useCallback(
     async (jp: JoinParams) => {
       const { appId: a, channel: c, token: t, uid: u } = jp;
@@ -579,7 +684,16 @@ export function useCallEngine(appId: string) {
       try {
         setPhase((p) => (p === "incoming" ? "connecting" : p));
         const client = clientRef.current!;
-        await client.join(a, c, t, u);
+
+        await joinWithRetry(
+          client,
+          { appId: a, channel: c, token: t, uid: u },
+          {
+            attempts: 3,
+            baseDelayMs: 700,
+          }
+        );
+
         console.log("[CALL] joined channel");
         await recreateAndPublishMic("speech_standard");
         setPhase("active");
@@ -652,6 +766,7 @@ export function useCallEngine(appId: string) {
               token: s.token,
               uid: Number(s.uid),
             });
+            setJoined(false);
             setPhase("outgoing");
           }
         }
@@ -766,7 +881,7 @@ export function useCallEngine(appId: string) {
     uplinkQuality,
     downlinkQuality,
 
-    // actions
+    // actions / flags
     startOutgoing, // if you already have session
     join, // if you already have params
     end, // end("ended" | "missed" | "declined", "local" | "remote")
@@ -774,6 +889,9 @@ export function useCallEngine(appId: string) {
     handleStartCall, // legacy caller: start then auto-join
     preflightAndJoin, // callee: Accept OR caller with params
     preflightStartCallAndJoin, // caller: one-shot startCall → join (no race)
+
+    // remote presence
+    joined, // <-- true only when remote actually joined (published audio)
   };
 }
 

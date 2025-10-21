@@ -254,7 +254,7 @@ export const buildFileDraftEntries = (files: File[]) =>
     url: URL.createObjectURL(f), // replace with CDN URL after upload
   }));
 
-export const useMessages = () => {
+export const useMessages = (id?: string) => {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const { chatId: _chatId } = useParams<{ chatId?: string }>();
@@ -265,7 +265,7 @@ export const useMessages = () => {
   const currentUserId: string | undefined =
     (user?._id as string) || (user?.id as string) || undefined;
 
-  console.log(medias);
+  // console.log(medias);
   const chatId =
     typeof _chatId === "string"
       ? _chatId
@@ -305,6 +305,19 @@ export const useMessages = () => {
       return inbox.getSingleConversation(chatId);
     },
     enabled: Boolean(chatId),
+  });
+
+  const {
+    data: quickMessages,
+    isLoading: isLoadingQuickMessages,
+    refetch: refetchQuickMessages,
+  } = useQuery({
+    queryKey: ["quick-conversation", id],
+    queryFn: async () => {
+      if (!id) return null;
+      return inbox.getMessageTemplates(id);
+    },
+    enabled: Boolean(id),
   });
 
   // ===== INBOX LIST =====
@@ -954,5 +967,8 @@ export const useMessages = () => {
     handleSendMessage,
     chatPages,
     handleMarkRead,
+    quickMessages,
+    isLoadingQuickMessages,
+    refetchQuickMessages,
   };
 };

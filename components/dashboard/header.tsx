@@ -41,7 +41,7 @@ const DashboardHeader = () => {
 
   const { isCopied, copy } = useCopyToClipboard();
 
-  console.log(request_subscriptions);
+  // console.log(request_subscriptions);
 
   const allSkils = skills?.data || [];
 

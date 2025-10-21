@@ -31,7 +31,7 @@ export const usePricing = (planId?: string) => {
   const upgradeType = planId ? sessionStorage.getItem("type") : "";
   const type = searchParams.get("type") || upgradeType || "BUSINESS";
 
-  console.log(planType);
+  // console.log(planType);
 
   // console.log(type);
 

@@ -349,6 +349,31 @@ export type MessageItem = {
   updatedAt: string; // ISO 8601 timestamp
 };
 
+export type CallItem = {
+  duration: string;
+  endTime: string;
+  startTime: string;
+  heading: {
+    name: string; // Name of the entity (e.g., 'Aaron Electrical')
+    image: string; // URL of the image
+    lastMessage: string; // Last message sent
+    lastMessageAt: string; // Timestamp of last message
+    unreadCount: number; // Number of unread messages
+  };
+  phoneNumber: {
+    code: string;
+    number: string;
+    verifiedAt: string;
+  };
+  status: string;
+  id: string;
+  _id: string;
+  fromUser: string;
+  toUser: string;
+  fromUserType: "customers" | "contractors";
+  toUserType: "customers" | "contractors";
+};
+
 export type singleConversationType = {
   job: string;
   createdAt: string;

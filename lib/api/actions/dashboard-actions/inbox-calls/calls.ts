@@ -84,4 +84,24 @@ export const callApi = {
       throw error;
     }
   },
+  getCallLogs: async ({ page, limit }: { page: number; limit: number }) => {
+    const params = new URLSearchParams();
+
+    params.append("page", String(page));
+    params.append("limit", String(limit));
+    try {
+      const response = await http.get(
+        `${url}/logs?${params?.toString()}`,
+        withAuth()
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 };

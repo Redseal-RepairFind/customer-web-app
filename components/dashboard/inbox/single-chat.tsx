@@ -21,6 +21,7 @@ import Modal from "@/components/ui/customModal";
 import { useSocket } from "@/contexts/socket-contexts";
 import CallPortal, { CallState } from "./call-portal";
 import { useUser } from "@/hook/useMe";
+import { useCall } from "@/contexts/call-provider";
 
 type Props = { id: string };
 
@@ -38,6 +39,8 @@ const SingleChatItem = ({ id }: Props) => {
     chatPages,
     handleMarkRead,
   } = useMessages();
+
+  // console.log(singleChat);
 
   const [message, setMessage] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -147,8 +150,10 @@ const SingleChatItem = ({ id }: Props) => {
 
   let lastMessageDate: string | null = null;
 
+  // console.log(singleChat);
+
   return (
-    <main className="flex flex-col h-screen">
+    <main className="flex flex-col h-screen no-scrollbar">
       {/* Chat header */}
       <ChatHeader item={singleChat?.data} />
 
@@ -217,7 +222,7 @@ export default SingleChatItem;
 
 // Helper: returns 'Today', 'Yesterday', or formatted date
 
-function formatMessageDay(dateString: string) {
+export function formatMessageDay(dateString: string) {
   const date = new Date(dateString);
   const now = new Date();
 
@@ -235,51 +240,20 @@ function formatMessageDay(dateString: string) {
 
 const ChatHeader = ({ item }: { item: singleConversationType }) => {
   const router = useRouter();
-  // In your page or parent component
-  const [portalOpen, setPortalOpen] = useState(true);
-  const [state, setState] = useState<CallState>("incoming");
-  const [muted, setMuted] = useState(false);
-  const [videoOn, setVideoOn] = useState(true);
-  const [hold, setHold] = useState(false);
-  const [share, setShare] = useState(false);
+
+  const { handleStartCall } = useCall();
+
+  const { curUser } = useUser();
+
+  const curUserId = curUser?.data?._id;
+  const contractor = item?.members?.find(
+    (mem: any) => mem?.member !== curUserId
+  );
+
+  console.log(contractor);
 
   return (
     <div className="flex-cols gap-2 ">
-      {/* <CallPortal
-        isOpen={portalOpen}
-        onClose={() => setPortalOpen(false)}
-        state={state}
-        remote={{
-          name: "Jane Smith",
-          avatarUrl: "/avatars/jane.jpg",
-          videoEnabled: true,
-        }}
-        local={{ name: "You", avatarUrl: "/avatars/you.jpg" }}
-        muted={muted}
-        videoEnabled={videoOn}
-        onHold={hold}
-        screenSharing={share}
-        durationLabel="00:42"
-        connection={{ quality: 4, networkLabel: "Good" }}
-        onAccept={() => setState("connecting")}
-        onDecline={() => {
-          setState("ended");
-        }}
-        onEnd={() => {
-          setState("ended");
-        }}
-        onMuteToggle={() => setMuted((m) => !m)}
-        onVideoToggle={() => setVideoOn((v) => !v)}
-        onHoldToggle={() => setHold((h) => !h)}
-        onShareToggle={() => setShare((s) => !s)}
-        onOpenKeypad={() => {
-        }}
-        onAddParticipant={() => {
-        }}
-        onOpenSettings={() => {
-        }}
-      /> */}
-
       <SpecialBox minHeight="min-h" className="p-3 flex-row-between">
         <div className="flex items-center gap-2 ">
           <button
@@ -311,7 +285,12 @@ const ChatHeader = ({ item }: { item: singleConversationType }) => {
         <div className="flex items-center ">
           <button
             className="mr-2 items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer relative"
-            onClick={() => setPortalOpen(true)}
+            onClick={() =>
+              handleStartCall({
+                toUser: contractor?.member,
+                toUserType: contractor?.memberType,
+              })
+            }
           >
             <Image
               src={icons.callIcon}
@@ -320,9 +299,9 @@ const ChatHeader = ({ item }: { item: singleConversationType }) => {
               alt="Call icon"
             />
           </button>
-          <button className="items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer relative">
+          {/* <button className="items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer relative">
             <Image src={icons.eyeIcon} height={20} width={20} alt="Chat icon" />
-          </button>
+          </button> */}
         </div>
       </SpecialBox>
       <div className="flex-rows gap-2">

@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import SubscriptionAgreementPage from "@/components/public/sub-terms";
 
 export const metadata: Metadata = {
-  title: "RepairFind Subscription Agreement",
-  description: "Terms for RepairFind subscription-based services.",
+  title: "RepairFind Membership Agreement",
+  description: "Terms for RepairFind Membership-based services.",
 };
 
 export default function SubAgreement() {

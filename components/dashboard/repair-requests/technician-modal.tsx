@@ -10,107 +10,195 @@ import { Rating } from "@/components/ui/rating";
 import { useState } from "react";
 import { dummyCommHistory, messageTemplates } from "@/lib/dasboard-constatns";
 import Button from "@/components/ui/custom-btn";
-import { formatTo12Hour } from "@/lib/helpers";
+import { formatDateProper, formatTo12Hour } from "@/lib/helpers";
 import Badge from "@/components/ui/badge";
+import { useMessages } from "@/hook/useMessages";
+import LoadingTemplate from "@/components/ui/spinner";
+import toast from "react-hot-toast";
+import { ClipLoader } from "react-spinners";
+import { useRouter } from "next/navigation";
+import { useCall } from "@/contexts/call-provider";
 
 const TechModal = ({
   tech,
   open,
   close,
+  convId,
 }: {
   tech: any;
   open: boolean;
   close: () => void;
+  convId: string;
 }) => {
   const [switched, setSwitched] = useState("Send Message");
+  const router = useRouter();
+  const {
+    handleSendMessage,
+    quickMessages,
+    isLoadingQuickMessages,
+    isSending,
+  } = useMessages(convId);
+  const { handleStartCall } = useCall();
+  // console.log(tech);
 
+  const contractor =
+    tech?.contractors > 1
+      ? tech?.contractors?.find(
+          (cnt: any) => cnt?.id === (tech?.contractor?.id || tech?.contractor)
+        )
+      : tech?.contractors[0];
+
+  console.log(contractor);
+
+  const quicktxt = quickMessages?.data?.quickMessages;
+
+  const handleSend = async (message: string) => {
+    try {
+      await handleSendMessage({
+        id: convId,
+        message: {
+          type: "TEXT",
+          message,
+        },
+      });
+
+      toast.success("Message sent successfully");
+      close();
+      router.push(`/inbox/${convId}`);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
+    }
+  };
+
+  const handleViewChat = () => {
+    router.push(`/inbox/${convId}`);
+  };
   return (
     <Modal onClose={close} isOpen={open}>
-      <div className="flex-cols gap-2">
-        <Text.SmallHeading>Contact Technician</Text.SmallHeading>
-        <Text.Paragraph className="text-dark-500 text-sm">
-          Communicate with your assigned contractor about the ongoing job
-        </Text.Paragraph>
-
-        <Box px="px-2">
-          <div className="flex flex-col gap-4 md:flex-row ">
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Image
-                  src={images.technician}
-                  height={24}
-                  width={24}
-                  className="rounded-full "
-                  alt="Technician"
-                />
-
-                <span>
-                  {"Jasper stark"} |{" "}
-                  <span className="text-xs text-dark-500">job: #1234</span>
-                </span>
-              </div>
-
-              <Text.SmallText className="text-dark-500 text-xs">
-                Plumbing Specialist
-              </Text.SmallText>
-
-              <div className="flex items-center gap-2">
-                <Rating defaultValue={5} disabled />
-                <Text.Paragraph className="text-sm text-dark-400">
-                  (156 Jobs)
-                </Text.Paragraph>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Text.SmallHeading className="font-semibold text-sm">
-                Appointment scheduled for Apr 15, 2025 at 2:00 PM - 4:00 PM
-              </Text.SmallHeading>
-              <Text.SmallText>Last updated: 15 minutes ago</Text.SmallText>
-              <div className="flex items-center">
-                <button className="mr-2 items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer">
-                  <Image
-                    src={icons.callIcon}
-                    height={20}
-                    width={20}
-                    alt="Call icon"
-                  />
-                </button>
-                <button className="items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer">
-                  <Image
-                    src={icons.chatIconActive2}
-                    height={20}
-                    width={20}
-                    alt="Chat icon"
-                  />
-                </button>
-              </div>
-            </div>
-          </div>
-        </Box>
-
-        <div className="border-t border-t-light-50 mt-4 py-2 flex-cols gap-2">
-          <PageToggler
-            setSwitched={setSwitched}
-            switched={switched}
-            btn1={"Send Message"}
-            btn2="Communication History"
-          />
-
-          {switched.toLowerCase().includes("message") ? (
-            <Messaging />
-          ) : (
-            <CommHistory />
-          )}
+      {isLoadingQuickMessages ? (
+        <div className="min-h-96">
+          <LoadingTemplate />
         </div>
-      </div>
+      ) : (
+        <div className="flex-cols gap-2">
+          <Text.SmallHeading>Contact Technician</Text.SmallHeading>
+          <Text.Paragraph className="text-dark-500 text-sm">
+            Communicate with your assigned contractor about the ongoing job
+          </Text.Paragraph>
+
+          <Box px="px-2">
+            <div className="flex flex-col gap-4 md:flex-row ">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <Image
+                    src={contractor?.profilePhoto || images.technician}
+                    height={24}
+                    width={24}
+                    className="rounded-full "
+                    alt="Technician"
+                  />
+
+                  <span>
+                    {contractor?.firstName} {contractor?.lastName}
+                    {/* <span className="text-xs text-dark-500">job: #1234</span> */}
+                  </span>
+                </div>
+
+                {/* <Text.SmallText className="text-dark-500 text-xs">
+                  Description: {tech?.description}
+                </Text.SmallText> */}
+
+                <div className="flex items-center gap-2">
+                  {/* <Rating defaultValue={5} disabled />
+                  <Text.Paragraph className="text-sm text-dark-400">
+                    (156 Jobs)
+                  </Text.Paragraph> */}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                {tech?.schedule && (
+                  <Text.SmallHeading className="font-semibold text-sm">
+                    Appointment scheduled for{" "}
+                    {formatDateProper(new Date(tech?.schedule?.startDate))}
+                    {"  "}
+                    {formatTo12Hour(new Date(tech?.schedule?.startDate))} -{" "}
+                    {/* {formatDateProper(new Date(tech?.schedule?.startDate))}{" "} */}
+                    {formatTo12Hour(new Date(tech?.schedule?.endDate))}
+                  </Text.SmallHeading>
+                )}
+                {/* <Text.SmallText>Last updated: 15 minutes ago</Text.SmallText> */}
+                <Text.SmallText className="text-dark-500 text-xs">
+                  Remark: {tech?.schedule?.remark}
+                </Text.SmallText>
+                <div className="flex items-center">
+                  <button
+                    className="mr-2 items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer"
+                    onClick={() =>
+                      handleStartCall({
+                        toUser: contractor?.id,
+                        toUserType: "contractors",
+                      })
+                    }
+                  >
+                    <Image
+                      src={icons.callIcon}
+                      height={20}
+                      width={20}
+                      alt="Call icon"
+                    />
+                  </button>
+                  <button
+                    className="items-center justify-center flex h-8 w-8 border border-light-0 rounded-sm cursor-pointer"
+                    onClick={handleViewChat}
+                  >
+                    <Image
+                      src={icons.chatIconActive2}
+                      height={20}
+                      width={20}
+                      alt="Chat icon"
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Box>
+
+          <div className="border-t border-t-light-50 mt-4 py-2 flex-cols gap-2">
+            {/* <PageToggler
+              setSwitched={setSwitched}
+              switched={switched}
+              btn1={"Send Message"}
+              btn2="Communication History"
+            /> */}
+
+            {switched.toLowerCase().includes("message") ? (
+              <Messaging
+                quickTexts={quicktxt || messageTemplates}
+                onSendMessage={handleSend}
+                isSending={isSending}
+              />
+            ) : (
+              <CommHistory />
+            )}
+          </div>
+        </div>
+      )}
     </Modal>
   );
 };
 
 export default TechModal;
 
-const Messaging = () => {
+const Messaging = ({
+  quickTexts,
+  onSendMessage,
+  isSending,
+}: {
+  quickTexts: string[];
+  onSendMessage: (message: string) => void;
+  isSending: boolean;
+}) => {
   const [message, setMessage] = useState("");
   return (
     <>
@@ -119,7 +207,7 @@ const Messaging = () => {
       </Text.Paragraph>
 
       <div className="grid grid-cols-2 gap-4 my-2">
-        {messageTemplates?.map((mes) => (
+        {quickTexts?.map((mes) => (
           <Box key={mes}>
             <button className="cursor-pointer" onClick={() => setMessage(mes)}>
               <Text.Paragraph className="text-sm text-start">
@@ -144,12 +232,23 @@ const Messaging = () => {
         />
       </div>
 
-      <Button className="mt-4">
-        <div className="flex items-center gap-2">
-          <Image src={icons.Vector} height={17} width={17} alt="message icon" />
+      <Button className="mt-4" disabled={isSending || !message}>
+        <Button.Icon>
+          {isSending ? (
+            <ClipLoader size={24} color="#fff" />
+          ) : (
+            <Image
+              src={icons.Vector}
+              height={17}
+              width={17}
+              alt="message icon"
+            />
+          )}
+        </Button.Icon>
 
-          <Button.Text>Send Message</Button.Text>
-        </div>
+        <Button.Text onClick={() => onSendMessage(message)}>
+          {isSending ? "Sending Text..." : "Send Message"}
+        </Button.Text>
       </Button>
     </>
   );
@@ -327,7 +426,9 @@ export const PageToggler: React.FC<PageTogglerProps> = ({
           const disabled = !!opt.disabled;
 
           const badge =
-            opt.badgeCount !== undefined && opt.badgeCount !== null ? (
+            opt.badgeCount !== undefined &&
+            opt.badgeCount !== null &&
+            Number(opt.badgeCount) > 0 ? (
               <Badge count={opt.badgeCount} isActive />
             ) : null;
 

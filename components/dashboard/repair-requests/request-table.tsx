@@ -31,6 +31,7 @@ import {
 } from "../home/job-toast-modal";
 import RepairDropdown from "./table-menu";
 import Badge from "@/components/ui/badge";
+import { useMessages } from "@/hook/useMessages";
 
 interface IProps {
   children: React.ReactNode;
@@ -43,6 +44,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const [open, setOpen] = useState(false);
   const [tech, setTech] = useState<any>();
   const { warning } = useToast();
+  const [convId, setConvId] = useState("");
 
   // console.log(data[0]?.missedCallsCount, data[0]?.unreadMessages, "table data");
 
@@ -131,6 +133,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const mthods = paymentMethods?.data;
 
   // console.log(data);
+
 
   return (
     <>
@@ -300,6 +303,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
             setTech(null);
           }}
           tech={tech}
+          convId={convId}
         />
         <Table>
           <Thead>
@@ -338,7 +342,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                       {rep.jobId}
                     </Text.SmallHeading>
                     <Text.SmallText>
-                      {formatDateProper(new Date())}
+                      {formatDateProper(new Date(rep?.createdAt))}
                     </Text.SmallText>
                   </div>
                 </Td>
@@ -412,6 +416,7 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
                         onClick={() => {
                           setOpen(true);
                           setTech(rep);
+                          setConvId(rep?.conversations[0]?.id);
                         }}
                       >
                         {rep?.unreadMessages > 0 && (

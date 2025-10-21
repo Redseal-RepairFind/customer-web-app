@@ -110,7 +110,7 @@ export default function CallPortal({
 }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
 
-  console.log(data);
+  // console.log(durationLabel);
 
   // Trap focus + ESC close
   useEffect(() => {
@@ -152,7 +152,7 @@ export default function CallPortal({
 
   const statusText = getStatusText(state, onHold, role);
   const canShowAccept = state === "incoming";
-  const canShowDecline = state === "incoming";
+  // const canShowDecline = state === "incoming";
 
   // Minimal dock when ringing or answered
   const showMinimalDock = [
@@ -173,12 +173,11 @@ export default function CallPortal({
       }}
     >
       {/* Top bar */}
-      <div className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between bg-black backdrop-blur-sm">
+      {/* <div className="absolute top-0 left-0 right-0 h-14 px-4 flex items-center justify-between bg-black backdrop-blur-sm">
         <div className="flex items-center gap-3 min-w-0">
           <Avatar name={data.name} url={data.image} />
           <div className="min-w-0">
             <div className="font-semibold truncate">{data.name}</div>
-            {/* Keep duration only; removed network bars/pill here */}
             {durationLabel && state === "active" && (
               <div className="text-xs text-white/70">{durationLabel}</div>
             )}
@@ -203,7 +202,7 @@ export default function CallPortal({
             <span className="hidden sm:inline text-sm">Minimize</span>
           </button>
         </div>
-      </div>
+      </div> */}
 
       {/* Main panel */}
       <div
@@ -212,8 +211,6 @@ export default function CallPortal({
       >
         {/* Remote media area */}
         <div className="relative flex-1 rounded-2xl bg-neutral-800/50 overflow-hidden border border-neutral-700/60">
-          {/* Screen share / video */}
-          {/* Screen share / video */}
           <div className="absolute inset-0">
             {screenSharing ? (
               <Placeholder label="Screen sharing" />
@@ -225,7 +222,12 @@ export default function CallPortal({
                 <div className="flex flex-col items-center gap-3">
                   <Avatar size="lg" name={data.name} url={data.image} />
                   <div className="text-lg font-semibold">{data.name}</div>
-                  <div className="text-sm text-white/80">{statusText}</div>
+                  <div className="text-sm text-white/80">
+                    {durationLabel ? durationLabel : statusText}
+                  </div>
+                  {/* {durationLabel && (
+                    <div className="text-xs text-white/70">{durationLabel}</div>
+                  )} */}
                 </div>
               </div>
             )}
@@ -250,7 +252,7 @@ export default function CallPortal({
           )}
         </div>
 
-        {/* Incoming accept/decline (unchanged so flows elsewhere don't break) */}
+        {/* Incoming accept/decline */}
         {canShowAccept && (
           <div className="mt-4 flex items-center justify-center gap-6">
             <CircleButton
@@ -281,7 +283,7 @@ export default function CallPortal({
                 ariaLabel="Mute or unmute microphone"
               />
               <ToggleButton
-                active={speakerOn}
+                active={true /* external audio route */}
                 label="Speaker"
                 onClick={onSpeakerToggle}
                 onIcon={<FaVolumeUp />}
@@ -296,7 +298,6 @@ export default function CallPortal({
                 ariaLabel="End call"
               />
             </div>
-            {/* Shortcuts kept; optional */}
             <div className="mt-2 text-center text-[11px] text-white/60">
               Shortcuts:{" "}
               <kbd className="px-1 py-0.5 bg-neutral-800/70 rounded">M</kbd>{" "}
@@ -364,35 +365,6 @@ function Avatar({
   );
 }
 
-function StatusPill({
-  state,
-  onHold,
-  role,
-}: {
-  state: CallState;
-  onHold: boolean;
-  role: "caller" | "callee";
-}) {
-  const text = getStatusText(state, onHold, role);
-  const color =
-    state === "active"
-      ? "bg-emerald-400/20 text-emerald-100 border-emerald-400/30"
-      : state === "incoming"
-      ? "bg-blue-400/20 text-blue-100 border-blue-400/30"
-      : state === "outgoing"
-      ? "bg-blue-400/20 text-blue-100 border-blue-400/30"
-      : state === "connecting" || state === "reconnecting"
-      ? "bg-yellow-400/20 text-yellow-100 border-yellow-400/30"
-      : state === "ended"
-      ? "bg-neutral-800/70 text-white/70 border-neutral-700/60"
-      : "bg-neutral-800/70 text-white/70 border-neutral-700/60";
-  return (
-    <span className={`px-2 py-0.5 rounded-full text-[11px] border ${color}`}>
-      {text}
-    </span>
-  );
-}
-
 function getStatusText(
   state: CallState,
   onHold: boolean,
@@ -403,13 +375,14 @@ function getStatusText(
     case "incoming":
       return "Incoming call";
     case "outgoing":
-      return role === "caller" ? "Calling…" : "Ringing…";
+      // ✅ Only caller sees "Calling…"; callee never sees “Ringing…”
+      return role === "caller" ? "Calling…" : "Connecting…";
     case "connecting":
       return "Connecting…";
     case "reconnecting":
       return "Reconnecting…";
     case "active":
-      return "In call";
+      return "ringing...";
     case "ended":
       return "Ended";
     default:

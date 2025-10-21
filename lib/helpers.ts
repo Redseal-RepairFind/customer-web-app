@@ -232,3 +232,24 @@ export const STATUS_META: Record<string, StatusMeta> = {
 //   }
 //   return file;
 // };
+
+export function toDate(v: Date | string | number): Date {
+  return v instanceof Date ? v : new Date(v);
+}
+
+export function durationHMM_SS(
+  startDate: Date | string | number,
+  endDate: Date | string | number
+): string {
+  const start = toDate(startDate).getTime();
+  const end = toDate(endDate).getTime();
+  const diffMs = Math.max(0, end - start);
+
+  const totalSec = Math.floor(diffMs / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+
+  // Format: H:MM: SS  (with a space before seconds to match "0:12: 50")
+  return `${h}:${String(m).padStart(2, "0")}: ${String(s).padStart(2, "0")}`;
+}
