@@ -67,14 +67,14 @@ import completeIcon from "@/public/icons/complete.png";
 
 export const accountType = [
   {
-    name: "Residential Subscription",
+    name: "Residential Membership",
     tag: "Perfect for homeowners and tenants looking for quick, reliable repairs.",
     variant: "black",
     icon: whitePeople,
     id: "RESIDENTIAL",
   },
   {
-    name: "Business Subscription",
+    name: "Business Membership",
     tag: "Tailored plans for businesses managing multiple properties and equipment.",
     variant: "green",
     icon: greenPeople,

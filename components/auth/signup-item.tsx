@@ -34,7 +34,7 @@ const SignupPage = () => {
             <div className="flex-rows mr-4">
               <BoxModel variant={acct.variant as "green"}>
                 <div className="h-5 w-5 relative">
-                  <Image src={acct.icon} alt="Subscription icon" />
+                  <Image src={acct.icon} alt="Membership icon" />
                 </div>
               </BoxModel>
             </div>

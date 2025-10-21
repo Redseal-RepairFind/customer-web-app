@@ -105,13 +105,13 @@ export const useRepairs = () => {
     }
     if (!data?.subscriptionId) {
       toast.error(
-        "Please select your subscription plan for issue locatiion identification."
+        "Please select your Membership plan for issue locatiion identification."
       );
       return;
     }
     if (!data?.subscriptionId) {
       toast.error(
-        "Please select your subscription plan for issue locatiion identification."
+        "Please select your Membership plan for issue locatiion identification."
       );
       return;
     }

@@ -136,7 +136,7 @@ const UserInformation = () => {
                 {inps.title}
               </Text.Paragraph>
               {inps.notice ? (
-                <HoverTooltip content="Providing false information about your equipment’s age will void your RepairFind subscription.">
+                <HoverTooltip content="Providing false information about your equipment’s age will void your RepairFind Membership.">
                   <button type="button" className="h-4 w-4 relative">
                     <Image src={icons.infoIcon} alt="Info icon" fill />
                   </button>
@@ -280,10 +280,10 @@ const UserInformation = () => {
                 <HoverTooltip
                   content={
                     inps.id === "homeAddress"
-                      ? "This is the address that will be linked to your subscription"
+                      ? "This is the address that will be linked to your Membership"
                       : inps.id === "number"
                       ? "Do not include country code"
-                      : "Providing false information about your equipment’s age will void your RepairFind subscription."
+                      : "Providing false information about your equipment’s age will void your RepairFind Membership."
                   }
                 >
                   <button
