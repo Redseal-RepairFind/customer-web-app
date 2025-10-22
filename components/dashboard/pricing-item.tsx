@@ -24,7 +24,7 @@ const PricingItem = ({
   const [showall, setShowall] = useState(false);
   const feats = showall ? item?.features : item?.features?.slice(0, 5) || [];
 
-  // console.log(feats);
+  console.log(item);
 
   return (
     <div
@@ -90,8 +90,15 @@ const PricingItem = ({
               {"  "}
               <span className="text-xs font-light sm:ml-1">
                 {feat.description}
-              </span>
+              </span>{" "}
+              {feat?.value && (
+                <span className="font-semibold text-sm text-dark">
+                  Value {formatCurrency(Number(feat?.value))}
+                </span>
+              )}
             </Text.Paragraph>
+
+            {/* <Text.SmallText></Text.SmallText> */}
           </div>
         );
       })}

@@ -50,9 +50,9 @@ const RecentRequests = ({ requestData }: { requestData: RepairJob[] }) => {
       <div className="flex-cols gap-4">
         <Text.SmallHeading>Recent Requests</Text.SmallHeading>
 
-        {requestData?.slice(0, 5).map((req) => (
+        {requestData?.slice(0, 5).map((req, i) => (
           <button
-            key={req.id}
+            key={req.id + i}
             className="cursor-pointer"
             onClick={() => {
               if (req.status === "COMPLETED") {

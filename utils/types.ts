@@ -234,6 +234,30 @@ export type Notification = {
   __v: number;
 };
 
+export type QuickActions = {
+  _id: string;
+  category: string;
+  context: {
+    jobId: string;
+    customerId: string;
+    contractorId: string;
+    disputeId: string;
+  };
+  createdAt: string; // ISO datetime
+  updatedAt: string; // ISO datetime
+  description: string;
+  entity: string; // id of the job
+  entityType: string;
+  event: string;
+  image: string; // url
+  options: Record<string, unknown>[]; // adjust if you have a concrete shape
+  status: string;
+  title: string;
+  user: string; // user id
+  userType: string;
+  __v: number;
+};
+
 export interface NotificationsPayload {
   bookingAlerts: any[]; // replace `any` with the actual type if known
   bookingConversationAlerts: any[];

@@ -61,6 +61,42 @@ export const notifications = {
       throw error;
     }
   },
+  getUserQuickActions: async ({
+    limit,
+    page,
+    sort,
+    key,
+  }: {
+    limit: number;
+    page: number;
+    sort?: any;
+    key?: any;
+  }) => {
+    try {
+      const params = new URLSearchParams();
+
+      // Required
+      params.append("page", String(page));
+      params.append("limit", String(limit));
+
+      // Optional
+      if (key) params.append("date", String(key));
+      if (sort) params.append("status", String(sort));
+
+      const response = await http.get(
+        `${url}/quick-actions?${params.toString()}`,
+        withAuth()
+      );
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 
   readNotification: async (id: string) => {
     try {

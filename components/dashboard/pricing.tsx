@@ -210,6 +210,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   // console.log(selectedPlan);
 
   // console.log(isUpgrade);
+  // console.log(plansToRender);
 
   return (
     <main className="w-full my-12  lg:px-8">

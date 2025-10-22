@@ -10,10 +10,11 @@ import Button from "@/components/ui/custom-btn";
 import { useNotification } from "@/hook/useNotification";
 import LoadingTemplate from "@/components/ui/spinner";
 import { ClipLoader } from "react-spinners";
-import { Notification } from "@/utils/types";
+import { Notification, QuickActions } from "@/utils/types";
 import { getTimeAgo } from "@/lib/helpers";
 import { useSocket } from "@/contexts/socket-contexts";
 import Image from "next/image";
+import { quickActions } from "@/lib/dasboard-constatns";
 
 const Notifs = () => {
   const [switched, setSwitched] = useState("Notifications");
@@ -26,15 +27,24 @@ const Notifs = () => {
     isLoading,
     sentinelRef,
     unreadCount,
+    actions,
+    fetchNextActs,
+    hasNextActs,
+    isFetchingNextPageActs,
+    isLoadingACtions,
+    statusACts,
+    refetchActs,
+    allActions,
+    sentinelAction,
   } = useNotification();
 
   const { handleReadNotifs } = useSocket();
 
-  // console.log(allNotifications);
+  console.log(allActions);
 
   // console.log(hasNextPage);
 
-  if (isLoading) return <LoadingTemplate />;
+  if (isLoading || isLoadingACtions) return <LoadingTemplate />;
   return (
     <main className="flex-cols gap-4">
       <div className="flex-row-between">
@@ -42,12 +52,12 @@ const Notifs = () => {
 
         <PlanBadge planName={`${unreadCount} unread`} />
       </div>
-      {/* <PageToggler
+      <PageToggler
         setSwitched={setSwitched}
         switched={switched}
         btn1="Notifications"
         btn2="Actions"
-      /> */}
+      />
 
       {switched.toLowerCase() === "notifications" ? (
         <div className="gap-2 flex-cols">
@@ -63,10 +73,16 @@ const Notifs = () => {
           <Text.SmallText className="text-sm text-dark-500 ">
             Track job requests received, accepted, and completed
           </Text.SmallText>
-          <ActionsItem />
+          {allActions?.map((act) => (
+            <ActionsItem key={act?._id} item={act} />
+          ))}
         </div>
       )}
-      <div ref={sentinelRef} className="h-12" />
+      {switched?.toLowerCase().includes("notification") ? (
+        <div ref={sentinelRef} className="h-12" />
+      ) : (
+        <div ref={sentinelAction} className="h-12" />
+      )}
 
       <div className="flex-row-center w-full">
         {isFetchingNextPage && <ClipLoader size={24} color="#000" />}
@@ -127,32 +143,40 @@ const NotifItem = ({
   );
 };
 
-const ActionsItem = () => {
+const ActionsItem = ({ item }: { item: QuickActions }) => {
   return (
     <SpecialBox className="border border-dark-10 flex-row-between px-2 md:px-4 py-2">
       <div className="flex items-start gap-2">
-        <div className="h-8 min-w-8 rounded-full flex-row-center bg-red-100">
-          <HiUser />
+        <div className="h-8 min-w-8 rounded-full flex-row-center bg-red-100 relative">
+          {item?.image ? (
+            <Image
+              src={item?.image}
+              fill
+              alt="Notification image"
+              className="rounded-full"
+            />
+          ) : (
+            <HiUser />
+          )}
         </div>
         <div className="flex-cols gap-2">
           <Text.SmallText className="text-base text-dark-500 font-semibold">
-            Customer has viewed your site
+            {item?.title}
           </Text.SmallText>
           <Text.SmallText className="text-sm text-dark-500 ">
-            Customer has viewed your site visit request for a job on RepairFind.
-            stay active and expect a response soon.{" "}
+            {item?.description}
           </Text.SmallText>
 
           <div>
             <Button>
-              <Button.Text>Send Estimate</Button.Text>
+              <Button.Text>Proceed</Button.Text>
             </Button>
           </div>
         </div>
       </div>
 
-      <Text.SmallText className="text-sm text-dark-500 ">
-        2 minutes ago
+      <Text.SmallText className="text-xs md:text-sm text-dark-500 ">
+        {getTimeAgo(new Date(item.createdAt)?.toISOString())}
       </Text.SmallText>
     </SpecialBox>
   );

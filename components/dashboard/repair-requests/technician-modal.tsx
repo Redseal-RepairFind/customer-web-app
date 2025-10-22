@@ -16,7 +16,7 @@ import { useMessages } from "@/hook/useMessages";
 import LoadingTemplate from "@/components/ui/spinner";
 import toast from "react-hot-toast";
 import { ClipLoader } from "react-spinners";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCall } from "@/contexts/call-provider";
 
 const TechModal = ({
@@ -335,7 +335,15 @@ type PageTogglerProps = {
   className?: string;
 };
 
-export const PageToggler: React.FC<PageTogglerProps> = ({
+// ...your existing types above (BtnItem, PageTogglerProps etc.)
+
+export const PageToggler: React.FC<
+  PageTogglerProps & {
+    // ⬇️ ADD these optional props
+    syncUrl?: boolean;
+    paramKey?: string;
+  }
+> = ({
   setSwitched,
   switched,
   btn1,
@@ -343,7 +351,15 @@ export const PageToggler: React.FC<PageTogglerProps> = ({
   btns,
   size = "md",
   className = "",
+  // ⬇️ defaults for the new URL-sync behavior
+  syncUrl = true,
+  paramKey = "tab",
 }) => {
+  // ⬇️ ADD these Next Router hooks (safe in client)
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   // Build a normalized options list while keeping backward compatibility
   const options = useMemo<BtnItem[]>(() => {
     if (btns && btns.length > 0) return btns;
@@ -359,6 +375,31 @@ export const PageToggler: React.FC<PageTogglerProps> = ({
           { label: "Two", value: "Two" },
         ];
   }, [btn1, btn2, btns]);
+
+  // ⬇️ READ from URL on mount / param change (only if syncUrl)
+  React.useEffect(() => {
+    if (!syncUrl) return;
+    const urlValue = searchParams.get(paramKey);
+    if (!urlValue) return;
+    // only switch if the URL value is a valid option and differs from current state
+    const exists = options.some((o) => o.value === urlValue);
+    if (exists && urlValue !== switched) {
+      setSwitched(urlValue);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncUrl, paramKey, searchParams, options]);
+
+  // ⬇️ WRITE to URL whenever `switched` changes (only if syncUrl)
+  React.useEffect(() => {
+    if (!syncUrl) return;
+    if (!pathname) return;
+
+    const sp = new URLSearchParams(searchParams.toString());
+    // keep other params intact; set/replace our key
+    sp.set(paramKey, String(switched));
+    router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncUrl, paramKey, switched, pathname]);
 
   const selectedIndex = Math.max(
     0,
@@ -417,7 +458,7 @@ export const PageToggler: React.FC<PageTogglerProps> = ({
               }rem))`,
               left: 0,
             }}
-          ></div>
+          />
         </div>
 
         {/* Buttons */}
@@ -496,7 +537,7 @@ export const PageToggler: React.FC<PageTogglerProps> = ({
       <div
         className="transition-opacity duration-300 ease-in-out"
         key={switched}
-      ></div>
+      />
     </>
   );
 };
