@@ -14,7 +14,6 @@ import { Notification, QuickActions } from "@/utils/types";
 import { getTimeAgo } from "@/lib/helpers";
 import { useSocket } from "@/contexts/socket-contexts";
 import Image from "next/image";
-import { quickActions } from "@/lib/dasboard-constatns";
 
 const Notifs = () => {
   const [switched, setSwitched] = useState("Notifications");
@@ -40,7 +39,7 @@ const Notifs = () => {
 
   const { handleReadNotifs } = useSocket();
 
-  console.log(allActions);
+  // console.log(allActions);
 
   // console.log(hasNextPage);
 
@@ -49,7 +48,6 @@ const Notifs = () => {
     <main className="flex-cols gap-4">
       <div className="flex-row-between">
         <Text.SmallHeading>Notifications</Text.SmallHeading>
-
         <PlanBadge planName={`${unreadCount} unread`} />
       </div>
       <PageToggler

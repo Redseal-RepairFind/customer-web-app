@@ -24,15 +24,15 @@ const DashboardHome = () => {
   const { repairsData, loadingRepairs } = useRepairs();
 
   const { subscriptions } = usePricing();
-  const { isLoadingBagde, notificationBagde } = useNotification();
+  // const { isLoadingBagde, notificationBagde } = useNotification();
   const router = useRouter();
-  console.log(notificationBagde);
+  // console.log(notificationBagde);
 
   // const { isConnected, socket } = useSocket();
 
   console.log(curUser);
 
-  if (loadingCurUser || isLoadingTrxSummary || loadingRepairs || isLoadingBagde)
+  if (loadingCurUser || isLoadingTrxSummary || loadingRepairs)
     return <LoadingTemplate />;
 
   const repairs = repairsData?.data?.data;
@@ -72,7 +72,7 @@ const DashboardHome = () => {
         </div>
       ) : null}
       <section className="flex-cols gap-5 mt-8">
-        <MarqueeBanner
+        {/* <MarqueeBanner
           items={[
             // "🔑 Verified landlords",
             // "🏠 New listings every hour",
@@ -89,7 +89,7 @@ const DashboardHome = () => {
           gapPx={48}
           className="h-16 cursor-pointer"
           onClick={() => router.push("/notifications?tab=Actions")}
-        />
+        /> */}
         <MultiBranch />
         <Metrics stats={metrics} plans={planType} planBalance={totalCredits} />
         <PlanLog plans={planType} />
