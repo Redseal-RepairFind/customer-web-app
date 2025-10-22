@@ -24,7 +24,7 @@ const PricingItem = ({
   const [showall, setShowall] = useState(false);
   const feats = showall ? item?.features : item?.features?.slice(0, 5) || [];
 
-  console.log(item);
+  // console.log(item);
 
   return (
     <div

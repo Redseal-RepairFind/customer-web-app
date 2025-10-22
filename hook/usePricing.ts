@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { usePageNavigator } from "./navigator";
 import { useSearchParams } from "next/navigation";
+import { repairActions } from "@/lib/api/actions/dashboard-actions/repair-actions/repair";
 
 type SubsPage = {
   data: any[]; // replace with your Subscription type
@@ -47,6 +48,13 @@ export const usePricing = (planId?: string) => {
   //   enabled: curPathname === "/upgrade_subscription" && Boolean(planId),
   //   staleTime: 5 * 60_000,
   // });
+  const { data: payementMethods, isLoading: loadingPayementMethods } = useQuery(
+    {
+      queryKey: ["fetche-payment-methods"],
+      queryFn: () => repairActions.fetchPaymentMethods(),
+      refetchOnWindowFocus: true,
+    }
+  );
 
   const { data: request_subscriptions, isLoading: isLoadingRequestSub } =
     useQuery({
@@ -195,7 +203,7 @@ export const usePricing = (planId?: string) => {
     } catch (error) {
       const errMsg = formatError(error);
       console.error("CheckoutError", error);
-      toast.error(errMsg || "checkout failed");
+      // toast.error(errMsg || "checkout failed");
       return;
     } finally {
       setIsCheckingOut(false);
@@ -366,5 +374,7 @@ export const usePricing = (planId?: string) => {
     handleContinuePlan,
     handleNewSubscription,
     handleValidateCoupon,
+    payementMethods,
+    loadingPayementMethods,
   };
 };
