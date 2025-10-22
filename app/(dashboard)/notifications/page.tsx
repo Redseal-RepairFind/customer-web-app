@@ -1,7 +1,7 @@
-import Notifs from "@/components/dashboard/notifications/notifications";
+import ClientNotis from "@/components/dashboard/notifications/client-notifs";
 
 const NotificationHome = () => {
-  return <Notifs />;
+  return <ClientNotis />;
 };
 
 export default NotificationHome;
