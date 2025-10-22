@@ -30,7 +30,7 @@ const DashboardHome = () => {
 
   // const { isConnected, socket } = useSocket();
 
-  // console.log(curUser);
+  console.log(curUser);
 
   if (loadingCurUser || isLoadingTrxSummary || loadingRepairs || isLoadingBagde)
     return <LoadingTemplate />;
@@ -72,26 +72,24 @@ const DashboardHome = () => {
         </div>
       ) : null}
       <section className="flex-cols gap-5 mt-8">
-        {notificationBagde?.data?.quickActions?.length > 0 && (
-          <MarqueeBanner
-            items={[
-              // "🔑 Verified landlords",
-              // "🏠 New listings every hour",
-              // "💬 In-app secure chat",
-              `📅 Hi ${curUser?.data?.firstName}!  Your subscription has been active for 25 days. It's time to schedule your equipment inspection appointment click on this banner to schedule a convenient date and time.`,
-            ]}
-            // bgSrc={images.CalendarImg}
-            bgAlt="" // decorative background
-            // bgOpacity={0.35}
-            overlay
-            overlayClassName="from-black/70 via-transparent to-black/70" // adjust to taste
-            speedSec={18}
-            direction="left"
-            gapPx={48}
-            className="h-16 cursor-pointer"
-            onClick={() => router.push("/notifications?tab=Actions")}
-          />
-        )}
+        <MarqueeBanner
+          items={[
+            // "🔑 Verified landlords",
+            // "🏠 New listings every hour",
+            // "💬 In-app secure chat",
+            `📅 Hi ${curUser?.data?.firstName}!  Your subscription has been active for 25 days. It's time to schedule your equipment inspection appointment click on this banner to schedule a convenient date and time.`,
+          ]}
+          // bgSrc={images.CalendarImg}
+          bgAlt="" // decorative background
+          // bgOpacity={0.35}
+          overlay
+          overlayClassName="from-black/70 via-transparent to-black/70" // adjust to taste
+          speedSec={18}
+          direction="left"
+          gapPx={48}
+          className="h-16 cursor-pointer"
+          onClick={() => router.push("/notifications?tab=Actions")}
+        />
         <MultiBranch />
         <Metrics stats={metrics} plans={planType} planBalance={totalCredits} />
         <PlanLog plans={planType} />
