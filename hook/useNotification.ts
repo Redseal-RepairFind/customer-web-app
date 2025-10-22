@@ -1,9 +1,11 @@
 "use client";
 
 import { notifications } from "@/lib/api/actions/dashboard-actions/dashboard/notifications";
+import { repairActions } from "@/lib/api/actions/dashboard-actions/repair-actions/repair";
 import { formatError, readStringCookie } from "@/lib/helpers";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 export const useNotification = () => {
   const observerRef = useRef<HTMLDivElement | null>(null);
@@ -12,6 +14,7 @@ export const useNotification = () => {
   const [sentinelAction, setSentinelAction] = useState<HTMLDivElement | null>(
     null
   );
+  const [inspecting, setInspecting] = useState(false);
 
   const token = readStringCookie(
     process.env.NEXT_PUBLIC_TOKEN_COOKIE ?? "reparfind_token"
@@ -39,6 +42,26 @@ export const useNotification = () => {
     });
 
     return response;
+  };
+
+  const handleSetInspection = async (payload: {
+    date: string;
+    time: string;
+    subscriptionId: string;
+    emergency: boolean;
+  }) => {
+    try {
+      setInspecting(true);
+
+      await repairActions.inspectionSchedule(payload);
+
+      toast.success("Inspection schedule set successfully");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setInspecting(false);
+    }
   };
 
   const {
@@ -188,5 +211,7 @@ export const useNotification = () => {
     refetchActs,
     allActions,
     sentinelAction: setSentinelAction,
+    handleSetInspection,
+    inspecting,
   };
 };

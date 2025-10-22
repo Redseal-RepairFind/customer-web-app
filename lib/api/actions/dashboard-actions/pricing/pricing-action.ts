@@ -223,4 +223,26 @@ export const pricingActions = {
       throw error;
     }
   },
+
+  validateCouponCode: async (payload: {
+    planId: string;
+    couponCode: string;
+  }) => {
+    try {
+      const response = await http.post(
+        `${url}/subscriptions/validate-coupon`,
+        payload,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 };

@@ -50,7 +50,12 @@ const PaymentModal = ({
   //   modal: false,
   // });
   const [acceptTerms, setAcceptTerms] = useState(false);
-  const { handleCheckout, isCheckingout, handleNewSubscription } = usePricing();
+  const {
+    handleCheckout,
+    isCheckingout,
+    handleNewSubscription,
+    handleValidateCoupon,
+  } = usePricing();
   const [toggle, setToggle] = useState(
     plan?.billingFrequency === "ANNUALLY" ? true : false
   );
@@ -59,6 +64,10 @@ const PaymentModal = ({
   const newSub = useSearchParams().get("new");
   const { curUser, curUser4PaymentMethod } = useUser();
   const [stripePmd, setStripePmd] = useState<any>();
+  const [couponCode, setCouponCode] = useState("");
+  const [couponResponse, setCouponResponse] = useState<any>();
+
+  console.log(couponResponse, "22134");
 
   // console.log(curUser4PaymentMethod?.data?.stripePaymentMethods);
 
@@ -69,7 +78,7 @@ const PaymentModal = ({
 
   // console.log(selectedPredictions.prediction.country);
 
-  console.log(newSub);
+  // console.log(newSub);
 
   const fivePercent = (n: number) => n * 0.05;
 
@@ -93,20 +102,26 @@ const PaymentModal = ({
     }
   }, [plan, toggle, equivalentYearlyPlan]);
 
-  // console.log(curUser?.data);
-
   const onSubmit = async () => {
     const predictions = selectedPredictions?.prediction;
 
-    // console.log(isUpgrade);
     if (!predictions?.latitude) {
       toast.error("Enter a valid address");
       return;
     }
-    // if (!dropdown?.id) {
-    //   toast.error("Select equipment age");
-    //   return;
-    // }
+
+    // 1) Validate coupon (only abort if invalid or validation fails)
+    if (couponCode && !couponResponse) {
+      const couponRes: any = await handleValidateCoupon({
+        planId: subPlan?._id,
+        couponCode,
+      });
+      console.log(couponRes);
+      setCouponResponse(couponRes);
+      return;
+    }
+
+    // 2) Build payload
     const payload = {
       coverageAddress: {
         latitude: predictions?.latitude || "",
@@ -121,22 +136,19 @@ const PaymentModal = ({
       equipmentAgeCategory: dropdown?.id || "1-4",
       subscriptionType:
         type ||
-        curUser?.data?.subscriptions[0]?.subscriptionType ||
+        curUser?.data?.subscriptions?.[0]?.subscriptionType ||
         "RESIDENTIAL",
-      // ...(user?.businessName ? { businessName: user?.businessName } : null),
       businessName: user?.businessName || user?.name,
       ...(newSub && { paymentMethodId: stripePmd?.id }),
+      ...(couponCode && { couponCode }),
     };
 
-    // console.log(user);
-
+    // 3) Proceed to the next call
     if (newSub) {
-      handleNewSubscription(payload as any);
-
-      return;
+      await handleNewSubscription(payload as any);
+    } else {
+      await handleCheckout(payload as any);
     }
-
-    await handleCheckout(payload as any);
   };
 
   const furtherDisable = newSub ? !stripePmd : false;
@@ -304,11 +316,37 @@ const PaymentModal = ({
           </InputContainer>
         </div>
       </div>
+
+      {
+        <div className="flex-col gap-4 my-4">
+          <Text.Paragraph className="font-semibold">
+            Coupon code (optional)
+          </Text.Paragraph>
+
+          <InputContainer>
+            <input
+              type="text"
+              className="text-input"
+              placeholder="Enter coupon code"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value)}
+            />
+          </InputContainer>
+        </div>
+      }
       <div className="bg-light-500 min-h-30 rounded-lg p-2">
         <Text.Paragraph className="font-semibold">
           Membership plan
         </Text.Paragraph>
         <div className="border-b border-b-light-10">
+          {couponResponse?.data && (
+            <div className="  flex-row-between py-3">
+              <Text.SmallText>Coupon Applied</Text.SmallText>
+              <Text.SmallText className="text-green-500 text-xs">
+                {couponResponse?.data?.coupon?.name}
+              </Text.SmallText>
+            </div>
+          )}
           <div className="  flex-row-between py-3">
             <Text.SmallText>{`${subPlan?.name?.split(" - ")[0]} - ${
               subPlan?.billingFrequency
@@ -328,8 +366,20 @@ const PaymentModal = ({
           </Text.SmallText>
           <Text.SmallText className="font-semibold text-sm">
             {formatCurrency(
-              subPlan?.priceDetails?.discountedPrice +
-                fivePercent(subPlan?.priceDetails?.discountedPrice)
+              Number(
+                couponResponse?.data?.discount?.finalAmount ??
+                  subPlan?.priceDetails?.discountedPrice ??
+                  0
+              ) +
+                Number(
+                  fivePercent(
+                    Number(
+                      couponResponse?.data?.discount?.finalAmount ??
+                        subPlan?.priceDetails?.discountedPrice ??
+                        0
+                    )
+                  )
+                )
             )}
           </Text.SmallText>
         </div>
@@ -382,7 +432,11 @@ const PaymentModal = ({
           {isCheckingout ? (
             <LoadingTemplate isMessage={false} variant="small" />
           ) : (
-            <Button.Text>Confirm Membership</Button.Text>
+            <Button.Text>
+              {couponCode && !couponResponse
+                ? "Confirm Coupon code"
+                : "Confirm Membership"}
+            </Button.Text>
           )}
         </Button>
         <Button

@@ -153,8 +153,12 @@ export const usePricing = (planId?: string) => {
       toast.success(
         res?.message || res?.data?.message || "Session created successfully"
       );
-      const url = res?.url || res?.data?.url;
-      window.location.href = url;
+
+      console.log(res);
+
+      const url = res?.url || res?.data?.url || res?.data?.session?.url;
+
+      if (url) window.location.href = url;
     } catch (error) {
       const errMsg = formatError(error);
       console.error("CheckoutError", error);
@@ -174,6 +178,25 @@ export const usePricing = (planId?: string) => {
       const errMsg = formatError(error);
       console.error("CheckoutError", error);
       toast.error(errMsg || "checkout failed");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+  const handleValidateCoupon = async (payload: {
+    planId: string;
+    couponCode: string;
+  }) => {
+    setIsCheckingOut(true);
+    try {
+      const res = await pricingActions.validateCouponCode(payload);
+      toast.success(res?.message || res?.data?.message || "");
+
+      return res;
+    } catch (error) {
+      const errMsg = formatError(error);
+      console.error("CheckoutError", error);
+      toast.error(errMsg || "checkout failed");
+      return;
     } finally {
       setIsCheckingOut(false);
     }
@@ -342,5 +365,6 @@ export const usePricing = (planId?: string) => {
     handleReactivatePlan,
     handleContinuePlan,
     handleNewSubscription,
+    handleValidateCoupon,
   };
 };

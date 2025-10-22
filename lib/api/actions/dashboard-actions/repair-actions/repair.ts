@@ -211,4 +211,27 @@ export const repairActions = {
       throw error;
     }
   },
+  inspectionSchedule: async (payload: {
+    date: string;
+    time: string;
+    subscriptionId: string;
+    emergency: boolean;
+  }) => {
+    try {
+      const response = await http.post(
+        `${url}/jobs/inspection`,
+        payload,
+        withAuth()
+      );
+
+      return response.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 };
