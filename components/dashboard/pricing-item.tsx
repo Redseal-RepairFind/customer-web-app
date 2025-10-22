@@ -19,7 +19,7 @@ const PricingItem = ({
   onSelectPlan: (item: any) => void;
   currentPlan?: boolean;
 }) => {
-  console.log(item);
+  // console.log(item);
   // return null;
   const [showall, setShowall] = useState(false);
   const feats = showall ? item?.features : item?.features?.slice(0, 5) || [];
@@ -77,7 +77,7 @@ const PricingItem = ({
       {feats?.map((feat: any, i: number) => {
         // const splitedText = feat?;
 
-        console.log(feat?.status);
+        // console.log(feat?.status);
 
         return (
           <div className="flex gap-2 items-start mt-2" key={i}>

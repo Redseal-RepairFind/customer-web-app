@@ -72,7 +72,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
     isUpgrade && singleSubPlans?.billingFrequency === "ANNUALLY" ? true : false
   );
 
-  console.log(stp);
+  // console.log(stp);
 
   useEffect(() => {
     if (isUpgrade && singleSubPlans?.billingFrequency === "ANNUALLY") {

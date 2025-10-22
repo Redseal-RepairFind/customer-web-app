@@ -67,7 +67,7 @@ const PaymentModal = ({
   const [couponCode, setCouponCode] = useState("");
   const [couponResponse, setCouponResponse] = useState<any>();
 
-  console.log(couponResponse, "22134");
+  // console.log(couponResponse, "22134");
 
   // console.log(curUser4PaymentMethod?.data?.stripePaymentMethods);
 
@@ -139,19 +139,19 @@ const PaymentModal = ({
         curUser?.data?.subscriptions?.[0]?.subscriptionType ||
         "RESIDENTIAL",
       businessName: user?.businessName || user?.name,
-      ...(newSub && { paymentMethodId: stripePmd?.id }),
+      ...(newSub && stripePmd && { paymentMethodId: stripePmd?.id }),
       ...(couponCode && { couponCode }),
     };
 
     // 3) Proceed to the next call
-    if (newSub) {
+    if (newSub && stripePmd?.id) {
       await handleNewSubscription(payload as any);
     } else {
       await handleCheckout(payload as any);
     }
   };
 
-  const furtherDisable = newSub ? !stripePmd : false;
+  // const furtherDisable = newSub ? !stripePmd : false;
 
   return (
     <div className="w-full flex-cols gap-4 z-[1000]">
@@ -221,7 +221,7 @@ const PaymentModal = ({
       {newSub && (
         <div className="flex-col gap-4 mb-4 w-full relative">
           <Text.Paragraph className="font-semibold">
-            Payment Method
+            Select Existing Payment Method
           </Text.Paragraph>
 
           <Dropdown className="w-full">
@@ -241,7 +241,7 @@ const PaymentModal = ({
             <Dropdown.Content className="w-full bg-white">
               <Dropdown.Label>
                 <Text.Paragraph className="text-dark-500">
-                  {"Select Equipment Age"}
+                  {"Select Payment method"}
                 </Text.Paragraph>
               </Dropdown.Label>
 
@@ -426,7 +426,7 @@ const PaymentModal = ({
       <div className="flex-rows items-center gap-4">
         <Button
           onClick={() => onSubmit()}
-          disabled={!acceptTerms || isCheckingout || furtherDisable}
+          disabled={!acceptTerms || isCheckingout}
           className="cursor-pointer  mb-4 mt-8 min-h-10 relative w-full"
         >
           {isCheckingout ? (
