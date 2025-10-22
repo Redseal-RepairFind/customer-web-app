@@ -1,5 +1,6 @@
 // lib/api/axios/http.ts
 // Axios client (browser) with cookie-based auth opt-in
+import "client-only";
 import axios, {
   AxiosHeaders,
   type AxiosRequestConfig,

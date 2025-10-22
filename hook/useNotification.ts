@@ -1,5 +1,7 @@
+"use client";
+
 import { notifications } from "@/lib/api/actions/dashboard-actions/dashboard/notifications";
-import { formatError } from "@/lib/helpers";
+import { formatError, readCookie, readStringCookie } from "@/lib/helpers";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -10,6 +12,12 @@ export const useNotification = () => {
   const [sentinelAction, setSentinelAction] = useState<HTMLDivElement | null>(
     null
   );
+
+  const token = readStringCookie(
+    process.env.NEXT_PUBLIC_TOKEN_COOKIE ?? "reparfind_token"
+  );
+
+  // console.log(token);
 
   const { data: notificationBagde, isLoading: isLoadingBagde } = useQuery({
     queryKey: ["badge_counts"],
@@ -52,6 +60,7 @@ export const useNotification = () => {
       return currentPage < totalPages ? currentPage + 1 : undefined;
     },
     initialPageParam: 1,
+    enabled: Boolean(token),
   });
 
   const {
@@ -73,6 +82,7 @@ export const useNotification = () => {
       return currentPage < totalPages ? currentPage + 1 : undefined;
     },
     initialPageParam: 1,
+    enabled: Boolean(token),
   });
 
   useEffect(() => {
