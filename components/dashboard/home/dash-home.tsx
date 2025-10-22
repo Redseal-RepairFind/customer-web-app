@@ -14,8 +14,8 @@ import { icons, images } from "@/lib/constants";
 import { useRepairs } from "@/hook/useRepairs";
 import MultiBranch from "./multi-branch";
 import { usePricing } from "@/hook/usePricing";
-import { useNotification } from "@/hook/useNotification";
-import MarqueeBanner from "./margueer-banner";
+// import { useNotification } from "@/hook/useNotification";
+// import MarqueeBanner from "./margueer-banner";
 import { useRouter } from "next/navigation";
 
 const DashboardHome = () => {
