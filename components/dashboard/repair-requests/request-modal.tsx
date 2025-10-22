@@ -81,7 +81,7 @@ const RequestModal = ({
   //   //   }
   // };
 
-  // console.log(subs.status);
+  // console.log(dropdown);
   return (
     <form className="w-full flex-cols gap-4 z-[1000]">
       <div className="flex-cols gap-2">
@@ -93,7 +93,7 @@ const RequestModal = ({
           you with qualified professionals in your area.
         </Text.SmallText>
       </div>
-      <div className="flex-col gap-4 mb-4">
+      {/* <div className="flex-col gap-4 mb-4">
         <div className="flex-rows mb-2">
           <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
             Service type
@@ -148,7 +148,7 @@ const RequestModal = ({
             ))}
           </Dropdown.Content>
         </Dropdown>
-      </div>
+      </div> */}
       <div className="flex-col gap-4 mb-4">
         <div className="flex-rows mb-2">
           <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
@@ -321,7 +321,7 @@ const RequestModal = ({
               return;
             }
             const payload = {
-              serviceType: dropdown?.name,
+              serviceType: "General Repairs",
               date: dayjs(value).format("YYYY-MM-DD"),
               time: dayjs(time).format("HH:mm"),
               description: message,
