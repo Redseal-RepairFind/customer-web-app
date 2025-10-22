@@ -1,7 +1,7 @@
 "use client";
 
 import { notifications } from "@/lib/api/actions/dashboard-actions/dashboard/notifications";
-import { formatError, readCookie, readStringCookie } from "@/lib/helpers";
+import { formatError, readStringCookie } from "@/lib/helpers";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
 
