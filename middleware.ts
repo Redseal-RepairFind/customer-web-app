@@ -36,6 +36,7 @@ function isAuthRoute(pathname: string) {
 }
 
 function isApiRoute(pathname: string) {
+  if (pathname.startsWith("/api/auth")) return false; // ✅ let NextAuth/Auth.js throug
   return pathname.startsWith("/api");
 }
 
@@ -104,6 +105,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|robots.txt|sitemap.xml|images|public).*)",
+    // everything except Next static/image, robots/sitemap, images/public, favicon, and NextAuth API
+    "/((?!_next/static|_next/image|robots\\.txt|sitemap\\.xml|images|public|favicon\\.ico|api/auth).*)",
   ],
 };

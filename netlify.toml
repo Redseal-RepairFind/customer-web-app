@@ -1,2 +1,71 @@
+# netlify.toml
+
+############################################
+# Build
+############################################
+[build]
+  command = "npm run build"
+  publish = ".next"          # the plugin rewires this automatically
+
 [build.environment]
-  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_API_BASE_URL,NEXT_PUBLIC_USER_COOKIE,NEXT_PUBLIC_TOKEN_COOKIE,NEXT_PUBLIC_MAP_API_KEY"
+  NODE_VERSION = "20"
+  # Optional: uncomment if you need it
+  # NPM_FLAGS = "--legacy-peer-deps"
+
+############################################
+# Next.js plugin (handles routing, images, SSR)
+############################################
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+############################################
+# Functions (Node Lambda) configuration
+############################################
+[functions]
+  node_bundler = "esbuild"
+  # If you need native deps or private modules, list them here
+  # external_node_modules = ["sharp"]
+
+############################################
+# OPTIONAL: Proxy your separate API (if you want same-origin calls)
+# Remove this block if you call the API by absolute URL instead.
+############################################
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://api.your-domain.com/:splat"
+#   status = 200              # rewrite (proxy), not a browser redirect
+#   force = true
+#   headers = { X-Forwarded-Host = ":host" }
+
+############################################
+# Caching headers (recommended)
+############################################
+# Long cache for Next static assets
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Reasonable cache for images & favicon
+[[headers]]
+  for = "/favicon.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+############################################
+# Security headers (safe defaults)
+############################################
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    # If you want a CSP, add it after testing carefully:
+    # Content-Security-Policy = "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; connect-src 'self' https://api.your-domain.com; frame-ancestors 'self';"
