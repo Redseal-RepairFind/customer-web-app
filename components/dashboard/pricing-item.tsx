@@ -102,6 +102,16 @@ const PricingItem = ({
           </div>
         );
       })}
+      {showall && (
+        <div className="flex items-center gap-3 mt-8">
+          <Text.Paragraph className="font-bold text-sm">
+            Total Value:
+          </Text.Paragraph>
+          <Text.SmallText className="text-sm">
+            {item?.totalValue}
+          </Text.SmallText>
+        </div>
+      )}
       {/* {showall
         ? feats?.benefits.map((feat: any, i: number) => {
             const splitedText = feat?.split(" - ");

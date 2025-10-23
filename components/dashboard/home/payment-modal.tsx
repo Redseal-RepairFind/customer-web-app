@@ -224,7 +224,7 @@ const PaymentModal = ({
       await handleCheckout(payload as any);
     }
   };
-
+  console.log(plan);
   const pmd =
     curUser4PaymentMethod?.data?.stripePaymentMethods?.length > 0
       ? curUser4PaymentMethod?.data?.stripePaymentMethods
