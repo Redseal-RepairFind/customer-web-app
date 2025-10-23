@@ -337,7 +337,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
               RepairFind Membership Plans
             </Text.Heading>
             <Text.Heading className="my-2 text-dark-400 text-xl lg:text-3xl text-center">
-              We don’t sell repairs, we sells peace of mind
+              We don’t sell repairs, we sell peace of mind
             </Text.Heading>
 
             <div className="flex items-center justify-center gap-2 text-dark-400 ">
