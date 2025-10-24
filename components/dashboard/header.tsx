@@ -47,11 +47,9 @@ const DashboardHeader = () => {
 
   const subscriptionOldest =
     items?.length > 0 &&
-    items
-      ?.filter((user: any) => user?.status?.toLowerCase()?.includes("active"))
-      ?.reduce((oldest: any, current: any) =>
-        current?.startDate < oldest?.startDate ? current : oldest
-      );
+    items?.reduce((oldest: any, current: any) =>
+      current?.startDate < oldest?.startDate ? current : oldest
+    );
   const { daysLeft } = useSubCalc(subscriptionOldest);
 
   const allSkils = skills?.data || [];
