@@ -224,7 +224,7 @@ const PaymentModal = ({
       await handleCheckout(payload as any);
     }
   };
-  console.log(plan);
+  // console.log(plan);
   const pmd =
     curUser4PaymentMethod?.data?.stripePaymentMethods?.length > 0
       ? curUser4PaymentMethod?.data?.stripePaymentMethods
@@ -441,7 +441,7 @@ const PaymentModal = ({
       </Text.SubParagraph>
 
       {/* Terms */}
-      <div className="flex-rows gap-2">
+      <div className="md:flex items-center gap-2 hidden">
         <button
           className={`h-4 w-4 rounded-sm border border-dark-300 ${
             acceptTerms ? "bg-dark" : ""
@@ -468,33 +468,60 @@ const PaymentModal = ({
       </div>
 
       {/* Actions */}
-      <div className="flex-rows items-center gap-4">
-        <Button
-          onClick={onSubmit}
-          disabled={
-            !acceptTerms ||
-            isCheckingout ||
-            couponStatus === "validating" ||
-            (couponCode &&
-              (couponStatus === "invalid" || couponStatus === "error"))
-          }
-          className="cursor-pointer mb-4 mt-8 min-h-10 relative w-full"
-        >
-          {isCheckingout ? (
-            <LoadingTemplate isMessage={false} variant="small" />
-          ) : (
-            <Button.Text>{"Confirm Membership"}</Button.Text>
-          )}
-        </Button>
+      <div className=" md:relative fixed bottom-0 left-3 right-3 md:p-0 p-3  bg-white">
+        <div className="flex items-center gap-2  md:hidden">
+          <button
+            className={`h-4 w-4 rounded-sm border border-dark-300 ${
+              acceptTerms ? "bg-dark" : ""
+            } flex-row-center cursor-pointer`}
+            onClick={() => setAcceptTerms((acc) => !acc)}
+          >
+            {acceptTerms ? <CgCheck color="#ffffff" /> : null}
+          </button>
 
-        <Button
-          variant="secondary"
-          onClick={onClose}
-          disabled={isCheckingout}
-          className="cursor-pointer mb-4 mt-8 min-h-10 relative w-full"
-        >
-          <Button.Text>Cancel</Button.Text>
-        </Button>
+          <Text.Paragraph className="text-sm lg:text-base">
+            I agree to the{" "}
+            <Link
+              href={`/subscription_agreement?type=${
+                type || curUser?.data?.planCategory
+              }`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold underline"
+            >
+              Terms of Service
+            </Link>
+            *
+          </Text.Paragraph>
+        </div>
+        <div className="flex-rows items-center gap-4 mt-4">
+          <Button
+            onClick={onSubmit}
+            disabled={
+              !acceptTerms ||
+              isCheckingout ||
+              couponStatus === "validating" ||
+              (couponCode &&
+                (couponStatus === "invalid" || couponStatus === "error"))
+            }
+            className="cursor-pointer mb-4 mt-8 min-h-10 relative w-full"
+          >
+            {isCheckingout ? (
+              <LoadingTemplate isMessage={false} variant="small" />
+            ) : (
+              <Button.Text>{"Confirm Membership"}</Button.Text>
+            )}
+          </Button>
+
+          <Button
+            variant="secondary"
+            onClick={onClose}
+            disabled={isCheckingout}
+            className="cursor-pointer mb-4 mt-8 min-h-10 relative w-full"
+          >
+            <Button.Text>Cancel</Button.Text>
+          </Button>
+        </div>
       </div>
     </div>
   );

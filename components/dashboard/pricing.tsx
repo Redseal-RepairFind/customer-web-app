@@ -435,6 +435,13 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
               </InputContainer>
             </div>
           </div>
+
+          <div className="my-6 font-bold">
+            <Text.Paragraph>
+              Kindly choose a membership plan below
+            </Text.Paragraph>
+          </div>
+
           {/* <div className="flex-col gap-4 mb-4">
             <div className="flex-rows mb-2">
               <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
