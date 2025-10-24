@@ -41,9 +41,9 @@ const Metrics = ({
   const date = dayjs(plans?.startDate || new Date()?.toDateString());
   const nextDate = date?.add(30, "day");
 
-  console.log(stats);
+  // console.log(stats);
 
-  console.log(plans);
+  // console.log(plans);
 
   const handleFeatureMessage = () => {
     warning({

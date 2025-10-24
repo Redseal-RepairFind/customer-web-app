@@ -27,6 +27,7 @@ import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ToggleBtn from "@/components/ui/toggle-btn";
+import EmptyPage from "@/components/ui/empty";
 
 const Notifs = () => {
   const [switched, setSwitched] = useState("Notifications");
@@ -36,7 +37,7 @@ const Notifs = () => {
   const [message, setMessage] = useState("");
   const [toggle, setToggle] = useState<boolean>(false);
 
-  const [subs, setSubs] = useState<Subscription>();
+  const [subs, setSubs] = useState<any>();
 
   const [open, setOpen] = useState({
     time: false,
@@ -72,7 +73,13 @@ const Notifs = () => {
   if (isLoading || isLoadingACtions) return <LoadingTemplate />;
   return (
     <main className="flex-cols gap-4">
-      <Modal isOpen={openModal} onClose={() => setOpenModal(false)}>
+      <Modal
+        isOpen={openModal}
+        onClose={() => {
+          setSubs(null);
+          setOpenModal(false);
+        }}
+      >
         <form>
           <div className="flex-cols gap-2 mb-8">
             <Text.SubHeading className="text-lg font-semibold">
@@ -181,15 +188,21 @@ const Notifs = () => {
           <div className="flex items-center gap-4 mt-8 w-full">
             <Button
               className="w-full"
-              onClick={() =>
-                handleSetInspection({
-                  date: dayjs(value).format("YYYY-MM-DD"),
-                  time: dayjs(time).format("HH:mm"),
-                  // description: message,
-                  subscriptionId: subs?.id,
-                  emergency: toggle,
-                })
-              }
+              onClick={() => {
+                handleSetInspection(
+                  {
+                    date: dayjs(value).format("YYYY-MM-DD"),
+                    time: dayjs(time).format("HH:mm"),
+                    // description: message,
+                    subscriptionId: subs?.context?.subscriptionId,
+                    emergency: toggle,
+                  },
+                  () => {
+                    setOpenModal(false);
+                    setSubs(null);
+                  }
+                );
+              }}
               disabled={inspecting}
             >
               {inspecting && (
@@ -219,9 +232,16 @@ const Notifs = () => {
         <div className="gap-2 flex-cols">
           <Text.SmallHeading>Recent Notification</Text.SmallHeading>
 
-          {allNotifications?.map((not) => (
-            <NotifItem key={not._id} notif={not} onRead={handleReadNotifs} />
-          ))}
+          {allNotifications?.length > 0 ? (
+            allNotifications?.map((not) => (
+              <NotifItem key={not._id} notif={not} onRead={handleReadNotifs} />
+            ))
+          ) : (
+            <EmptyPage
+              tytle="No Notifications"
+              message="You have no notifications yet"
+            />
+          )}
         </div>
       ) : (
         <div className="gap-2 flex-cols">
@@ -229,9 +249,25 @@ const Notifs = () => {
           <Text.SmallText className="text-sm text-dark-500 ">
             Track job requests received, accepted, and completed
           </Text.SmallText>
-          {allActions?.map((act) => (
-            <ActionsItem key={act?._id} item={act} />
-          ))}
+          {allActions?.length > 0 ? (
+            allActions?.map((act) => (
+              <ActionsItem
+                key={act?._id}
+                item={act}
+                openModal={() => {
+                  if (act?.title === "Equipment Inspection Required") {
+                    setOpenModal(true);
+                    setSubs(act);
+                  }
+                }}
+              />
+            ))
+          ) : (
+            <EmptyPage
+              tytle="No quick actions"
+              message="You have no quick Actions to perform"
+            />
+          )}
         </div>
       )}
       {switched?.toLowerCase().includes("notification") ? (
@@ -299,7 +335,13 @@ const NotifItem = ({
   );
 };
 
-const ActionsItem = ({ item }: { item: QuickActions }) => {
+const ActionsItem = ({
+  item,
+  openModal,
+}: {
+  item: QuickActions;
+  openModal: () => void;
+}) => {
   return (
     <SpecialBox className="border border-dark-10 flex-row-between px-2 md:px-4 py-2">
       <div className="flex items-start gap-2">
@@ -324,8 +366,8 @@ const ActionsItem = ({ item }: { item: QuickActions }) => {
           </Text.SmallText>
 
           <div>
-            <Button>
-              <Button.Text>Proceed</Button.Text>
+            <Button onClick={openModal}>
+              <Button.Text>Act now</Button.Text>
             </Button>
           </div>
         </div>

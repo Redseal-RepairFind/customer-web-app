@@ -24,6 +24,7 @@ import { ClipLoader } from "react-spinners";
 import Image from "next/image";
 import { icons } from "@/lib/constants";
 import toast from "react-hot-toast";
+import { useSubCalc } from "@/hook/useSubCalc";
 
 type SkilsTYpe = {
   name: string;
@@ -41,11 +42,11 @@ const RequestModal = ({
   closeModal: () => void;
 }) => {
   const [toggle, setToggle] = useState<boolean>(false);
-  const [dropdown, setDropdown] = useState<{
-    name: string;
-    distance: number | string;
-    contractorCount: number;
-  }>();
+  // const [dropdown, setDropdown] = useState<{
+  //   name: string;
+  //   distance: number | string;
+  //   contractorCount: number;
+  // }>();
 
   const [subs, setSubs] = useState<Subscription>();
   const [value, setValue] = useState<Dayjs | null>(dayjs());
@@ -54,13 +55,14 @@ const RequestModal = ({
     time: false,
     date: false,
   });
+  const { daysLeft } = useSubCalc(subs);
 
-  const [serviceType, setServiceType] = useState<SkilsTYpe>(skillsList);
+  // const [serviceType, setServiceType] = useState<SkilsTYpe>(skillsList);
   const [message, setMessage] = useState("");
   const language = readStringCookie(LANG_ID);
-  const isWeekend = value ? value.day() === 0 || value.day() === 6 : false;
+  // const isWeekend = value ? value.day() === 0 || value.day() === 6 : false;
 
-  // console.log();
+  // console.log(subs);
 
   const { creatingRequest, handleCreateRequest } = useRepairs();
 
@@ -157,9 +159,9 @@ const RequestModal = ({
         </div>
         <Dropdown className="w-full">
           <Dropdown.Trigger className="w-full flex-row-between cursor-pointer">
-            <Text.Paragraph className="text-dark-500 text-sm">
+            <Text.Paragraph className="text-dark-500 text-sm text-start">
               {subs
-                ? `${subs.coverageAddress.address}  - ${subs.planType || ""}`
+                ? `${subs.coverageAddress.address}  - ${subs.planName || ""}`
                 : "Select Membership address"}
             </Text.Paragraph>
           </Dropdown.Trigger>
@@ -186,7 +188,7 @@ const RequestModal = ({
           </Dropdown.Content>
         </Dropdown>
 
-        {subs && subs.status !== "ACTIVE" ? (
+        {(subs && subs.status !== "ACTIVE") || (subs && daysLeft > 0) ? (
           <div className="flex items-center gap-2 mt-4">
             <Image
               src={icons.disclaimer}
@@ -194,11 +196,17 @@ const RequestModal = ({
               width={20}
               alt="Disclaimer icon"
             />
-
-            <Text.Paragraph className="text-sm text-red-500">
-              Note: the selected Membership is not active at the moment, You can
-              not make repair requests to the selected location
-            </Text.Paragraph>
+            {daysLeft > 0 ? (
+              <Text.Paragraph className="text-sm text-red-500">
+                Note: The selected location is not eligible to make repair
+                requests yet.
+              </Text.Paragraph>
+            ) : (
+              <Text.Paragraph className="text-sm text-red-500">
+                Note: the selected Membership is not active at the moment, You
+                can not make repair requests to the selected location
+              </Text.Paragraph>
+            )}
           </div>
         ) : null}
       </div>
@@ -314,7 +322,9 @@ const RequestModal = ({
       </div>
       <div className="flex-rows gap-2">
         <Button
-          disabled={creatingRequest || subs?.status !== "ACTIVE"}
+          disabled={
+            creatingRequest || subs?.status !== "ACTIVE" || daysLeft > 0
+          }
           onClick={async () => {
             if (!subs?.coverageAddress?.address) {
               toast.error("Selected Membership have no coverage address");

@@ -30,7 +30,6 @@ const DashboardHeader = () => {
   const [openModal, setOpenModal] = useState(false);
   const user = curUser?.data;
   const { warning, error } = useToast();
-  const { daysLeft } = useSubCalc(user?.subscription);
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const total = slideImages?.length ?? 0;
@@ -41,13 +40,25 @@ const DashboardHeader = () => {
 
   const { isCopied, copy } = useCopyToClipboard();
 
-  // console.log(request_subscriptions);
+  // find the oldest subscription
+  // calculate how many days left till day 30
+
+  const items = user?.subscriptions ?? [];
+
+  const subscriptionOldest =
+    items?.length > 0 &&
+    items
+      ?.filter((user: any) => user?.status?.toLowerCase()?.includes("active"))
+      ?.reduce((oldest: any, current: any) =>
+        current?.startDate < oldest?.startDate ? current : oldest
+      );
+  const { daysLeft } = useSubCalc(subscriptionOldest);
 
   const allSkils = skills?.data || [];
 
   const isSubsPage = curPathname.includes("manage-subscription");
 
-  // console.log(request_subscriptions);
+  // console.log(daysLeft);
 
   const handleCloseModal = () => setOpenModal(false);
   const handleOpenModal = () => {
@@ -58,15 +69,17 @@ const DashboardHeader = () => {
       return;
     }
 
-    const planType = user?.subscriptions?.find((user: any) =>
-      user?.status?.toLowerCase()?.includes("active")
-    );
+    // const planType = user?.subscriptions?.find((user: any) =>
+    //   user?.status?.toLowerCase()?.includes("active")
+    // );
 
     // setOpenModal(true);
 
     if (daysLeft > 0)
       warning({
-        render: (api) => <RequestSubmitToast subscription={planType} />,
+        render: (api) => (
+          <RequestSubmitToast subscription={subscriptionOldest} />
+        ),
         vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
       });
     else {

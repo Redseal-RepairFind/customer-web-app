@@ -44,26 +44,6 @@ export const useNotification = () => {
     return response;
   };
 
-  const handleSetInspection = async (payload: {
-    date: string;
-    time: string;
-    subscriptionId: string;
-    emergency: boolean;
-  }) => {
-    try {
-      setInspecting(true);
-
-      await repairActions.inspectionSchedule(payload);
-
-      toast.success("Inspection schedule set successfully");
-    } catch (error: any) {
-      console.error(error);
-      toast.error(error?.response?.data?.message);
-    } finally {
-      setInspecting(false);
-    }
-  };
-
   const {
     data,
     fetchNextPage,
@@ -185,6 +165,32 @@ export const useNotification = () => {
     } catch (error: any) {
       formatError(error);
       console.error("read error", error);
+    }
+  };
+
+  const handleSetInspection = async (
+    payload: {
+      date: string;
+      time: string;
+      subscriptionId: string;
+      emergency: boolean;
+    },
+    onClose: () => void
+  ) => {
+    try {
+      setInspecting(true);
+
+      await repairActions.inspectionSchedule(payload);
+
+      toast.success("Inspection schedule set successfully");
+
+      await refetchActs();
+      onClose();
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error?.response?.data?.message);
+    } finally {
+      setInspecting(false);
     }
   };
 

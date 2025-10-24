@@ -57,7 +57,7 @@ const DashboardHome = () => {
     planType,
   };
 
-  // console.log(curUser);
+  // console.log(notificationBagde?.data);
 
   return (
     <main className="w-full">
@@ -72,7 +72,7 @@ const DashboardHome = () => {
         </div>
       ) : null}
       <section className="flex-cols gap-5 mt-8">
-        {notificationBagde?.data?.quickActions?.length > 0 && (
+        {notificationBagde?.data?.inspectionReminderActions?.length > 0 && (
           <MarqueeBanner
             items={[
               // "🔑 Verified landlords",
