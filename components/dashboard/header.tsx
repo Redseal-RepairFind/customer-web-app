@@ -71,18 +71,18 @@ const DashboardHeader = () => {
     //   user?.status?.toLowerCase()?.includes("active")
     // );
 
-    // setOpenModal(true);
+    setOpenModal(true);
 
-    if (daysLeft > 0)
-      warning({
-        render: (api) => (
-          <RequestSubmitToast subscription={subscriptionOldest} />
-        ),
-        vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
-      });
-    else {
-      setOpenModal(true);
-    }
+    // if (daysLeft > 0)
+    //   warning({
+    //     render: (api) => (
+    //       <RequestSubmitToast subscription={subscriptionOldest} />
+    //     ),
+    //     vars: { bg: "#FF2D55", fg: "#ffffff" }, // still can theme even with custom render
+    //   });
+    // else {
+    //   setOpenModal(true);
+    // }
   };
 
   const stop = () => {
