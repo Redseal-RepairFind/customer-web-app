@@ -322,9 +322,10 @@ const RequestModal = ({
       </div>
       <div className="flex-rows gap-2">
         <Button
-          disabled={
-            creatingRequest || subs?.status !== "ACTIVE" || daysLeft > 0
-          }
+          // disabled={
+          //   creatingRequest || subs?.status !== "ACTIVE" || daysLeft > 0
+          // }
+          disabled={creatingRequest}
           onClick={async () => {
             if (!subs?.coverageAddress?.address) {
               toast.error("Selected Membership have no coverage address");
