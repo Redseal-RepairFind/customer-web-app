@@ -68,7 +68,7 @@ const Notifs = () => {
 
   const { handleReadNotifs } = useSocket();
 
-  // console.log(allActions);
+  console.log(allActions);
 
   // console.log(hasNextPage);
 
@@ -283,7 +283,10 @@ const Notifs = () => {
                 key={act?._id}
                 item={act}
                 openModal={() => {
-                  if (act?.title === "Equipment Inspection Required") {
+                  if (
+                    act?.title?.toLowerCase().includes("inspection") ||
+                    act?.event === "EQUIPMENT_INSPECTION_REMINDER"
+                  ) {
                     setOpenModal(true);
                     setSubs(act);
                   }
