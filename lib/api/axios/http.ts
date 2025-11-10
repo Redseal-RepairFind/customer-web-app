@@ -75,8 +75,11 @@ http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 http.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err?.response?.status === 401) {
-      // clearToken(); // maybe redirect to /login
+    if (
+      err?.response?.status === 401 &&
+      err?.response?.message === "Invalid authorization token"
+    ) {
+      clearToken(); // maybe redirect to /login
     }
     return Promise.reject(err);
   }

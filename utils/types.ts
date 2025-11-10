@@ -51,6 +51,7 @@ export type SubscriptionType = {
     country: string;
     descrition?: string;
   };
+  inspectionDate?: string;
   businessName?: string;
   paymentMethodId?: string;
 };

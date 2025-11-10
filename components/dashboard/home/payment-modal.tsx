@@ -5,13 +5,16 @@ import SubscriptionAgreementPage from "@/components/public/sub-terms";
 import Button from "@/components/ui/custom-btn";
 import Dropdown from "@/components/ui/dropdown";
 import PlacesAutocomplete from "@/components/ui/places-autocomplete";
+import RestrictedDateTimePicker from "@/components/ui/restrict-date";
 import LoadingTemplate from "@/components/ui/spinner";
 import PortalModal from "@/components/ui/terms-portal";
 import Text from "@/components/ui/text";
 import ToggleBtn from "@/components/ui/toggle-btn";
+import { useCompanyInspAvailability } from "@/hook/useAvailableDates";
 import { useUser } from "@/hook/useMe";
 import { usePricing } from "@/hook/usePricing";
 import { formatCurrency } from "@/lib/helpers";
+import dayjs, { Dayjs } from "dayjs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -63,8 +66,10 @@ const PaymentModal = ({
     handleValidateCoupon,
     payementMethods,
   } = usePricing();
+
+  const { companyInspectionAvailability } = useCompanyInspAvailability();
   const [toggle, setToggle] = useState(plan?.billingFrequency === "ANNUALLY");
-  const [termsModal, setTermsMoal] = useState(false);
+  // const [termsModal, setTermsMoal] = useState(false);
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
   const newSub = searchParams.get("new");
@@ -94,7 +99,8 @@ const PaymentModal = ({
   const [couponStatus, setCouponStatus] = useState<Status>("idle");
   const [couponRes, setCouponRes] = useState<CouponResult | null>(null);
   const [couponErr, setCouponErr] = useState<string | null>(null);
-
+  const [date, setDate] = useState<Dayjs | null>();
+  const [time, setTime] = useState<Dayjs | null>(dayjs());
   // cache validated results per (code|plan) so we don't re-hit API
   const cacheRef = useRef(new Map<string, CouponResult>());
 
@@ -216,6 +222,9 @@ const PaymentModal = ({
         couponStatus === "valid" && {
           couponCode: couponCode.trim().toUpperCase(),
         }),
+      ...(date && {
+        inspectionDate: date.toISOString(),
+      }),
     };
 
     if (newSub && stripePmd?.id && stripePmd?.id !== 1) {
@@ -229,7 +238,7 @@ const PaymentModal = ({
     curUser4PaymentMethod?.data?.stripePaymentMethods?.length > 0
       ? curUser4PaymentMethod?.data?.stripePaymentMethods
       : payementMethods?.data;
-
+  const apiSlots = companyInspectionAvailability?.data;
   return (
     <div className="w-full flex-cols gap-4 z-[1000]">
       {/* <PortalModal
@@ -398,7 +407,24 @@ const PaymentModal = ({
           </Text.SmallText>
         )}
       </div>
-
+      <div className="flex-col gap-4 my-4">
+        <Text.Paragraph className="font-semibold">
+          Select Inspection Date
+        </Text.Paragraph>
+        <RestrictedDateTimePicker
+          api={apiSlots} // <- pass your real API response here
+          date={date}
+          time={time}
+          onDateChange={setDate}
+          onTimeChange={setTime}
+          ampm={false} // 24h clock
+          disablePortal={true} // needed inside react-responsive-modal
+          labelDate="Select Preferred Date"
+          labelTime="Select Preferred Time"
+          classNameDateWrapper="mb-4"
+          classNameTimeWrapper=""
+        />
+      </div>
       {/* Summary */}
       <div className="bg-light-500 min-h-30 rounded-lg p-2">
         <Text.Paragraph className="font-semibold">

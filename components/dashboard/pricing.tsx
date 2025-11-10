@@ -22,6 +22,7 @@ import { ClipLoader } from "react-spinners";
 import { InputContainer } from "../auth/signup-item";
 import { useAuthentication } from "@/hook/useAuthentication";
 import { CgChevronLeft } from "react-icons/cg";
+import { useCompanyInspAvailability } from "@/hook/useAvailableDates";
 
 const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
   const { curUser, loadingCurUser } = useUser();
@@ -64,6 +65,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
     handleCheckoutUpgrade,
     isCheckingout,
   } = usePricing(isUpgrade ? decodeURIComponent(planId?.trim()) : "");
+  const { loadingCompanyInspectionAvailability } = useCompanyInspAvailability();
 
   const stp = accountType?.find(
     (acc) => acc?.id === user?.subscriptions[0]?.subscriptionType
@@ -183,7 +185,12 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
 
   // console.log(subType);
 
-  if (loadingCurUser || loadingSubsPlans) return <LoadingTemplate />;
+  if (
+    loadingCurUser ||
+    loadingSubsPlans ||
+    loadingCompanyInspectionAvailability
+  )
+    return <LoadingTemplate />;
 
   const plansToRender = toggle ? yearlylyPlans : monthlyPlans;
   const handleCloseInfoModal = () => setPaymentInfo({ info: {}, open: false });

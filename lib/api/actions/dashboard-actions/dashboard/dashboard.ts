@@ -34,4 +34,30 @@ export const dashboard = {
       throw error;
     }
   },
+  getCompanyInspectionAvailability: async ({
+    year,
+    month,
+  }: {
+    year?: string;
+    month?: number;
+  }) => {
+    const params = new URLSearchParams();
+    if (year) params.append("year", year);
+    if (month) params.append("month", month.toString());
+    try {
+      const res = await http.get(
+        `/customer/inspection-schedule?${params.toString()}`,
+        withAuth()
+      );
+
+      return res?.data;
+    } catch (error: any) {
+      console.error(
+        "Axios error:",
+        error.response?.status,
+        error.response?.data
+      );
+      throw error;
+    }
+  },
 };

@@ -10,12 +10,7 @@ import Button from "@/components/ui/custom-btn";
 import { useNotification } from "@/hook/useNotification";
 import LoadingTemplate from "@/components/ui/spinner";
 import { ClipLoader } from "react-spinners";
-import {
-  LANG_ID,
-  Notification,
-  QuickActions,
-  Subscription,
-} from "@/utils/types";
+import { LANG_ID, Notification, QuickActions } from "@/utils/types";
 import { getTimeAgo, readStringCookie } from "@/lib/helpers";
 import { useSocket } from "@/contexts/socket-contexts";
 import Image from "next/image";
@@ -28,6 +23,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ToggleBtn from "@/components/ui/toggle-btn";
 import EmptyPage from "@/components/ui/empty";
+import { useCompanyInspAvailability } from "@/hook/useAvailableDates";
+import RestrictedDateTimePicker from "@/components/ui/restrict-date";
 
 const Notifs = () => {
   const [switched, setSwitched] = useState("Notifications");
@@ -36,6 +33,7 @@ const Notifs = () => {
   const [time, setTime] = useState<Dayjs | null>(dayjs());
   const [message, setMessage] = useState("");
   const [toggle, setToggle] = useState<boolean>(false);
+  const [date, setDate] = useState<Dayjs | null>();
 
   const [subs, setSubs] = useState<any>();
 
@@ -63,14 +61,22 @@ const Notifs = () => {
     handleSetInspection,
     inspecting,
   } = useNotification();
+  const {
+    companyInspectionAvailability,
+    loadingCompanyInspectionAvailability,
+  } = useCompanyInspAvailability();
 
   const { handleReadNotifs } = useSocket();
 
-  console.log(allActions);
+  // console.log(allActions);
 
   // console.log(hasNextPage);
 
-  if (isLoading || isLoadingACtions) return <LoadingTemplate />;
+  if (isLoading || isLoadingACtions || loadingCompanyInspectionAvailability)
+    return <LoadingTemplate />;
+  const apiSlots = companyInspectionAvailability?.data;
+
+  // console.log(apiSlots);
   return (
     <main className="flex-cols gap-4">
       <Modal
@@ -92,7 +98,7 @@ const Notifs = () => {
           </div>
           <div className="">
             <div className="flex-col gap-4 mb-4">
-              <div className="flex-rows mb-2">
+              {/* <div className="flex-rows mb-2">
                 <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
                   Prefered date
                 </Text.Paragraph>
@@ -124,9 +130,9 @@ const Notifs = () => {
                   }}
                 />
               </LocalizationProvider>
-            </div>
+            </div> */}
 
-            <div className="flex-col gap-4 mb-4">
+              {/* <div className="flex-col gap-4 mb-4">
               <div className="flex-rows mb-2">
                 <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
                   Prefered time
@@ -159,6 +165,28 @@ const Notifs = () => {
                   }}
                 />
               </LocalizationProvider>
+            </div> */}
+              <div className="flex-col gap-4 mb-4">
+                <div className="flex-rows mb-2">
+                  <Text.Paragraph className="font-semibold mr-2 text-sm lg:text-base text-dark-00">
+                    Prefered date and Time
+                  </Text.Paragraph>
+                </div>
+                <RestrictedDateTimePicker
+                  api={apiSlots} // <- pass your real API response here
+                  date={value}
+                  time={time}
+                  onDateChange={setValue}
+                  onTimeChange={setTime}
+                  ampm={false} // 24h clock
+                  disablePortal={true} // needed inside react-responsive-modal
+                  labelDate="Select Preferred Date"
+                  labelTime="Select Preferred Time"
+                  classNameDateWrapper="mb-4"
+                  classNameTimeWrapper=""
+                  includeTime
+                />
+              </div>
             </div>
           </div>
           <div className="flex flex-col">
