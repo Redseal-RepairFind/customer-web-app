@@ -25,6 +25,7 @@ import ToggleBtn from "@/components/ui/toggle-btn";
 import EmptyPage from "@/components/ui/empty";
 import { useCompanyInspAvailability } from "@/hook/useAvailableDates";
 import RestrictedDateTimePicker from "@/components/ui/restrict-date";
+import { useRouter } from "next/navigation";
 
 const Notifs = () => {
   const [switched, setSwitched] = useState("Notifications");
@@ -66,16 +67,16 @@ const Notifs = () => {
     loadingCompanyInspectionAvailability,
   } = useCompanyInspAvailability();
 
-  const { handleReadNotifs } = useSocket();
+  const { handleReadNotifs, badgeCount, badge } = useSocket();
 
-  console.log(allActions);
+  // console.log(allActions);
 
   // console.log(hasNextPage);
 
   if (isLoading || isLoadingACtions || loadingCompanyInspectionAvailability)
     return <LoadingTemplate />;
   const apiSlots = companyInspectionAvailability?.data;
-
+  // console.log(badge);
   // console.log(apiSlots);
   return (
     <main className="flex-cols gap-4">
@@ -247,7 +248,17 @@ const Notifs = () => {
       </Modal>
       <div className="flex-row-between">
         <Text.SmallHeading>Notifications</Text.SmallHeading>
-        <PlanBadge planName={`${unreadCount} unread`} />
+        <PlanBadge
+          planName={`${
+            badgeCount?.totalCount > 0
+              ? badgeCount?.totalCount > 99
+                ? "99+"
+                : badgeCount?.totalCount
+              : badge > 99
+              ? "99+"
+              : badge
+          } unread`}
+        />
       </div>
       <PageToggler
         setSwitched={setSwitched}
@@ -323,13 +334,44 @@ const NotifItem = ({
   notif: Notification;
   onRead: (id: string) => void;
 }) => {
-  // console.log(notif?.heading);
+  // console.log(notif);
+  const router = useRouter();
+  const handleNavigationOnclick = ({
+    type,
+    id,
+  }: {
+    type: string;
+    id?: string;
+  }) => {
+    const lowerTypeIncludes = (cmp: string) =>
+      type?.toLowerCase()?.includes(cmp);
+    if (
+      lowerTypeIncludes("subscription") ||
+      lowerTypeIncludes("stripe") ||
+      lowerTypeIncludes("payment")
+    ) {
+      router.push("/manage-subscription");
+    } else if (
+      lowerTypeIncludes("inspection") ||
+      lowerTypeIncludes("repair") ||
+      lowerTypeIncludes("job")
+    ) {
+      router.push("/repair-request");
+    } else if (lowerTypeIncludes("message")) {
+      router.push(`/inbox/${id}`);
+    } else if (lowerTypeIncludes("call")) {
+      router.push("/inbox?tab=Call logs");
+    }
+  };
 
   return (
     <SpecialBox
       className={`border border-dark-10 flex-row-between px-2 md:px-4 py-2`}
       isBtn
-      onClick={() => onRead(notif?._id)}
+      onClick={() => {
+        handleNavigationOnclick({ type: notif.type || "", id: notif?.entity });
+        onRead(notif?._id);
+      }}
       isRead={Boolean(notif.readAt)}
     >
       <div className="flex-rows gap-2 w-[80%]">

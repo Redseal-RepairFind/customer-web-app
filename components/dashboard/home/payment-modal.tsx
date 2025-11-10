@@ -409,7 +409,11 @@ const PaymentModal = ({
       </div>
       <div className="flex-col gap-4 my-4">
         <Text.Paragraph className="font-semibold">
-          Select Inspection Date
+          Select Inspection Date{" "}
+          <span className="text-xs font-normal ">
+            ( This will enable Repairfind to send a technician to your location
+            for an equipment inspection.)
+          </span>
         </Text.Paragraph>
         <RestrictedDateTimePicker
           api={apiSlots} // <- pass your real API response here
