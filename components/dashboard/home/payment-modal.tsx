@@ -223,7 +223,7 @@ const PaymentModal = ({
           couponCode: couponCode.trim().toUpperCase(),
         }),
       ...(date && {
-        inspectionDate: date.toISOString(),
+        inspectionDate: `${date.format("YYYY-MM-DD")}:${time?.format("HH:mm")}`,
       }),
     };
 
@@ -423,6 +423,7 @@ const PaymentModal = ({
           labelTime="Select Preferred Time"
           classNameDateWrapper="mb-4"
           classNameTimeWrapper=""
+          includeTime
         />
       </div>
       {/* Summary */}
