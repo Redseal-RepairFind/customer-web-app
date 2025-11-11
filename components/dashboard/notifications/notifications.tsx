@@ -185,7 +185,7 @@ const Notifs = () => {
                   labelTime="Select Preferred Time"
                   classNameDateWrapper="mb-4"
                   classNameTimeWrapper=""
-                  includeTime
+                  // includeTime
                 />
               </div>
             </div>

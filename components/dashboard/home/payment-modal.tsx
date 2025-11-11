@@ -407,10 +407,10 @@ const PaymentModal = ({
           </Text.SmallText>
         )}
       </div>
-      <div className="flex-col gap-4 my-4">
-        <Text.Paragraph className="font-semibold">
+      <div className="flex-col gap-5 my-4">
+        <Text.Paragraph className="font-semibold leading-[1.15]">
           Select Inspection Date{" "}
-          <span className="text-xs font-normal ">
+          <span className="text-xs font-normal  leading-[1.15]">
             ( This will enable Repairfind to send a technician to your location
             for an equipment inspection.)
           </span>
@@ -423,11 +423,11 @@ const PaymentModal = ({
           onTimeChange={setTime}
           ampm={false} // 24h clock
           disablePortal={true} // needed inside react-responsive-modal
-          labelDate="Select Preferred Date"
+          labelDate=""
           labelTime="Select Preferred Time"
           classNameDateWrapper="mb-4"
           classNameTimeWrapper=""
-          includeTime
+          // includeTime
         />
       </div>
       {/* Summary */}

@@ -14,12 +14,13 @@ dayjs.extend(customParseFormat);
 /** ========= API types (match your payload) ========= */
 export type SlotItem = {
   date: string; // e.g. "2025-11-03T00:00:00"
-  type?: "available" | string; // only "available" is selectable
+  type?: "available" | string; // we will only accept "available"
   times: string[]; // e.g. ["13:00:00","13:30:00",...]
 };
 
 export type ApiMonthBucket = {
   schedules: SlotItem[];
+  // your payload may also contain other keys like `events`, `inspection_booked`, `summary` — ignored here
 };
 
 export type ApiSchedulesResponse = {
@@ -64,9 +65,6 @@ type Props = {
   /** Optional classNames for layout */
   classNameDateWrapper?: string;
   classNameTimeWrapper?: string;
-
-  /** If falsey, only show DatePicker (no time) */
-  includeTime?: boolean;
 };
 
 const DATE_KEY_FMT = "YYYY-MM-DD" as const;
@@ -83,12 +81,14 @@ function getMonthMap(
   api?: ApiSchedulesResponse | Record<string, ApiMonthBucket>
 ): Record<string, ApiMonthBucket> | null {
   if (!api) return null;
+  // If it's the wrapper shape
   if (
     (api as ApiSchedulesResponse).data &&
     typeof (api as ApiSchedulesResponse).data === "object"
   ) {
     return (api as ApiSchedulesResponse).data;
   }
+  // If it's directly the map
   return api as Record<string, ApiMonthBucket>;
 }
 
@@ -147,6 +147,7 @@ function buildSlotsMap(src: {
   return out;
 }
 
+/** Index minutes by hour for one day's times */
 function indexMinutesByHour(timesHHmm: readonly HHmm[]) {
   const byHour = new Map<number, Set<number>>();
   const hours = new Set<number>();
@@ -167,24 +168,6 @@ function indexMinutesByHour(timesHHmm: readonly HHmm[]) {
     firstHour != null ? Math.min(...Array.from(byHour.get(firstHour)!)) : null;
 
   return { byHour, hours: new Set(sortedHours), firstHour, firstMinute };
-}
-
-/** Build 30-minute interval times between startHour and endHour inclusive of end:00 (no :30 past end) */
-function buildHalfHourWindow(
-  startHour: number,
-  endHourInclusive: number
-): readonly HHmm[] {
-  const list: string[] = [];
-  for (let h = startHour; h <= endHourInclusive; h++) {
-    list.push(`${String(h).padStart(2, "0")}:00`);
-    if (h < endHourInclusive) list.push(`${String(h).padStart(2, "0")}:30`);
-  }
-  return list;
-}
-
-function isWeekend(d: Dayjs): boolean {
-  const dow = d.day(); // 0=Sun ... 6=Sat
-  return dow === 0 || dow === 6;
 }
 
 /** Public helper to combine date + time into ISO string (for your API) */
@@ -215,39 +198,23 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
   autoSnap = true,
   classNameDateWrapper,
   classNameTimeWrapper,
-  includeTime,
 }) => {
   const slotsMap = useMemo(() => buildSlotsMap({ api, slots }), [api, slots]);
 
-  // Today (weekday gets free 30-min intervals from 09:00 to 17:00)
-  const today = useMemo(() => dayjs().startOf("day"), []);
-  const todayKey = today.format(DATE_KEY_FMT);
-  const halfHourToday9to5 = useMemo(() => buildHalfHourWindow(9, 17), []);
-
-  // Bound calendar to earliest/latest available OR include today if outside
+  // Optional: bound calendar to earliest/latest available date
   const availableKeys = useMemo(() => Object.keys(slotsMap).sort(), [slotsMap]);
-  const minAvail = useMemo(
+  const minDate = useMemo(
     () =>
       availableKeys.length ? dayjs(availableKeys[0], DATE_KEY_FMT) : undefined,
     [availableKeys]
   );
-  const maxAvail = useMemo(
+  const maxDate = useMemo(
     () =>
       availableKeys.length
         ? dayjs(availableKeys[availableKeys.length - 1], DATE_KEY_FMT)
         : undefined,
     [availableKeys]
   );
-
-  const minDate = useMemo(() => {
-    if (!minAvail) return today;
-    return today.isBefore(minAvail, "day") ? today : minAvail;
-  }, [minAvail, today]);
-
-  const maxDate = useMemo(() => {
-    if (!maxAvail) return today;
-    return today.isAfter(maxAvail, "day") ? today : maxAvail;
-  }, [maxAvail, today]);
 
   const [open, setOpen] = useState<{ date: boolean; time: boolean }>({
     date: false,
@@ -259,9 +226,7 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
     if (!autoSnap || !date) return;
 
     const key = date.format(DATE_KEY_FMT);
-    const isTodayWeekday = key === todayKey && !isWeekend(date);
-
-    const times = isTodayWeekday ? halfHourToday9to5 : slotsMap[key] ?? [];
+    const times = slotsMap[key] ?? [];
 
     if (!times.length) {
       if (time) onTimeChange(null);
@@ -277,44 +242,30 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
     if (!times.includes(hhmm)) {
       onTimeChange(dayjs(times[0], "HH:mm"));
     }
-  }, [
-    autoSnap,
-    date,
-    onTimeChange,
-    slotsMap,
-    time,
-    todayKey,
-    halfHourToday9to5,
-  ]);
+  }, [autoSnap, date, onTimeChange, slotsMap, time]);
 
   const allowedTimesForDate: readonly HHmm[] = useMemo(() => {
     if (!date) return [];
-    const key = date.format(DATE_KEY_FMT);
-    if (isWeekend(date)) return []; // weekends disabled entirely
-    if (key === todayKey) return halfHourToday9to5; // 9:00–17:00 in 30-min steps
-    return slotsMap[key] ?? [];
-  }, [date, slotsMap, todayKey, halfHourToday9to5]);
+    return slotsMap[date.format(DATE_KEY_FMT)] ?? [];
+  }, [date, slotsMap]);
 
   /** Version-agnostic props type for PickersDay */
   type DayProps = React.ComponentProps<typeof PickersDay>;
 
-  /** Custom day renderer: strike-through & dim — weekends OR not-allowed days; allow weekday "today" */
+  /** Custom day renderer: strike-through & dim unavailable days */
   const DayWithStrike: React.FC<DayProps> = (props) => {
     const { day, outsideCurrentMonth } = props;
-    const d = day as unknown as Dayjs;
-    const key = d.format(DATE_KEY_FMT);
-    const weekend = isWeekend(d);
-    const inApi = !!slotsMap[key];
-    const isTodayWeekday = key === todayKey && !weekend;
-
-    const strike = (weekend || !inApi) && !isTodayWeekday;
+    const d = day as unknown as Dayjs; // AdapterDayjs guarantees Dayjs instance
+    const isAllowed = !!slotsMap[d.format(DATE_KEY_FMT)];
 
     return (
       <PickersDay
         {...props}
         outsideCurrentMonth={outsideCurrentMonth}
         sx={
-          strike ? { textDecoration: "line-through", opacity: 0.45 } : undefined
+          isAllowed
+            ? undefined
+            : { textDecoration: "line-through", opacity: 0.45 }
         }
       />
     );
@@ -331,22 +282,8 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
             onDateChange(newDate);
             if (!autoSnap) return;
 
-            if (!newDate) {
-              onTimeChange(null);
-              return;
-            }
-
-            if (isWeekend(newDate)) {
-              onTimeChange(null);
-              return;
-            }
-
-            const key = newDate.format(DATE_KEY_FMT);
-            const isTodayWeekday = key === todayKey && !isWeekend(newDate);
-            const times = isTodayWeekday
-              ? halfHourToday9to5
-              : slotsMap[key] ?? [];
-
+            const key = newDate ? newDate.format(DATE_KEY_FMT) : "";
+            const times = key ? slotsMap[key] ?? [] : [];
             if (!times.length) {
               onTimeChange(null);
             } else {
@@ -357,13 +294,7 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
               onTimeChange(keep);
             }
           }}
-          // Weekends disabled; Weekday "today" always selectable; otherwise only API-available days
-          shouldDisableDate={(d) => {
-            if (isWeekend(d)) return true;
-            const key = d.format(DATE_KEY_FMT);
-            if (key === todayKey) return false;
-            return !slotsMap[key];
-          }}
+          shouldDisableDate={(d) => !slotsMap[d.format(DATE_KEY_FMT)]} // only "available" dates are enabled
           minDate={minDate}
           maxDate={maxDate}
           slots={{ day: DayWithStrike }}
@@ -373,64 +304,57 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
             textField: {
               fullWidth: true,
               onClick: () => setOpen({ date: true, time: false }),
-              inputProps: { readOnly: true },
+              inputProps: { readOnly: true }, // prevent free typing
               InputProps: { sx: { color: "text.primary" } },
             } as any,
-            popper: { disablePortal: true },
+            popper: { disablePortal },
           }}
         />
       </div>
 
       {/* Time */}
-      {includeTime && (
-        <div className={classNameTimeWrapper}>
-          <TimePicker
-            label={labelTime}
-            value={time}
-            onChange={(newTime) => onTimeChange(newTime)}
-            ampm={ampm}
-            views={["hours", "minutes"]}
-            minutesStep={30} // 30-minute UI stepping
-            disabled={!date || !allowedTimesForDate.length}
-            shouldDisableTime={(candidate, view) => {
-              if (!date) return true;
+      <div className={classNameTimeWrapper}>
+        <TimePicker
+          label={labelTime}
+          value={time}
+          onChange={(newTime) => onTimeChange(newTime)}
+          ampm={ampm}
+          views={["hours", "minutes"]}
+          disabled={!date || !allowedTimesForDate.length}
+          shouldDisableTime={(candidate, view) => {
+            if (!date) return true;
 
-              // If weekend, everything disabled
-              if (isWeekend(date)) return true;
+            const times = allowedTimesForDate;
+            if (!times.length) return true;
 
-              const times = allowedTimesForDate;
-              if (!times.length) return true;
+            const { byHour, hours, firstHour } = indexMinutesByHour(times);
 
-              const { byHour, hours, firstHour } = indexMinutesByHour(times);
+            if (view === "hours") {
+              return !hours.has(candidate.hour());
+            }
 
-              if (view === "hours") {
-                return !hours.has(candidate.hour());
-              }
+            if (view === "minutes") {
+              const currentHour =
+                (time?.isValid() ? time.hour() : firstHour) ?? candidate.hour();
+              const allowedMinutes = byHour.get(currentHour);
+              if (!allowedMinutes) return true;
+              return !allowedMinutes.has(candidate.minute());
+            }
 
-              if (view === "minutes") {
-                const currentHour =
-                  (time?.isValid() ? time.hour() : firstHour) ??
-                  candidate.hour();
-                const allowedMinutes = byHour.get(currentHour);
-                if (!allowedMinutes) return true;
-                return !allowedMinutes.has(candidate.minute());
-              }
-
-              return false; // seconds not used
-            }}
-            open={open.time}
-            onClose={() => setOpen((op) => ({ ...op, time: false }))}
-            slotProps={{
-              textField: {
-                fullWidth: true,
-                onClick: () => setOpen({ date: false, time: true }),
-                inputProps: { readOnly: true },
-              } as any,
-              popper: { disablePortal: true },
-            }}
-          />
-        </div>
-      )}
+            return false; // seconds not used
+          }}
+          open={open.time}
+          onClose={() => setOpen((op) => ({ ...op, time: false }))}
+          slotProps={{
+            textField: {
+              fullWidth: true,
+              onClick: () => setOpen({ date: false, time: true }),
+              inputProps: { readOnly: true }, // prevent free typing
+            } as any,
+            popper: { disablePortal },
+          }}
+        />
+      </div>
     </LocalizationProvider>
   );
 };
