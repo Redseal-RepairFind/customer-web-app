@@ -33,11 +33,9 @@ export default function RootLayout({
             <GoogleMapsProvider>{children}</GoogleMapsProvider>
           </MainLayout>
         </ToastProvider>
-
         <ClientToaster />
       </body>
     </html>
   );
 }
-
 //

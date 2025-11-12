@@ -5,8 +5,9 @@ import Footer from "./footer";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ThemeRegistry from "@/contexts/theme-context";
 
-import { useFCMNotifications } from "@/hook/useFcmToken";
 import { SocketProvider } from "@/contexts/socket-contexts";
+import { NotificationSoundProvider } from "@/contexts/sound-provider";
+import GeneralLayout from "./genera-layout";
 
 export default function MainLayout({
   children,
@@ -27,8 +28,6 @@ export default function MainLayout({
     curPathname === "/resetPassword" ||
     curPathname === "/upgrade_subscription";
 
-  useFCMNotifications();
-
   return (
     <QueryClientProvider client={queryClient}>
       <div
@@ -40,11 +39,15 @@ export default function MainLayout({
               isHome || isAuth ? "lay-bg" : ""
             }`}
           >
-            <SocketProvider>
-              <>
-                <ThemeRegistry>{children}</ThemeRegistry>
-              </>
-            </SocketProvider>
+            <NotificationSoundProvider>
+              <GeneralLayout>
+                <SocketProvider>
+                  <>
+                    <ThemeRegistry>{children}</ThemeRegistry>
+                  </>
+                </SocketProvider>
+              </GeneralLayout>
+            </NotificationSoundProvider>
           </div>
         </main>
 

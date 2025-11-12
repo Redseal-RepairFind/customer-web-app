@@ -91,18 +91,18 @@ const PricingItem = ({
               <span className="text-xs font-light sm:ml-1">
                 {feat.description}
               </span>{" "}
-              {feat?.value && (
+              {/* {feat?.value && (
                 <span className="font-semibold text-sm text-dark">
                   Value {formatCurrency(Number(feat?.value))}
                 </span>
-              )}
+              )} */}
             </Text.Paragraph>
 
             {/* <Text.SmallText></Text.SmallText> */}
           </div>
         );
       })}
-      {showall && (
+      {/* {showall && (
         <div className="flex items-center gap-3 mt-8">
           <Text.Paragraph className="font-bold text-sm">
             Total Value:
@@ -111,7 +111,7 @@ const PricingItem = ({
             {item?.totalValue}
           </Text.SmallText>
         </div>
-      )}
+      )} */}
       {/* {showall
         ? feats?.benefits.map((feat: any, i: number) => {
             const splitedText = feat?.split(" - ");
