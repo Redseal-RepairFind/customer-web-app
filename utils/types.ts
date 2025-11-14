@@ -54,6 +54,7 @@ export type SubscriptionType = {
   inspectionDate?: string;
   businessName?: string;
   paymentMethodId?: string;
+  billingFrequency?: "MONTHLY" | "ANNUALLY";
 };
 export type CoverageAddress = {
   latitude: string;

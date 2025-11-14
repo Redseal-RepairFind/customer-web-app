@@ -146,12 +146,19 @@ export const usePricing = (planId?: string) => {
 
   // console.log(subPlans);
   // ---- Plans helpers ----
-  const monthlyPlans = subPlans?.data?.filter((p: any) =>
-    p?.billingFrequency?.toLowerCase().includes("monthly")
-  );
-  const yearlylyPlans = subPlans?.data?.filter((p: any) =>
-    p?.billingFrequency?.toLowerCase().includes("annually")
-  );
+  const monthlyPlans = subPlans?.data?.map((p: any) => ({
+    ...p,
+    priceDetails: p?.priceDetails?.find(
+      (pd: any) => pd?.frequency?.toLowerCase() === "monthly"
+    ),
+  }));
+  const yearlylyPlans = subPlans?.data?.map((p: any) => ({
+    ...p,
+    priceDetails: p?.priceDetails?.find(
+      (pd: any) => pd?.frequency?.toLowerCase() !== "monthly"
+    ),
+  }));
+  // console.log(yearlylyPlans);
 
   // ---- Checkout ----
   const handleCheckout = async (payload: SubscriptionType) => {

@@ -141,7 +141,6 @@ export const pricingActions = {
         payload,
         withAuth()
       );
-
       return response.data;
     } catch (error: any) {
       console.error(

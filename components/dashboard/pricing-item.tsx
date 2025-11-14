@@ -6,7 +6,6 @@ import { CgChevronDown, CgChevronUp } from "react-icons/cg";
 import { formatCurrency } from "@/lib/helpers";
 
 const PricingItem = ({
-  isRecommended,
   item,
   cycle,
   blurItems,
@@ -46,11 +45,11 @@ const PricingItem = ({
       </div>
 
       <span className="flex  gap-2 mb-1">
-        {item?.billingFrequency === "ANNUALLY" ? (
+        {item?.priceDetails?.frequency?.toLowerCase() === "monthly" ? null : (
           <Text.SubHeading className="text-red-500 line-through text-sm font-semibold">
             {formatCurrency(item?.priceDetails?.basePrice || "")}
           </Text.SubHeading>
-        ) : null}
+        )}
         <Text.Heading className="xl:font-black font-black lg:text-lg md:font-black">
           {formatCurrency(item?.priceDetails?.discountedPrice)}
         </Text.Heading>

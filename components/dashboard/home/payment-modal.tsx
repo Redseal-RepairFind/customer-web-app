@@ -225,6 +225,7 @@ const PaymentModal = ({
       ...(date && {
         inspectionDate: `${date.format("YYYY-MM-DD")}:${time?.format("HH:mm")}`,
       }),
+      billingFrequency: toggle ? "ANNUALLY" : "MONTHLY",
     };
 
     if (newSub && stripePmd?.id && stripePmd?.id !== 1) {
