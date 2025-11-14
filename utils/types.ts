@@ -110,7 +110,7 @@ export type RepairType = {
 export type RepaairsGetParams = {
   page: number;
   limit: number;
-  type: "REPAIR";
+  type: "REPAIR" | "INSPECTION";
   date?: Date | string;
   status?: string;
   startDate?: Date | string;

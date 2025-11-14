@@ -64,6 +64,10 @@ import logoutIcon from "@/public/icons/logout.png";
 import callIcon from "@/public/icons/call.png";
 import noticeIcon from "@/public/icons/notice.png";
 import completeIcon from "@/public/icons/complete.png";
+import upcomingIcon from "@/public/image/elements.png";
+import clockIcon from "@/public/image/clock.png";
+import notificationIcon from "@/public/image/notification.png";
+import reloadIcon from "@/public/image/reload.png";
 import CalendarImg from "@/public/image/Calendar.png";
 
 export const accountType = [
@@ -139,7 +143,11 @@ export const icons = {
   completeIcon,
   subIcon,
   subIconActive,
+  upcomingIcon,
   card,
+  reloadIcon,
+  clockIcon,
+  notificationIcon,
 };
 
 export const socialIcons = {

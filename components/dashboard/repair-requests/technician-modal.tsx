@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import Modal from "@/components/ui/customModal";
 import Text from "@/components/ui/text";
 import Box from "../home/box";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { icons, images } from "@/lib/constants";
 import { Rating } from "@/components/ui/rating";
 import { useState } from "react";
@@ -319,7 +319,7 @@ type BtnItem = {
   /** Optional numeric/string badge (e.g., counts) */
   badgeCount?: number | string;
   /** Icon can be an <img> URL (string) or a ReactNode (e.g., <SomeIcon />) */
-  icon?: string | React.ReactNode;
+  icon?: StaticImageData;
   disabled?: boolean;
 };
 
@@ -473,24 +473,15 @@ export const PageToggler: React.FC<
               <Badge count={opt.badgeCount} isActive />
             ) : null;
 
-          const icon =
-            typeof opt.icon === "string" ? (
-              <img
-                src={opt.icon}
-                alt=""
-                aria-hidden="true"
-                className="w-4 h-4 shrink-0"
-                loading="lazy"
-              />
-            ) : opt.icon ? (
-              <span
-                className="w-4 h-4 shrink-0 flex items-center justify-center"
-                aria-hidden="true"
-              >
-                {opt.icon}
-              </span>
-            ) : null;
-
+          const icon = (
+            <Image
+              src={opt.icon}
+              alt=""
+              aria-hidden="true"
+              className="w-4 h-4 shrink-0 hidden md:flex"
+              loading="lazy"
+            />
+          );
           return (
             <button
               key={opt.value}
@@ -503,7 +494,7 @@ export const PageToggler: React.FC<
                 transition-colors duration-300 ease-in-out
                 ${isSelected ? "text-black" : "text-dark-500"}
                 ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
-                flex items-center justify-center gap-2 select-none p-4 h-full -translate-y-[20%] md:-translate-y-[25%] `}
+                flex items-center justify-center gap-2 select-none pt-4  h-full -translate-y-[20%] md:-translate-y-[25%] `}
               onClick={() => !disabled && setSwitched(opt.value)}
               onKeyDown={(e) => {
                 if (disabled) return;

@@ -40,7 +40,6 @@ interface IProps {
 }
 
 const RepairTable = ({ data }: { data: RepairJob[] }) => {
-  const [check, setCheck] = useState(false);
   const [open, setOpen] = useState(false);
   const [tech, setTech] = useState<any>();
   const { warning } = useToast();
@@ -133,7 +132,6 @@ const RepairTable = ({ data }: { data: RepairJob[] }) => {
   const mthods = paymentMethods?.data;
 
   // console.log(data);
-
 
   return (
     <>

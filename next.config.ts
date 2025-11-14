@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
       "picsum.photos",
       "unsplash.com",
       "example.com",
+      "placehold.co",
     ], // Include other domains as needed
 
     remotePatterns: [
@@ -51,6 +52,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "example.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "placehold.co",
         port: "",
         pathname: "/**",
       },

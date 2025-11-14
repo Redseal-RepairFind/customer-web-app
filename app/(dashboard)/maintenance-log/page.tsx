@@ -1,4 +1,5 @@
 // app/dashboard/page.tsx
+import MaintenanceLog from "@/components/dashboard/maintenance";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 const MaintenanceHome = () => {
-  return <main>Lorem ipsum dolor sit amet.</main>;
+  return <MaintenanceLog />;
 };
 
 export default MaintenanceHome;

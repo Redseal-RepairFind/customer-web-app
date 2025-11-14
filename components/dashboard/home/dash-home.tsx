@@ -26,7 +26,7 @@ const DashboardHome = () => {
   const { subscriptions } = usePricing();
   const { isLoadingBagde, notificationBagde } = useNotification();
   const router = useRouter();
-  console.log(notificationBagde);
+  // console.log(notificationBagde);
 
   // const { isConnected, socket } = useSocket();
 
