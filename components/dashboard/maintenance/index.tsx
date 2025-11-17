@@ -9,6 +9,7 @@ import { MaintenanceTable, UpcomingMaintenanceTable } from "./table-alert";
 import { useMaintenanceInfinite } from "@/hook/useMaintenance";
 import LoadingTemplate from "@/components/ui/spinner";
 import { RepairJob } from "@/utils/repairtype";
+import EmptyPage from "@/components/ui/empty";
 const togglers = [
   {
     label: "Upcoming Maintenance",
@@ -40,7 +41,17 @@ const MaintenanceLog = () => {
   // if (isError)
   //   return <div className="p-4 text-red-600">Error: {String(error)}</div>;
 
-  console.log(items);
+  // console.log(items);
+
+  if (items?.length === 0)
+    return (
+      <div className="h-screen">
+        <EmptyPage
+          tytle="No Inspection or Maintenance activity to show"
+          message="You have No Inspection or Maintenance activity to showt"
+        />
+      </div>
+    );
   return (
     <main className="flex flex-col gap-5">
       <div>

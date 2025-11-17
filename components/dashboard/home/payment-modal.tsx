@@ -240,6 +240,8 @@ const PaymentModal = ({
       ? curUser4PaymentMethod?.data?.stripePaymentMethods
       : payementMethods?.data;
   const apiSlots = companyInspectionAvailability?.data;
+
+  // console.log(companyInspectionAvailability);
   return (
     <div className="w-full flex-cols gap-4 z-[1000]">
       {/* <PortalModal

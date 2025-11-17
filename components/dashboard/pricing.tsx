@@ -509,7 +509,7 @@ const Pricingg = ({ isUpgrade }: { isUpgrade: boolean }) => {
         </>
       )}
       <div
-        className={` ${plansToRender?.length > 3 ? "grid-4" : "grid-3"} w-full`}
+        className={` ${plansToRender?.length > 3 ? "grid-3" : "grid-3"} w-full`}
       >
         {plansToRender.map((pla: any, i: number) => {
           // console.log(dropdown?.id);

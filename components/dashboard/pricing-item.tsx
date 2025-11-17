@@ -66,7 +66,10 @@ const PricingItem = ({
 
       <button
         className="min-h-10 w-full flex-row-center rounded-lg bg-purple-blue-100 mb-5 cursor-pointer hover:bg-black hover:text-white transition-all duration-300"
-        onClick={() => onSelectPlan(item)}
+        onClick={(e) => {
+          e?.preventDefault();
+          onSelectPlan(item);
+        }}
       >
         <Text.Paragraph className="font-semibold text-sm">
           Choose {item?.name.split(" - ")[0]}

@@ -8,6 +8,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { PickersDay } from "@mui/x-date-pickers/PickersDay";
+import { MultiSectionDigitalClock } from "@mui/x-date-pickers/MultiSectionDigitalClock";
 
 dayjs.extend(customParseFormat);
 
@@ -321,6 +322,8 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
           ampm={ampm}
           views={["hours", "minutes"]}
           disabled={!date || !allowedTimesForDate.length}
+          timeSteps={{ hours: 1, minutes: 1 }} // ensure every minute is considered
+          // keep your existing disabling logic
           shouldDisableTime={(candidate, view) => {
             if (!date) return true;
 
@@ -330,10 +333,12 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
             const { byHour, hours, firstHour } = indexMinutesByHour(times);
 
             if (view === "hours") {
+              // unchanged: disable hours not allowed
               return !hours.has(candidate.hour());
             }
 
             if (view === "minutes") {
+              // only minutes allowed for the current hour stay enabled
               const currentHour =
                 (time?.isValid() ? time.hour() : firstHour) ?? candidate.hour();
               const allowedMinutes = byHour.get(currentHour);
@@ -341,7 +346,17 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
               return !allowedMinutes.has(candidate.minute());
             }
 
-            return false; // seconds not used
+            return false;
+          }}
+          // NEW: hide disabled minutes (hours remain visible as-is)
+          viewRenderers={{
+            minutes: (props) => (
+              <MultiSectionDigitalClock
+                {...props}
+                view="minutes"
+                skipDisabled // ← hides minutes disabled by shouldDisableTime
+              />
+            ),
           }}
           open={open.time}
           onClose={() => setOpen((op) => ({ ...op, time: false }))}
@@ -349,7 +364,7 @@ const RestrictedDateTimePicker: React.FC<Props> = ({
             textField: {
               fullWidth: true,
               onClick: () => setOpen({ date: false, time: true }),
-              inputProps: { readOnly: true }, // prevent free typing
+              inputProps: { readOnly: true },
             } as any,
             popper: { disablePortal },
           }}
