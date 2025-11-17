@@ -144,20 +144,60 @@ export const usePricing = (planId?: string) => {
     return () => observer.disconnect();
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // console.log(subPlans);
+  console.log(subPlans);
   // ---- Plans helpers ----
-  const monthlyPlans = subPlans?.data?.map((p: any) => ({
-    ...p,
-    priceDetails: p?.priceDetails?.find(
-      (pd: any) => pd?.frequency?.toLowerCase() === "monthly"
-    ),
-  }));
-  const yearlylyPlans = subPlans?.data?.map((p: any) => ({
-    ...p,
-    priceDetails: p?.priceDetails?.find(
-      (pd: any) => pd?.frequency?.toLowerCase() !== "monthly"
-    ),
-  }));
+  // helpers
+  const normalizePriceDetails = (pd: any): any[] => {
+    if (Array.isArray(pd)) return pd;
+
+    if (pd && typeof pd === "object") {
+      // If it looks like a single tier object, wrap it
+      const looksLikeTier =
+        "frequency" in pd || "basePrice" in pd || "discountedPrice" in pd;
+      if (looksLikeTier) return [pd];
+
+      // Otherwise assume dictionary of tiers; pull values that look like tiers
+      return Object.values(pd).filter(
+        (v: any) =>
+          v &&
+          typeof v === "object" &&
+          ("frequency" in v || "basePrice" in v || "discountedPrice" in v)
+      ) as any[];
+    }
+
+    return [];
+  };
+
+  const pickTier = (tiers: any[], freq: "monthly" | "annually") =>
+    tiers.find((t) => String(t?.frequency ?? "").toLowerCase() === freq) ??
+    null;
+
+  // usage
+  const plans = Array.isArray(subPlans?.data) ? subPlans!.data : [];
+
+  const monthlyPlans = plans.map((p: any) => {
+    const tiers = normalizePriceDetails(p?.priceDetails);
+    return {
+      ...p,
+      // keep same field name if you want, or use priceDetailsMonthly to avoid overwriting
+      priceDetails: pickTier(tiers, "monthly"),
+    };
+  });
+
+  const yearlyPlans = plans.map((p: any) => {
+    const tiers = normalizePriceDetails(p?.priceDetails);
+    return {
+      ...p,
+      // prefer an explicit ANNUALLY tier; otherwise "not monthly" as fallback
+      priceDetails:
+        pickTier(tiers, "annually") ??
+        tiers.find(
+          (t) => String(t?.frequency ?? "").toLowerCase() !== "monthly"
+        ) ??
+        null,
+    };
+  });
+
   // console.log(yearlylyPlans);
 
   // ---- Checkout ----
@@ -346,7 +386,7 @@ export const usePricing = (planId?: string) => {
     subPlans,
     loadingSubsPlans,
     monthlyPlans,
-    yearlylyPlans,
+    yearlylyPlans: yearlyPlans,
 
     // subscriptions (infinite)
     subscriptions,
